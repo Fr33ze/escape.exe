@@ -1,6 +1,7 @@
 package at.ac.tuwien.mmue_sb10;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
@@ -10,17 +11,23 @@ public class GameThread extends Thread {
 
     private GameState state;
     private SurfaceHolder holder;
-    private GameView view;
+    private float frametime;
 
     private Canvas canvas;
     private boolean running;
 
-    public GameThread(GameState state, GameView view) {
+    public GameThread(GameState state, SurfaceHolder holder, float fps) {
         this.state = state;
-        this.view = view;
-        this.holder = view.getHolder();
+        this.holder = holder;
+        this.frametime = 1000 / fps;
+    }
 
-        this.running = true;
+    public void setRunning(boolean active) {
+        this.running = active;
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 
     @Override
@@ -32,21 +39,28 @@ public class GameThread extends Thread {
 
             state.update(deltaFrameTime);
 
-            synchronized (holder) {
-                try {
-                    canvas = holder.lockCanvas();
-                } finally {
-                    if (canvas != null) {
-                        state.draw(canvas);
-                        holder.unlockCanvasAndPost(canvas);
-                        view.postInvalidate();
-                    }
+            try {
+                canvas = holder.lockCanvas();
+                synchronized (holder) {
+                    state.draw(canvas);
+                }
+            } finally {
+                if (canvas != null) {
+                    holder.unlockCanvasAndPost(canvas);
                 }
             }
 
             lastFrameTime = currentFrameTime;
 
-            //CALCULATE SLEEP HERE
+            //SLEEP AND FRAME SKIP
+            int sleepTime = (int) (frametime - deltaFrameTime);
+            if (sleepTime > 0) {
+                try {
+                    Thread.sleep(sleepTime);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

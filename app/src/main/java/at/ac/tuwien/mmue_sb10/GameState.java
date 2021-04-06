@@ -14,21 +14,29 @@ public class GameState {
     * */
     float x = 0;
     float y = 100;
-    float vel = 10;
+    float x_velocity = 200;
+    float y_velocity = 0;
+    float y_acceleration = 20;
     Paint paint;
 
     public GameState() {
         paint = new Paint();
-        paint.setColor(Color.parseColor("green"));
+        paint.setColor(Color.RED);
+        paint.setStyle(Paint.Style.FILL_AND_STROKE);
+    }
+
+    public void invertGravity() {
+        y_acceleration *= -1;
     }
 
     public void update(long deltaFrameTime) {
-        x += vel * ((float)deltaFrameTime / 1000);
+        x += x_velocity * ((float)deltaFrameTime / 1000);
+        y_velocity += ((float)deltaFrameTime / 1000) * y_acceleration;
+        y += y_velocity;
     }
 
     public void draw(Canvas c) {
-        Log.d(TAG, "x=" + x + ", y=" + y);
-        c.drawColor(Color.parseColor("white"));
-        c.drawRect(x, y, x+200, y+200, paint);
+        c.drawColor(Color.WHITE);
+        c.drawRect(x, y, x+100, y+100, paint);
     }
 }
