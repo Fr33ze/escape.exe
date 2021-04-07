@@ -10,13 +10,26 @@ public class GameState {
     private static final String TAG = GameState.class.getSimpleName();
 
     /*
-    * TESTING VALUES FOR UPDATE AND DRAW
-    * */
-    float x = 0;
-    float y = 100;
-    float x_velocity = 200;
-    float y_velocity = 0;
-    float y_acceleration = 20;
+    * PLAYER STATE: POSITION, VELOCITY, ACCELERATION, ...
+    */
+    float player_pos_x;
+    float player_pos_y;
+    float player_velocity_x = 200;
+    float player_velocity_y = 0;
+    float player_acceleration_y = 20;
+    byte gravity = 1;
+    boolean inAir;
+
+    /*
+    * CURRENT STAGE
+    */
+    Stage stage;
+    boolean finished; //Stage is finished
+    boolean finished_continue; //Player presses continue after stage is finished
+
+    /*
+     * TEMPORARY
+     */
     Paint paint;
 
     public GameState() {
@@ -25,18 +38,38 @@ public class GameState {
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
     }
 
-    public void invertGravity() {
-        y_acceleration *= -1;
-    }
-
     public void update(long deltaFrameTime) {
-        x += x_velocity * ((float)deltaFrameTime / 1000);
-        y_velocity += ((float)deltaFrameTime / 1000) * y_acceleration;
-        y += y_velocity;
+        player_pos_x += player_velocity_x * ((float)deltaFrameTime / 1000);
+        player_velocity_y += ((float)deltaFrameTime / 1000) * player_acceleration_y * gravity;
+        player_pos_y += player_velocity_y;
+
+        if(finished && finished_continue)
+            load(stage.level + 1);
     }
 
     public void draw(Canvas c) {
         c.drawColor(Color.WHITE);
-        c.drawRect(x, y, x+100, y+100, paint);
+        c.drawRect(player_pos_x, player_pos_y, player_pos_x+100, player_pos_y+100, paint);
+    }
+
+    public void invertGravity() {
+        player_acceleration_y *= -1;
+    }
+
+    public void jump() {
+        if(!inAir) {
+            player_velocity_y += 500; //TODO: Change to proper value
+            inAir = true;
+        }
+    }
+
+    public void load(int level) {
+        stage = new Stage(level);
+        player_pos_x = stage.player_start_x;
+        player_pos_y = stage.player_start_y;
+        player_velocity_x = 200; //TODO: Change to default value
+        player_velocity_y = 0; //TODO: Change to default value
+        finished = false;
+        finished_continue = false;
     }
 }

@@ -49,6 +49,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
         state = new GameState();
+        state.load(1);
         thread = new GameThread(state, holder, fps);
     }
 
