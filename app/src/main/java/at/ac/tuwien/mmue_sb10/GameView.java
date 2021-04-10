@@ -1,14 +1,8 @@
 package at.ac.tuwien.mmue_sb10;
 
-import android.app.Activity;
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PixelFormat;
-import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
+import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -24,33 +18,54 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private GameState state;
     private GameThread thread;
     private float fps;
+    private float density;
+    private int screenWidth;
+    private int screenHeigth;
 
     public GameView(Context context) {
         super(context);
-        fps = ((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRefreshRate();
+        Display dsp = ((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        this.fps = dsp.getRefreshRate();
+        DisplayMetrics dm = new DisplayMetrics();
+        dsp.getMetrics(dm);
+        this.density = dm.density;
+        this.screenWidth = dm.widthPixels;
+        this.screenHeigth = dm.heightPixels;
         getHolder().addCallback(this);
         setFocusable(true);
     }
 
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        fps = ((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRefreshRate();
+        Display dsp = ((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        this.fps = dsp.getRefreshRate();
+        DisplayMetrics dm = new DisplayMetrics();
+        dsp.getMetrics(dm);
+        this.density = dm.density;
+        this.screenWidth = dm.widthPixels;
+        this.screenHeigth = dm.heightPixels;
         getHolder().addCallback(this);
         setFocusable(true);
     }
 
     public GameView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        fps = ((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRefreshRate();
+        Display dsp = ((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        this.fps = dsp.getRefreshRate();
+        DisplayMetrics dm = new DisplayMetrics();
+        dsp.getMetrics(dm);
+        this.density = dm.density;
+        this.screenWidth = dm.widthPixels;
+        this.screenHeigth = dm.heightPixels;
         getHolder().addCallback(this);
         setFocusable(true);
     }
 
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
-        state = new GameState(getContext());
-        state.load(0);
-        thread = new GameThread(state, holder, fps);
+        this.state = new GameState(getContext(), this.density);
+        this.state.load(0);
+        this.thread = new GameThread(state, holder, fps);
     }
 
     @Override
@@ -66,10 +81,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
-            if(!thread.isRunning()) {
+            if(!this.thread.isRunning()) {
                 startgame();
             } else {
-                state.invertGravity();
+                if(event.getX() < this.screenWidth / 2) {
+                    this.state.invertGravity();
+                } else {
+                    this.state.jump();
+                }
             }
         } else {
 
@@ -78,19 +97,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void startgame() {
-        if(thread == null) {
-            state = new GameState(getContext()); //TODO: Load from saved instance?
-            thread = new GameThread(state, getHolder(), fps);
+        if(this.thread == null) {
+            this.state = new GameState(getContext(), this.density); //TODO: Load from saved instance?
+            this.state.load(0); //TODO
+            this.thread = new GameThread(state, getHolder(), fps);
         } else {
-            thread.setRunning(true);
-            thread.start();
+            this.thread.setRunning(true);
+            this.thread.start();
         }
     }
 
     public void endgame() {
-        thread.setRunning(false);
+        this.thread.setRunning(false);
         try {
-            thread.join();
+            this.thread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

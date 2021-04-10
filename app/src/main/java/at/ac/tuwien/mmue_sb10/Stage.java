@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Rect;
 
 import java.io.BufferedReader;
@@ -78,8 +80,7 @@ public class Stage {
                             for (int x = 0; x < tilesInLine.length; x++) {
                                 if (!tilesInLine[x].equals("--")) {
                                     int tile_id = Integer.parseInt(tilesInLine[x]);
-                                    //canvas.drawBitmap(tiles_textures[tile_id], x * 24, y * 24, null);
-                                    canvas.drawBitmap(tiles_textures[tile_id], null, new Rect(x * 24, y * 24, 24, 24), null);
+                                    canvas.drawBitmap(tiles_textures[tile_id], null, new Rect(x * 24, y * 24, x * 24 + 24, y * 24 + 24), null);
                                     collision[x][y] = tiles_collision[tile_id];
                                 }
                             }
