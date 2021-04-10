@@ -48,8 +48,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
-        state = new GameState();
-        state.load(1);
+        state = new GameState(getContext());
+        state.load(0);
         thread = new GameThread(state, holder, fps);
     }
 
@@ -79,7 +79,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     public void startgame() {
         if(thread == null) {
-            state = new GameState(); //TODO: Load from saved instance?
+            state = new GameState(getContext()); //TODO: Load from saved instance?
             thread = new GameThread(state, getHolder(), fps);
         } else {
             thread.setRunning(true);

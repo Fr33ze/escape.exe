@@ -1,5 +1,6 @@
 package at.ac.tuwien.mmue_sb10;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -31,8 +32,10 @@ public class GameState {
      * TEMPORARY
      */
     Paint paint;
+    Context context;
 
-    public GameState() {
+    public GameState(Context context) {
+        this.context = context;
         paint = new Paint();
         paint.setColor(Color.RED);
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
@@ -49,6 +52,7 @@ public class GameState {
 
     public void draw(Canvas c) {
         c.drawColor(Color.WHITE);
+        c.drawBitmap(stage.terrain, 0, 0, null);
         c.drawRect(player_pos_x, player_pos_y, player_pos_x+100, player_pos_y+100, paint);
     }
 
@@ -58,13 +62,14 @@ public class GameState {
 
     public void jump() {
         if(!inAir) {
-            player_velocity_y += 500; //TODO: Change to proper value
+            player_velocity_y += 500 * gravity; //TODO: Change to proper value
             inAir = true;
         }
     }
 
     public void load(int level) {
-        stage = new Stage(level);
+        stage = new Stage(context);
+        stage.load(level);
         player_pos_x = stage.player_start_x;
         player_pos_y = stage.player_start_y;
         player_velocity_x = 200; //TODO: Change to default value
