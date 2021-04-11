@@ -4,4 +4,5 @@
     <string name="new_game">New Game</string>
     <string name="continue_game">Continue</string>
     <string name="quit_game">Quit</string>
+    <string name="player_died">You died, Retry?</string>
 </resources>

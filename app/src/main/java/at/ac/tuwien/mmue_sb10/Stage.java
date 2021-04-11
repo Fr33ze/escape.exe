@@ -16,6 +16,7 @@ public class Stage {
     public String name;
     public int level;
     public int player_start_x, player_start_y;
+    public float player_velocity_x;
     public int[][] collision;
     public Bitmap terrain;
 
@@ -63,6 +64,8 @@ public class Stage {
                         this.player_start_x = Integer.parseInt(line.split("=")[1]);
                         line = reader.readLine();
                         this.player_start_y = Integer.parseInt(line.split("=")[1]);
+                        line = reader.readLine();
+                        this.player_velocity_x = Float.parseFloat(line.split("=")[1]);
                         break;
                     case "#size":
                         line = reader.readLine();

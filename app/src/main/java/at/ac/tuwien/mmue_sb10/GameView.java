@@ -63,7 +63,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
-        this.state = new GameState(getContext(), this.density);
+        this.state = new GameState(getContext(), this.density, this.screenWidth, this.screenHeigth);
         this.state.load(0);
         this.thread = new GameThread(state, holder, fps);
     }
@@ -84,21 +84,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             if(!this.thread.isRunning()) {
                 startgame();
             } else {
-                if(event.getX() < this.screenWidth / 2) {
-                    this.state.invertGravity();
-                } else {
-                    this.state.jump();
-                }
+                this.state.onTouchEvent(event);
             }
         } else {
-
+            //TODO: ???
         }
         return super.onTouchEvent(event);
     }
 
     public void startgame() {
         if(this.thread == null) {
-            this.state = new GameState(getContext(), this.density); //TODO: Load from saved instance?
+            this.state = new GameState(getContext(), this.density, this.screenWidth, this.screenHeigth); //TODO: Load from saved instance?
             this.state.load(0); //TODO
             this.thread = new GameThread(state, getHolder(), fps);
         } else {
