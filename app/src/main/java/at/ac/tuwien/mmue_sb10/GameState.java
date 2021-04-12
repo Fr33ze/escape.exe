@@ -3,6 +3,7 @@ package at.ac.tuwien.mmue_sb10;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -10,6 +11,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Shader;
 import android.view.MotionEvent;
 
 public class GameState {
@@ -25,9 +27,10 @@ public class GameState {
     private float player_velocity_x;
     private float player_velocity_y;
     private float player_acceleration_y;
-    private byte gravity; //Gravity top or bottom?
-    private boolean player_inAir; //Player is in air?
-    private boolean player_dead; //Player died?
+    private byte gravity; //gravity top or bottom?
+    private boolean player_inAir; //player is in air?
+    private boolean player_first_gravity_inAir; //can do 1x gravity change while in air
+    private boolean player_dead; //player died?
 
     /*
      * CURRENT STAGE
@@ -50,6 +53,8 @@ public class GameState {
     /*
      * PAINT
      */
+    private Paint background_paint; //for repeating bitmap
+    private Paint terrain_paint; //for anti-aliasing
     private Paint player_paint; //TODO: Remove when player sprite is implemented
     private Paint text_paint; //paint for text
     private Paint trans_paint; //paint for transparency
@@ -91,6 +96,9 @@ public class GameState {
         this.trans_paint = new Paint();
         this.trans_paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         this.trans_paint.setAntiAlias(true);
+        this.terrain_paint = new Paint();
+        this.terrain_paint.setAntiAlias(true);
+        this.background_paint = new Paint();
 
         this.you_died_retry = context.getResources().getString(R.string.player_died);
 
@@ -127,8 +135,8 @@ public class GameState {
             this.collision_corners[3] = this.stage.collision[this.player_collision_tiles.left][this.player_collision_tiles.bottom]; //BottomLeft
             if (this.collision_corners[0] != 0 || this.collision_corners[1] != 0 || this.collision_corners[2] != 0 || this.collision_corners[3] != 0) {
                 //One of the player corners collides with a tile with behavior (solid, die, ...)
-                if ((collision_corners[0] == 1 && collision_corners[1] == 1) || (collision_corners[2] == 1 && collision_corners[3] == 1)) {
-                    if ((collision_corners[0] == 1 && collision_corners[3] == 1) || (collision_corners[1] == 1 && collision_corners[2] == 1)) {
+                if ((this.collision_corners[0] == 1 && this.collision_corners[1] == 1) || (this.collision_corners[2] == 1 && this.collision_corners[3] == 1)) {
+                    if ((this.collision_corners[0] == 1 && this.collision_corners[3] == 1) || (this.collision_corners[1] == 1 && this.collision_corners[2] == 1)) {
                         //X Collision (both X and Y collision can happen at same time, if 3 corners collide)
                         this.player_dead = true;
                     }
@@ -157,7 +165,7 @@ public class GameState {
                         //no valid collision on Y, collision on X
                         this.player_dead = true;
                     } else {
-                        //Y before X => Y Collosion treatment as usual
+                        //Y before X => Y Collosion treatment
                         if (this.player_velocity_y > 0) //TODO: Make one formula instead of if(..)?
                             this.player_pos_y = this.player_collision_px.top - this.player_collision_px.top % 24;
                         else
@@ -166,10 +174,12 @@ public class GameState {
                 }
                 this.player_velocity_y = 0;
                 this.player_inAir = false;
+                this.player_first_gravity_inAir = false;
             } else {
                 //None of the player corners collides with anything
                 this.player_pos_y = this.player_collision_px.top;
                 this.player_inAir = true;
+                this.player_first_gravity_inAir = false;
             }
             this.player_pos_x = this.player_collision_px.left;
         } else {
@@ -186,6 +196,8 @@ public class GameState {
      * @param c The Canvas that is drawed onto
      */
     public void draw(Canvas c) {
+        //c.drawRect(new RectF(0, 0, this.stage.background.getWidth() * this.density * SCALE, this.stage.background.getHeight() * this.density * SCALE), this.background_paint);
+        //c.drawBitmap(this.stage.background, null, new RectF(0, 0, this.stage.background.getWidth() * this.density * SCALE, this.stage.background.getHeight() * this.density * SCALE), null);
         c.drawColor(Color.WHITE);
         c.drawBitmap(this.stage.terrain, null, new RectF(0, 0, this.stage.terrain.getWidth() * this.density * SCALE, this.stage.terrain.getHeight() * this.density * SCALE), null);
         c.drawRect(this.player_pos_x * this.density * SCALE, this.player_pos_y * this.density * SCALE, (this.player_pos_x + 24) * this.density * SCALE, (this.player_pos_y + 24) * this.density * SCALE, player_paint);
@@ -205,9 +217,10 @@ public class GameState {
      * Only works if player is not in air when method call happens
      */
     public void invertGravity() {
-        if (!this.player_inAir) {
+        if (!this.player_inAir || !this.player_first_gravity_inAir) {
             this.gravity *= -1;
             this.player_inAir = true;
+            this.player_first_gravity_inAir = true;
         }
     }
 
@@ -255,10 +268,13 @@ public class GameState {
         this.player_acceleration_y = 10;
         this.player_dead = false;
         this.player_inAir = true;
+        this.player_first_gravity_inAir = false;
         this.gravity = 1;
 
         this.finished = false;
         this.finished_continue = false;
+
+        this.background_paint.setShader(new BitmapShader(this.stage.background, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT));
         this.start_circle_radius = 0;
     }
 
@@ -273,6 +289,7 @@ public class GameState {
         this.player_acceleration_y = 10;
         this.player_dead = false;
         this.player_inAir = true;
+        this.player_first_gravity_inAir = false;
         this.gravity = 1;
 
         this.finished = false;

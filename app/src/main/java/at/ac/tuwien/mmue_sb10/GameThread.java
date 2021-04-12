@@ -52,7 +52,7 @@ public class GameThread extends Thread {
 
             lastFrameTime = currentFrameTime;
 
-            //SLEEP AND FRAME SKIP
+            //SLEEP
             int sleepTime = (int) (frametime - deltaFrameTime);
             if (sleepTime > 0) {
                 try {

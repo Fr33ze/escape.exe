@@ -1,9 +1,10 @@
 #info
 name=Chapter 0
+background=bg0
 
 #player
 startx=1
-starty=7
+starty=8
 velocityx=100
 
 #size

@@ -19,6 +19,7 @@ public class Stage {
     public float player_velocity_x;
     public int[][] collision;
     public Bitmap terrain;
+    public Bitmap background;
 
     private Context context;
     private Bitmap[] tiles_textures;
@@ -65,6 +66,10 @@ public class Stage {
                     case "#info":
                         line = reader.readLine();
                         this.name = line.split("=")[1];
+                        line = reader.readLine();
+                        BitmapFactory.Options o = new BitmapFactory.Options();
+                        o.inScaled = false;
+                        background = BitmapFactory.decodeResource(context.getResources(), context.getResources().getIdentifier(line.split("=")[1], "drawable", context.getPackageName()), o);
                         break;
                     case "#player":
                         line = reader.readLine();
