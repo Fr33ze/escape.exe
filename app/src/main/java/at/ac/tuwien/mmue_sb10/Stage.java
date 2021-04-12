@@ -31,6 +31,9 @@ public class Stage {
         loadTileset();
     }
 
+    /**
+     * Loads the tileset from the resources and splits it in 24x24 tiles
+     */
     private void loadTileset() {
         BitmapFactory.Options o = new BitmapFactory.Options();
         o.inScaled = false;
@@ -48,6 +51,10 @@ public class Stage {
         }
     }
 
+    /**
+     * Loads stage from the assets folder
+     * @param level ID of the stage to load
+     */
     public void load(int level) {
         Canvas canvas = null; //draws on terrain bitmap
         try {

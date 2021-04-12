@@ -32,41 +32,41 @@ public class GameState {
     /*
      * CURRENT STAGE
      */
-    private Stage stage;
-    private boolean finished; //Stage is finished
-    private boolean finished_continue; //Player presses continue after stage is finished
+    private Stage stage; //current stage
+    private boolean finished; //stage is finished
+    private boolean finished_continue; //player presses continue after stage is finished
 
     /*
      * MISC
      */
-    private Context context;
-    private float density;
-    private float screenWidth;
-    private float screenHeight;
+    private Context context; //context of the app
+    private float density; //density of the smartphone screen
+    private float screenWidth; //screen width of the smartphone in px
+    private float screenHeight; //screen heigth of the smartphone in px
     private float start_circle_radius; //interpolates between 0 and 1
-    private Bitmap start_circle_bmp;
-    private Canvas start_circle_canvas;
+    private Bitmap start_circle_bmp; //bitmap for the expanding circle at the start
+    private Canvas start_circle_canvas; //canvas to draw on start_circle_bmp
 
     /*
      * PAINT
      */
     private Paint player_paint; //TODO: Remove when player sprite is implemented
-    private Paint text_paint;
-    private Paint trans_paint;
+    private Paint text_paint; //paint for text
+    private Paint trans_paint; //paint for transparency
 
     /*
      * STRINGS
      */
-    private String you_died_retry;
+    private String you_died_retry; //message to display when player died
 
     /*
      * COLLISION
      */
-    private RectF player_collision_px;
-    private Rect player_collision_tiles;
+    private RectF player_collision_px; //contains player corner coordinates in px after next step
+    private Rect player_collision_tiles; //contains player corner coordinates in tiles after next step
     private int[] collision_corners; //0=TopLeft, 1=TopRight, 2=BottomRight, 3=BottomLeft
-    private float col_time_x;
-    private float col_time_y;
+    private float col_time_x; //collision time on x-axis
+    private float col_time_y; //collision time on y-axis
 
     public GameState(Context context, float density, float screenWidth, float screenHeight) {
         this.context = context;
@@ -147,6 +147,7 @@ public class GameState {
                         this.col_time_x = (this.player_collision_tiles.right * 24 - this.player_pos_x) / this.player_velocity_x;
                     else
                         this.col_time_x = (this.player_collision_tiles.left * 24 - this.player_pos_x) / this.player_velocity_x;
+
                     if(this.player_velocity_y < 0)
                         this.col_time_y = (this.player_collision_tiles.bottom * 24 - this.player_pos_y) / this.player_velocity_y;
                     else
