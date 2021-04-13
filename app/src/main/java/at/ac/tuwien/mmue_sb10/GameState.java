@@ -2,7 +2,6 @@ package at.ac.tuwien.mmue_sb10;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -17,7 +16,6 @@ import android.view.MotionEvent;
 public class GameState {
 
     private static final String TAG = GameState.class.getSimpleName();
-    private static final float SCALE = 1.0f;
 
     /*
      * PLAYER STATE: POSITION, VELOCITY, ACCELERATION, ... in pixels
@@ -53,7 +51,6 @@ public class GameState {
     /*
      * PAINT
      */
-    private Paint background_paint; //for repeating bitmap
     private Paint terrain_paint; //for anti-aliasing
     private Paint player_paint; //TODO: Remove when player sprite is implemented
     private Paint text_paint; //paint for text
@@ -75,7 +72,7 @@ public class GameState {
 
     public GameState(Context context, float density, float screenWidth, float screenHeight) {
         this.context = context;
-        this.stage = new Stage(context);
+        this.stage = new Stage(context, density);
         this.density = density;
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
@@ -95,10 +92,8 @@ public class GameState {
         this.text_paint.setTextSize(24 * this.density);
         this.trans_paint = new Paint();
         this.trans_paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-        this.trans_paint.setAntiAlias(true);
         this.terrain_paint = new Paint();
         this.terrain_paint.setAntiAlias(true);
-        this.background_paint = new Paint();
 
         this.you_died_retry = context.getResources().getString(R.string.player_died);
 
@@ -127,12 +122,12 @@ public class GameState {
         this.player_collision_px.set(this.player_pos_x + this.player_velocity_x * ((float) deltaFrameTime / 1000), this.player_pos_y + this.player_velocity_y, this.player_pos_x + this.player_velocity_x * ((float) deltaFrameTime / 1000) + 24, this.player_pos_y + this.player_velocity_y + 24);
         this.player_collision_tiles.set((int) (this.player_collision_px.left / 24), (int) (this.player_collision_px.top / 24), (int) (this.player_collision_px.right / 24), (int) (this.player_collision_px.bottom / 24));
 
-        if (this.player_collision_tiles.left >= 0 && this.player_collision_tiles.top >= 0 && this.player_collision_tiles.right < this.stage.collision.length && this.player_collision_tiles.bottom <= this.stage.collision[0].length) {
+        if (this.player_collision_tiles.left >= 0 && this.player_collision_tiles.top >= 0 && this.player_collision_tiles.right < this.stage.stage_collision.length && this.player_collision_tiles.bottom <= this.stage.stage_collision[0].length) {
             //Player is inside bounds => CHECK COLLISION!
-            this.collision_corners[0] = this.stage.collision[this.player_collision_tiles.left][this.player_collision_tiles.top]; //TopLeft
-            this.collision_corners[1] = this.stage.collision[this.player_collision_tiles.right][this.player_collision_tiles.top]; //TopRight
-            this.collision_corners[2] = this.stage.collision[this.player_collision_tiles.right][this.player_collision_tiles.bottom]; //BottomRight
-            this.collision_corners[3] = this.stage.collision[this.player_collision_tiles.left][this.player_collision_tiles.bottom]; //BottomLeft
+            this.collision_corners[0] = this.stage.stage_collision[this.player_collision_tiles.left][this.player_collision_tiles.top]; //TopLeft
+            this.collision_corners[1] = this.stage.stage_collision[this.player_collision_tiles.right][this.player_collision_tiles.top]; //TopRight
+            this.collision_corners[2] = this.stage.stage_collision[this.player_collision_tiles.right][this.player_collision_tiles.bottom]; //BottomRight
+            this.collision_corners[3] = this.stage.stage_collision[this.player_collision_tiles.left][this.player_collision_tiles.bottom]; //BottomLeft
             if (this.collision_corners[0] != 0 || this.collision_corners[1] != 0 || this.collision_corners[2] != 0 || this.collision_corners[3] != 0) {
                 //One of the player corners collides with a tile with behavior (solid, die, ...)
                 if ((this.collision_corners[0] == 1 && this.collision_corners[1] == 1) || (this.collision_corners[2] == 1 && this.collision_corners[3] == 1)) {
@@ -188,7 +183,7 @@ public class GameState {
         }
 
         if (this.finished && this.finished_continue)
-            load(this.stage.level + 1);
+            load(this.stage.stage_level + 1);
     }
 
     /**
@@ -196,18 +191,17 @@ public class GameState {
      * @param c The Canvas that is drawed onto
      */
     public void draw(Canvas c) {
-        //c.drawRect(new RectF(0, 0, this.stage.background.getWidth() * this.density * SCALE, this.stage.background.getHeight() * this.density * SCALE), this.background_paint);
-        //c.drawBitmap(this.stage.background, null, new RectF(0, 0, this.stage.background.getWidth() * this.density * SCALE, this.stage.background.getHeight() * this.density * SCALE), null);
+        //c.drawRect(new RectF(0, 0, this.screenWidth, this.screenHeight), this.background_paint); //TODO: Draw Background without frame loss
         c.drawColor(Color.WHITE);
-        c.drawBitmap(this.stage.terrain, null, new RectF(0, 0, this.stage.terrain.getWidth() * this.density * SCALE, this.stage.terrain.getHeight() * this.density * SCALE), null);
-        c.drawRect(this.player_pos_x * this.density * SCALE, this.player_pos_y * this.density * SCALE, (this.player_pos_x + 24) * this.density * SCALE, (this.player_pos_y + 24) * this.density * SCALE, player_paint);
+        c.drawBitmap(this.stage.stage_foreground, 0, 0, null);
+        c.drawRect(this.player_pos_x * this.stage.stage_scale, this.player_pos_y * this.stage.stage_scale, (this.player_pos_x + 24) * this.stage.stage_scale, (this.player_pos_y + 24) * this.stage.stage_scale, player_paint);
         if(this.player_dead) {
             //Player is dead. Draw retry message
             c.drawText(this.you_died_retry, this.screenWidth / 2, this.screenHeight / 2, this.text_paint);
         } else if(this.start_circle_radius < 1) {
             //Stage has started. Draw expanding circle first second
             this.start_circle_canvas.drawColor(Color.BLACK);
-            this.start_circle_canvas.drawCircle((this.player_pos_x + 24) * this.density * SCALE, (this.player_pos_y + 24) * this.density * SCALE, this.start_circle_radius * this.screenWidth, trans_paint);
+            this.start_circle_canvas.drawCircle((this.player_pos_x + 24) * this.stage.stage_scale, (this.player_pos_y + 24) * this.stage.stage_scale, this.start_circle_radius * this.screenWidth, trans_paint);
             c.drawBitmap(start_circle_bmp, 0, 0, null);
         }
     }
@@ -274,7 +268,6 @@ public class GameState {
         this.finished = false;
         this.finished_continue = false;
 
-        this.background_paint.setShader(new BitmapShader(this.stage.background, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT));
         this.start_circle_radius = 0;
     }
 

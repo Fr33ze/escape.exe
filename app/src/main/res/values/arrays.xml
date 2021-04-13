@@ -1,114 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer-array name="collision">
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
-
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
-        <item>1</item>
+        <!--Column 0-->
+        <item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item>
+        <!--Column 1-->
+        <item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item>
+        <!--Column 2-->
+        <item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item>
+        <!--Column 3-->
+        <item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item>
+        <!--Column 4-->
+        <item>0</item><item>0</item><item>0</item><item>0</item><item>0</item><item>0</item><item>0</item><item>0</item><item>0</item><item>0</item>
+        <!--Column 5-->
+        <item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item>
+        <!--Column 6-->
+        <item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item>
+        <!--Column 7-->
+        <item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item>
+        <!--Column 8-->
+        <item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item>
+        <!--Column 9-->
+        <item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item><item>1</item>
     </integer-array>
 </resources>
