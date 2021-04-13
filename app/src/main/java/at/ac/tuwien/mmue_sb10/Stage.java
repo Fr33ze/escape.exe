@@ -20,6 +20,7 @@ public class Stage {
     public int[][] stage_collision; //array of tile behavior
     public Bitmap stage_foreground; //stage tiles put together (scaled)
     public Bitmap stage_background; //stage background (scaled)
+    public float tile_size_scaled; //24 * density * scale
     private int stage_width_tiles; //width in tiles
     private int stage_heigth_tiles; //heigth in tiles
 
@@ -27,7 +28,6 @@ public class Stage {
     private int[] tiles_collision; //all tile behaviors of the tileset. uses same id as tiles_textures
 
     private Context context; //context of the app to get resources
-    private float tile_size_scaled; //24 * density * scale
 
     public Stage(Context context, float density) {
         this.context = context;

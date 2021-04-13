@@ -129,7 +129,7 @@ public class GameState {
             this.collision_corners[2] = this.stage.stage_collision[this.player_collision_tiles.right][this.player_collision_tiles.bottom]; //BottomRight
             this.collision_corners[3] = this.stage.stage_collision[this.player_collision_tiles.left][this.player_collision_tiles.bottom]; //BottomLeft
             if (this.collision_corners[0] != 0 || this.collision_corners[1] != 0 || this.collision_corners[2] != 0 || this.collision_corners[3] != 0) {
-                //One of the player corners collides with a tile with behavior (solid, die, ...)
+                //At least one of the player corners collides with a tile with behavior (solid, die, ...)
                 if ((this.collision_corners[0] == 1 && this.collision_corners[1] == 1) || (this.collision_corners[2] == 1 && this.collision_corners[3] == 1)) {
                     if ((this.collision_corners[0] == 1 && this.collision_corners[3] == 1) || (this.collision_corners[1] == 1 && this.collision_corners[2] == 1)) {
                         //X Collision (both X and Y collision can happen at same time, if 3 corners collide)
@@ -174,7 +174,6 @@ public class GameState {
                 //None of the player corners collides with anything
                 this.player_pos_y = this.player_collision_px.top;
                 this.player_inAir = true;
-                this.player_first_gravity_inAir = false;
             }
             this.player_pos_x = this.player_collision_px.left;
         } else {
@@ -186,15 +185,38 @@ public class GameState {
             load(this.stage.stage_level + 1);
     }
 
+    private float trans_x = 0;
+    private float trans_y = 0;
+
     /**
      * Draws the current state of the game onto c
      * @param c The Canvas that is drawed onto
      */
     public void draw(Canvas c) {
+        if (this.player_velocity_x > 0) {
+            this.trans_x = this.player_pos_x * this.stage.stage_scale - this.stage.tile_size_scaled * 4;
+        } else {
+            this.trans_x = this.player_pos_x * this.stage.stage_scale - (c.getWidth() - this.stage.tile_size_scaled * 4);
+        }
+        if (this.trans_x < 0) this.trans_x = 0;
+        else if (this.trans_x > this.stage.stage_foreground.getWidth() - c.getWidth()) this.trans_x = this.stage.stage_foreground.getWidth() - c.getWidth();
+        if (this.player_velocity_y > 0) {
+            this.trans_y = this.player_pos_y * this.stage.stage_scale - this.stage.tile_size_scaled * 1;
+        } else {
+            this.trans_y = this.player_pos_y * this.stage.stage_scale - (c.getHeight() - this.stage.tile_size_scaled * 2);
+        }
+        if (this.trans_y < 0) this.trans_y = 0;
+        else if (this.trans_y > this.stage.stage_foreground.getHeight() - c.getHeight()) this.trans_y = this.stage.stage_foreground.getHeight() - c.getHeight();
+
         //c.drawRect(new RectF(0, 0, this.screenWidth, this.screenHeight), this.background_paint); //TODO: Draw Background without frame loss
         c.drawColor(Color.WHITE);
-        c.drawBitmap(this.stage.stage_foreground, 0, 0, null);
-        c.drawRect(this.player_pos_x * this.stage.stage_scale, this.player_pos_y * this.stage.stage_scale, (this.player_pos_x + 24) * this.stage.stage_scale, (this.player_pos_y + 24) * this.stage.stage_scale, player_paint);
+        c.drawBitmap(this.stage.stage_foreground, -this.trans_x, -this.trans_y, null);
+        c.drawRect(
+                this.player_pos_x * this.stage.stage_scale - this.trans_x,
+                this.player_pos_y * this.stage.stage_scale - this.trans_y,
+                (this.player_pos_x + 24) * this.stage.stage_scale - this.trans_x,
+                (this.player_pos_y + 24) * this.stage.stage_scale - this.trans_y,
+                player_paint);
         if(this.player_dead) {
             //Player is dead. Draw retry message
             c.drawText(this.you_died_retry, this.screenWidth / 2, this.screenHeight / 2, this.text_paint);
