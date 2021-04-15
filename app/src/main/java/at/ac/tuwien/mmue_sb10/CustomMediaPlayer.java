@@ -6,6 +6,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 
+// TODO: make it work without buttons but intents, make it work inside of existing activity
 public class CustomMediaPlayer extends AppCompatActivity {
     MediaPlayer player;
     boolean playerIsMuted = false;
