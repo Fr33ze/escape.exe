@@ -196,17 +196,13 @@ public class GameState {
         if (this.player_velocity_x > 0) {
             this.trans_x = this.player_pos_x * this.stage.stage_scale - this.stage.tile_size_scaled * 4;
         } else {
-            this.trans_x = this.player_pos_x * this.stage.stage_scale - (c.getWidth() - this.stage.tile_size_scaled * 4);
+            this.trans_x = this.player_pos_x * this.stage.stage_scale - (c.getWidth() - this.stage.tile_size_scaled * 5);
         }
         if (this.trans_x < 0) this.trans_x = 0;
         else if (this.trans_x > this.stage.stage_foreground.getWidth() - c.getWidth()) this.trans_x = this.stage.stage_foreground.getWidth() - c.getWidth();
-        if (this.player_velocity_y > 0) {
-            this.trans_y = this.player_pos_y * this.stage.stage_scale - this.stage.tile_size_scaled * 1;
-        } else {
-            this.trans_y = this.player_pos_y * this.stage.stage_scale - (c.getHeight() - this.stage.tile_size_scaled * 2);
-        }
-        if (this.trans_y < 0) this.trans_y = 0;
-        else if (this.trans_y > this.stage.stage_foreground.getHeight() - c.getHeight()) this.trans_y = this.stage.stage_foreground.getHeight() - c.getHeight();
+
+        if (this.player_pos_y * this.stage.stage_scale - this.trans_y > this.trans_y + c.getHeight() - this.stage.tile_size_scaled * 2) this.trans_y += (this.player_pos_y * this.stage.stage_scale - this.trans_y) - (this.trans_y + c.getHeight() - this.stage.tile_size_scaled * 2);
+        //else if (this.trans_y > this.stage.stage_foreground.getHeight() - c.getHeight()) this.trans_y = this.stage.stage_foreground.getHeight() - c.getHeight();
 
         //c.drawRect(new RectF(0, 0, this.screenWidth, this.screenHeight), this.background_paint); //TODO: Draw Background without frame loss
         c.drawColor(Color.WHITE);
@@ -232,7 +228,7 @@ public class GameState {
      * Inverts the gravity of the game to face upside down. Also marks the player to be in air
      * Only works if player is not in air when method call happens
      */
-    public void invertGravity() {
+    private void invertGravity() {
         if (!this.player_inAir || !this.player_first_gravity_inAir) {
             this.gravity *= -1;
             this.player_inAir = true;
@@ -244,7 +240,7 @@ public class GameState {
      * Sets the vertical velocity of the player to make a small jump. Also marks the player to be in air
      * Only works if player is not in air when method call happens
      */
-    public void jump() {
+    private void jump() {
         if (!this.player_inAir) {
             this.player_velocity_y -= 5 * gravity; //TODO: Change to proper value
             this.player_inAir = true;
