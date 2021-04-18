@@ -51,7 +51,6 @@ public class GameState {
     /*
      * PAINT
      */
-    private Paint terrain_paint; //for anti-aliasing
     private Paint player_paint; //TODO: Remove when player sprite is implemented
     private Paint text_paint; //paint for text
     private Paint trans_paint; //paint for transparency
@@ -92,8 +91,6 @@ public class GameState {
         this.text_paint.setTextSize(24 * this.density);
         this.trans_paint = new Paint();
         this.trans_paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-        this.terrain_paint = new Paint();
-        this.terrain_paint.setAntiAlias(true);
 
         this.you_died_retry = context.getResources().getString(R.string.player_died);
 
@@ -201,12 +198,20 @@ public class GameState {
         if (this.trans_x < 0) this.trans_x = 0;
         else if (this.trans_x > this.stage.stage_foreground.getWidth() - c.getWidth()) this.trans_x = this.stage.stage_foreground.getWidth() - c.getWidth();
 
-        if (this.player_pos_y * this.stage.stage_scale - this.trans_y > this.trans_y + c.getHeight() - this.stage.tile_size_scaled * 2) this.trans_y += (this.player_pos_y * this.stage.stage_scale - this.trans_y) - (this.trans_y + c.getHeight() - this.stage.tile_size_scaled * 2);
-        //else if (this.trans_y > this.stage.stage_foreground.getHeight() - c.getHeight()) this.trans_y = this.stage.stage_foreground.getHeight() - c.getHeight();
+        /*if (this.player_pos_y * this.stage.stage_scale - this.trans_y > this.trans_y + c.getHeight() - this.stage.tile_size_scaled * 2)
+            this.trans_y += (this.player_pos_y * this.stage.stage_scale - this.trans_y) - (this.trans_y + c.getHeight() - this.stage.tile_size_scaled * 2);
+        else if (this.player_pos_y * this.stage.stage_scale - this.trans_y < this.trans_y + this.stage.tile_size_scaled)
+            this.trans_y += (this.player_pos_y * this.stage.stage_scale - this.trans_y) - (this.trans_y + this.stage.tile_size_scaled);*/
 
         //c.drawRect(new RectF(0, 0, this.screenWidth, this.screenHeight), this.background_paint); //TODO: Draw Background without frame loss
-        c.drawColor(Color.WHITE);
-        c.drawBitmap(this.stage.stage_foreground, -this.trans_x, -this.trans_y, null);
+        c.drawBitmap(this.stage.stage_background, 0, 0, null);
+        //c.drawBitmap(this.stage.stage_foreground, -this.trans_x, -this.trans_y, null);
+        for(int x = 0; x < this.stage.tiles.length; x++) {
+            for(int y = 0; y < this.stage.tiles[0].length; y++) {
+                if(this.stage.tiles[x][y] != -1)
+                    c.drawBitmap(this.stage.tiles_textures[this.stage.tiles[x][y]], null, new RectF(x * this.stage.tile_size_scaled - trans_x, y * this.stage.tile_size_scaled - trans_y, x * this.stage.tile_size_scaled + this.stage.tile_size_scaled - trans_x, y * this.stage.tile_size_scaled + this.stage.tile_size_scaled -trans_y), null);
+            }
+        }
         c.drawRect(
                 this.player_pos_x * this.stage.stage_scale - this.trans_x,
                 this.player_pos_y * this.stage.stage_scale - this.trans_y,
