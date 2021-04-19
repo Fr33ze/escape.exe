@@ -66,6 +66,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         this.state = new GameState(getContext(), this.density, this.screenWidth, this.screenHeigth);
         this.state.load(0);
         this.thread = new GameThread(state, holder, fps);
+        startgame(); //TODO: Remove?
     }
 
     @Override

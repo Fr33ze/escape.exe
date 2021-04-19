@@ -23,6 +23,7 @@ public class GameState {
     private float player_pos_x;
     private float player_pos_y;
     private float player_velocity_x;
+    private float player_boost_x;
     private float player_velocity_y;
     private float player_acceleration_y;
     private byte gravity; //gravity top or bottom?
@@ -123,7 +124,8 @@ public class GameState {
 
         this.player_velocity_y += ((float) deltaFrameTime / 1000) * this.player_acceleration_y * this.gravity;
 
-        this.player_collision_px.set(this.player_pos_x + this.player_velocity_x * ((float) deltaFrameTime / 1000), this.player_pos_y + this.player_velocity_y, this.player_pos_x + this.player_velocity_x * ((float) deltaFrameTime / 1000) + 24, this.player_pos_y + this.player_velocity_y + 24);
+        //Player position after this deltatime-step
+        this.player_collision_px.set(this.player_pos_x + this.player_velocity_x * this.player_boost_x * ((float) deltaFrameTime / 1000), this.player_pos_y + this.player_velocity_y, this.player_pos_x + this.player_velocity_x * this.player_boost_x * ((float) deltaFrameTime / 1000) + 24, this.player_pos_y + this.player_velocity_y + 24);
         this.player_collision_tiles.set((int) (this.player_collision_px.left / 24), (int) (this.player_collision_px.top / 24), (int) (this.player_collision_px.right / 24), (int) (this.player_collision_px.bottom / 24));
 
         if (this.player_collision_tiles.left >= 0 && this.player_collision_tiles.top >= 0 && this.player_collision_tiles.right < this.stage.stage_collision.length && this.player_collision_tiles.bottom <= this.stage.stage_collision[0].length) {
@@ -135,40 +137,31 @@ public class GameState {
             if (this.collision_corners[0] != 0 || this.collision_corners[1] != 0 || this.collision_corners[2] != 0 || this.collision_corners[3] != 0) {
                 //At least one of the player corners collides with a tile with behavior (solid, die, ...)
                 if ((this.collision_corners[0] == 1 && this.collision_corners[1] == 1) || (this.collision_corners[2] == 1 && this.collision_corners[3] == 1)) {
-                    if ((this.collision_corners[0] == 1 && this.collision_corners[3] == 1) || (this.collision_corners[1] == 1 && this.collision_corners[2] == 1)) {
-                        //X Collision (both X and Y collision can happen at same time, if 3 corners collide)
-                        this.player_dead = true;
-                    }
-                    //Y Collision => Collision treatment
-                    if (this.player_velocity_y > 0) //TODO: Make one formula instead of if(..)?
-                        this.player_pos_y = this.player_collision_px.top - this.player_collision_px.top % 24;
-                    else
-                        this.player_pos_y = this.player_collision_px.top + (24 - this.player_collision_px.top % 24);
+                    //Y Solid Collision => Position adjustment
+                    adjustPositionY();
+                    //X Collision can still happen
+                    checkCollisionX();
+                } else if ((this.collision_corners[0] == 4 && this.collision_corners[1] == 4) || (this.collision_corners[2] == 4 && this.collision_corners[3] == 4)) {
+                    adjustPositionY();
+                    checkCollisionX();
+                    this.player_boost_x = 2; //TODO
                 } else if ((collision_corners[0] == 1 && collision_corners[3] == 1) || (collision_corners[1] == 1 && collision_corners[2] == 1)) {
-                    //X Collision
+                    //X Solid Collision
                     this.player_dead = true;
                 } else {
                     //Only one corner collided, can be either X or Y first
-
-                    if(this.player_velocity_x < 0)
-                        this.col_time_x = (this.player_collision_tiles.right * 24 - this.player_pos_x) / this.player_velocity_x;
-                    else
-                        this.col_time_x = (this.player_collision_tiles.left * 24 - this.player_pos_x) / this.player_velocity_x;
-
-                    if(this.player_velocity_y < 0)
-                        this.col_time_y = (this.player_collision_tiles.bottom * 24 - this.player_pos_y) / this.player_velocity_y;
-                    else
-                        this.col_time_y = (this.player_collision_tiles.top * 24 - this.player_pos_y) / this.player_velocity_y;
+                    calcCollisionTimeX();
+                    calcCollisionTimeY();
 
                     if (this.col_time_y < 0 && this.col_time_x > 0) {
                         //no valid collision on Y, collision on X
                         this.player_dead = true;
                     } else {
-                        //Y before X => Y Collosion treatment
-                        if (this.player_velocity_y > 0) //TODO: Make one formula instead of if(..)?
-                            this.player_pos_y = this.player_collision_px.top - this.player_collision_px.top % 24;
-                        else
-                            this.player_pos_y = this.player_collision_px.top + (24 - this.player_collision_px.top % 24);
+                        //Y before X => Y Solid Collosion => Position adjustment
+                        adjustPositionY();
+                        if(collision_corners[0] == 4 || collision_corners[3] == 4 || collision_corners[1] == 4 && collision_corners[2] == 4) {
+                            this.player_boost_x = 2; //TODO
+                        }
                     }
                 }
                 this.player_velocity_y = 0;
@@ -187,6 +180,47 @@ public class GameState {
 
         if (this.finished && this.finished_continue)
             load(this.stage.stage_level + 1);
+    }
+
+    /**
+     * When player object collides with tiles on Y axis (basically when it is walking on the ground), adjust Y position to be exactly
+     */
+    private void adjustPositionY() {
+        if (this.player_velocity_y > 0)
+            this.player_pos_y = this.player_collision_px.top - this.player_collision_px.top % 24;
+        else
+            this.player_pos_y = this.player_collision_px.top + (24 - this.player_collision_px.top % 24);
+    }
+
+    /**
+     * When player object collides with a wall horizontally, player dies
+     */
+    private void checkCollisionX() {
+        if ((this.collision_corners[0] == 1 && this.collision_corners[3] == 1) || (this.collision_corners[1] == 1 && this.collision_corners[2] == 1)) {
+            this.player_dead = true;
+        }
+    }
+
+    /**
+     * Calculates the exact time it took the player object to collide with the tile object on x axis
+     * Player object might overlap the collided object, this calculates exact time it takes to collide without overlap
+     */
+    private void calcCollisionTimeX() {
+        if(this.player_velocity_x < 0)
+            this.col_time_x = (this.player_collision_tiles.right * 24 - this.player_pos_x) / (this.player_velocity_x * this.player_boost_x);
+        else
+            this.col_time_x = (this.player_collision_tiles.left * 24 - this.player_pos_x) / (this.player_velocity_x * this.player_boost_x);
+    }
+
+    /**
+     * Calculates the exact time it took the player object to collide with the tile object on y axis
+     * Player object might overlap the collided object, this calculates exact time it takes to collide without overlap
+     */
+    private void calcCollisionTimeY() {
+        if(this.player_velocity_y < 0)
+            this.col_time_y = (this.player_collision_tiles.bottom * 24 - this.player_pos_y) / this.player_velocity_y;
+        else
+            this.col_time_y = (this.player_collision_tiles.top * 24 - this.player_pos_y) / this.player_velocity_y;
     }
 
     private float trans_x = 0;
@@ -280,7 +314,8 @@ public class GameState {
         this.player_pos_x = stage.player_start_x * 24;
         this.player_pos_y = stage.player_start_y * 24;
         this.player_velocity_x = stage.player_velocity_x;
-        this.player_velocity_y = 0; //TODO: Change to default value
+        this.player_boost_x = 1.0f;
+        this.player_velocity_y = 0;
         this.player_acceleration_y = 10;
         this.player_dead = false;
         this.player_inAir = true;
@@ -300,7 +335,8 @@ public class GameState {
         this.player_pos_x = stage.player_start_x * 24;
         this.player_pos_y = stage.player_start_y * 24;
         this.player_velocity_x = stage.player_velocity_x;
-        this.player_velocity_y = 0; //TODO: Change to default value
+        this.player_boost_x = 1.0f;
+        this.player_velocity_y = 0;
         this.player_acceleration_y = 10;
         this.player_dead = false;
         this.player_inAir = true;
