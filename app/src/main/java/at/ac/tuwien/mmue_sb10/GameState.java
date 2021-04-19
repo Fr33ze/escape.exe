@@ -69,6 +69,13 @@ public class GameState {
     private float col_time_x; //collision time on x-axis
     private float col_time_y; //collision time on y-axis
 
+    /**
+     * Creates a new GameState instance
+     * @param context Context of the App to get resources
+     * @param density Pixel density of the screen
+     * @param screenWidth Width of the screen in pixel
+     * @param screenHeight Heigth of the screen in pixel
+     */
     public GameState(Context context, float density, float screenWidth, float screenHeight) {
         this.context = context;
         this.stage = new Stage(context, density);
@@ -198,20 +205,12 @@ public class GameState {
         if (this.trans_x < 0) this.trans_x = 0;
         else if (this.trans_x > this.stage.stage_foreground.getWidth() - c.getWidth()) this.trans_x = this.stage.stage_foreground.getWidth() - c.getWidth();
 
-        /*if (this.player_pos_y * this.stage.stage_scale - this.trans_y > this.trans_y + c.getHeight() - this.stage.tile_size_scaled * 2)
+        if (this.player_pos_y * this.stage.stage_scale - this.trans_y > this.trans_y + c.getHeight() - this.stage.tile_size_scaled * 2)
             this.trans_y += (this.player_pos_y * this.stage.stage_scale - this.trans_y) - (this.trans_y + c.getHeight() - this.stage.tile_size_scaled * 2);
         else if (this.player_pos_y * this.stage.stage_scale - this.trans_y < this.trans_y + this.stage.tile_size_scaled)
-            this.trans_y += (this.player_pos_y * this.stage.stage_scale - this.trans_y) - (this.trans_y + this.stage.tile_size_scaled);*/
+            this.trans_y += (this.player_pos_y * this.stage.stage_scale - this.trans_y) - (this.trans_y + this.stage.tile_size_scaled);
 
-        //c.drawRect(new RectF(0, 0, this.screenWidth, this.screenHeight), this.background_paint); //TODO: Draw Background without frame loss
-        c.drawBitmap(this.stage.stage_background, 0, 0, null);
-        //c.drawBitmap(this.stage.stage_foreground, -this.trans_x, -this.trans_y, null);
-        for(int x = 0; x < this.stage.tiles.length; x++) {
-            for(int y = 0; y < this.stage.tiles[0].length; y++) {
-                if(this.stage.tiles[x][y] != -1)
-                    c.drawBitmap(this.stage.tiles_textures[this.stage.tiles[x][y]], null, new RectF(x * this.stage.tile_size_scaled - trans_x, y * this.stage.tile_size_scaled - trans_y, x * this.stage.tile_size_scaled + this.stage.tile_size_scaled - trans_x, y * this.stage.tile_size_scaled + this.stage.tile_size_scaled -trans_y), null);
-            }
-        }
+        c.drawBitmap(this.stage.stage_foreground, -this.trans_x, -this.trans_y, null);
         c.drawRect(
                 this.player_pos_x * this.stage.stage_scale - this.trans_x,
                 this.player_pos_y * this.stage.stage_scale - this.trans_y,
