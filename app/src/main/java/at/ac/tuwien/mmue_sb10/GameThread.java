@@ -51,16 +51,6 @@ public class GameThread extends Thread {
             }
 
             lastFrameTime = currentFrameTime;
-
-            //SLEEP
-            int sleepTime = (int) (frametime - deltaFrameTime);
-            if (sleepTime > 0) {
-                try {
-                    Thread.sleep(sleepTime);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 }

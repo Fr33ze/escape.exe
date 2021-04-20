@@ -11,6 +11,7 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
+import android.graphics.Typeface;
 import android.view.MotionEvent;
 
 public class GameState {
@@ -36,7 +37,7 @@ public class GameState {
      */
     private Stage stage; //current stage
     private boolean finished; //stage is finished
-    private boolean finished_continue; //player presses continue after stage is finished
+    private boolean started; //stage is started
 
     /*
      * MISC
@@ -54,6 +55,7 @@ public class GameState {
      */
     private Paint player_paint; //TODO: Remove when player sprite is implemented
     private Paint text_paint; //paint for text
+    private Paint text_border_paint; //border paint for text
     private Paint trans_paint; //paint for transparency
 
     /*
@@ -95,8 +97,17 @@ public class GameState {
         this.text_paint = new Paint();
         this.text_paint.setColor(Color.RED);
         this.text_paint.setStyle(Paint.Style.FILL_AND_STROKE);
+        this.text_paint.setTypeface(Typeface.DEFAULT_BOLD);
         this.text_paint.setTextAlign(Paint.Align.CENTER);
         this.text_paint.setTextSize(24 * this.density);
+        this.text_border_paint = new Paint();
+        this.text_border_paint.setColor(Color.WHITE);
+        this.text_border_paint.setTextAlign(Paint.Align.CENTER);
+        this.text_border_paint.setTextSize(24 * this.density);
+        this.text_border_paint.setTypeface(Typeface.DEFAULT_BOLD);
+        this.text_border_paint.setStyle(Paint.Style.STROKE);
+        this.text_border_paint.setStrokeWidth(2 * this.density);
+
         this.trans_paint = new Paint();
         this.trans_paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
 
@@ -111,12 +122,10 @@ public class GameState {
      * @param deltaFrameTime The passed time since the last updated frame.
      */
     public void update(long deltaFrameTime) {
-        if (this.player_dead || this.finished) {
+        if (this.player_dead || this.finished || !this.started) {
             //Game over. Proceed to next stage or retry
             return;
-        }
-
-        if(this.start_circle_radius < 1) {
+        } else if(this.start_circle_radius < 1) {
             //Black circle at start of level is expanding. After 1 second the screen is fully visible
             this.start_circle_radius += (float)deltaFrameTime / 1000;
             return;
@@ -144,10 +153,20 @@ public class GameState {
                 } else if ((this.collision_corners[0] == 4 && this.collision_corners[1] == 4) || (this.collision_corners[2] == 4 && this.collision_corners[3] == 4)) {
                     adjustPositionY();
                     checkCollisionX();
-                    this.player_boost_x = 2; //TODO
-                } else if ((collision_corners[0] == 1 && collision_corners[3] == 1) || (collision_corners[1] == 1 && collision_corners[2] == 1)) {
-                    //X Solid Collision
-                    this.player_dead = true;
+                    if (this.player_velocity_x > 0)
+                        this.player_boost_x = 2; //TODO
+                    else
+                        this.player_boost_x = 1;
+                } else if ((this.collision_corners[0] == 5 && this.collision_corners[1] == 5) || (this.collision_corners[2] == 5 && this.collision_corners[3] == 5)) {
+                    adjustPositionY();
+                    checkCollisionX();
+                    if (this.player_velocity_x < 0)
+                        this.player_boost_x = 2; //TODO
+                    else
+                        this.player_boost_x = 1;
+                } else if ((collision_corners[0] != 0 && collision_corners[3] != 0) || (collision_corners[1] != 0 && collision_corners[2] != 0)) {
+                    //X Collision
+                    checkCollisionX();
                 } else {
                     //Only one corner collided, can be either X or Y first
                     calcCollisionTimeX();
@@ -159,11 +178,33 @@ public class GameState {
                     } else {
                         //Y before X => Y Solid Collosion => Position adjustment
                         adjustPositionY();
-                        if(collision_corners[0] == 4 || collision_corners[3] == 4 || collision_corners[1] == 4 && collision_corners[2] == 4) {
-                            this.player_boost_x = 2; //TODO
+                        if (collision_corners[0] == 4 || collision_corners[3] == 4 || collision_corners[1] == 4 || collision_corners[2] == 4) {
+                            if (this.player_velocity_x > 0)
+                                this.player_boost_x = 2; //TODO
+                            else
+                                this.player_boost_x = 1;
+                        } else if (collision_corners[0] == 5 || collision_corners[3] == 5 || collision_corners[1] == 5 || collision_corners[2] == 5) {
+                            if (this.player_velocity_x < 0)
+                                this.player_boost_x = 2; //TODO
+                            else
+                                this.player_boost_x = 1;
                         }
                     }
                 }
+
+                //Check for x-velocity-inverter
+                if (collision_corners[0] == 3 || collision_corners[1] == 3 || collision_corners[2] == 3 || collision_corners[3] == 3) {
+                    //X Inverter Collision
+                    this.player_velocity_x *= -1;
+                } else if (collision_corners[0] == 6 || collision_corners[1] == 6 || collision_corners[2] == 6 || collision_corners[3] == 6) {
+                    //X Finish Collision
+                    this.finished = true;
+                } else if (collision_corners[0] == 2 || collision_corners[1] == 2 || collision_corners[2] == 2 || collision_corners[3] == 2) {
+                    //X Death Collision (spikes)
+                    this.player_dead = true;
+                }
+
+
                 this.player_velocity_y = 0;
                 this.player_inAir = false;
                 this.player_first_gravity_inAir = false;
@@ -177,9 +218,6 @@ public class GameState {
             //Player is out of bounds => DIE!
             this.player_dead = true;
         }
-
-        if (this.finished && this.finished_continue)
-            load(this.stage.stage_level + 1);
     }
 
     /**
@@ -251,12 +289,16 @@ public class GameState {
                 (this.player_pos_x + 24) * this.stage.stage_scale - this.trans_x,
                 (this.player_pos_y + 24) * this.stage.stage_scale - this.trans_y,
                 player_paint);
+
         if(this.player_dead) {
             //Player is dead. Draw retry message
+            c.drawText(this.you_died_retry, this.screenWidth / 2, this.screenHeight / 2, this.text_border_paint);
             c.drawText(this.you_died_retry, this.screenWidth / 2, this.screenHeight / 2, this.text_paint);
+        } else if (this.finished) {
+            c.drawText(this.stage.stage_name + " finished!\nTap to continue.", this.screenWidth / 2, this.screenHeight / 2, this.text_border_paint); //TODO: Replace string
+            c.drawText(this.stage.stage_name + " finished!\nTap to continue.", this.screenWidth / 2, this.screenHeight / 2, this.text_paint); //TODO: Replace string
         } else if(this.start_circle_radius < 1) {
             //Stage has started. Draw expanding circle first second
-            this.start_circle_canvas.drawColor(Color.BLACK);
             this.start_circle_canvas.drawCircle((this.player_pos_x + 24) * this.stage.stage_scale, (this.player_pos_y + 24) * this.stage.stage_scale, this.start_circle_radius * this.screenWidth, trans_paint);
             c.drawBitmap(start_circle_bmp, 0, 0, null);
         }
@@ -293,11 +335,16 @@ public class GameState {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             if(this.player_dead) {
                 this.retry();
-            }
-            if (event.getX() < this.screenWidth / 2) {
-                this.invertGravity();
+            } else if (this.finished) {
+                this.load(this.stage.stage_level + 1);
+            } else if (!this.started) {
+                this.started = true;
             } else {
-                this.jump();
+                if (event.getX() < this.screenWidth / 2) {
+                    this.invertGravity();
+                } else {
+                    this.jump();
+                }
             }
         } else {
             //TODO: Other Events?
@@ -309,6 +356,8 @@ public class GameState {
      * @param level The ID of the stage to be loaded. Starts with 0
      */
     public void load(int level) {
+        this.started = false;
+
         this.stage.load(level);
 
         this.player_pos_x = stage.player_start_x * 24;
@@ -322,10 +371,12 @@ public class GameState {
         this.player_first_gravity_inAir = false;
         this.gravity = 1;
 
-        this.finished = false;
-        this.finished_continue = false;
-
         this.start_circle_radius = 0;
+        this.start_circle_canvas.drawColor(Color.BLACK);
+        this.start_circle_canvas.drawText(this.stage.stage_name, this.screenWidth / 2, this.screenHeight / 2, this.text_border_paint);
+        this.start_circle_canvas.drawText(this.stage.stage_name, this.screenWidth / 2, this.screenHeight / 2, this.text_paint);
+
+        this.finished = false;
     }
 
     /**
@@ -344,6 +395,5 @@ public class GameState {
         this.gravity = 1;
 
         this.finished = false;
-        this.finished_continue = false;
     }
 }
