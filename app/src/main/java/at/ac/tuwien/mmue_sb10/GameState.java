@@ -29,6 +29,7 @@ public class GameState {
     private float player_acceleration_y;
     private byte gravity; //gravity top or bottom?
     private boolean player_inAir; //player is in air?
+    private boolean player_onBoost; //player touches booster?
     private boolean player_first_gravity_inAir; //can do 1x gravity change while in air
     private boolean player_dead; //player died?
 
@@ -150,20 +151,15 @@ public class GameState {
                     adjustPositionY();
                     //X Collision can still happen
                     checkCollisionX();
+                    this.player_onBoost = false;
                 } else if ((this.collision_corners[0] == 4 && this.collision_corners[1] == 4) || (this.collision_corners[2] == 4 && this.collision_corners[3] == 4)) {
                     adjustPositionY();
                     checkCollisionX();
-                    if (this.player_velocity_x > 0)
-                        this.player_boost_x = 2; //TODO
-                    else
-                        this.player_boost_x = 1;
+                    boostPlayerRight();
                 } else if ((this.collision_corners[0] == 5 && this.collision_corners[1] == 5) || (this.collision_corners[2] == 5 && this.collision_corners[3] == 5)) {
                     adjustPositionY();
                     checkCollisionX();
-                    if (this.player_velocity_x < 0)
-                        this.player_boost_x = 2; //TODO
-                    else
-                        this.player_boost_x = 1;
+                    boostPlayerLeft();
                 } else if ((collision_corners[0] != 0 && collision_corners[3] != 0) || (collision_corners[1] != 0 && collision_corners[2] != 0)) {
                     //X Collision
                     checkCollisionX();
@@ -179,20 +175,15 @@ public class GameState {
                         //Y before X => Y Solid Collosion => Position adjustment
                         adjustPositionY();
                         if (collision_corners[0] == 4 || collision_corners[3] == 4 || collision_corners[1] == 4 || collision_corners[2] == 4) {
-                            if (this.player_velocity_x > 0)
-                                this.player_boost_x = 2; //TODO
-                            else
-                                this.player_boost_x = 1;
+                            boostPlayerRight();
                         } else if (collision_corners[0] == 5 || collision_corners[3] == 5 || collision_corners[1] == 5 || collision_corners[2] == 5) {
-                            if (this.player_velocity_x < 0)
-                                this.player_boost_x = 2; //TODO
-                            else
-                                this.player_boost_x = 1;
+                            boostPlayerLeft();
+                        } else {
+                            this.player_onBoost = false;
                         }
                     }
                 }
 
-                //Check for x-velocity-inverter
                 if (collision_corners[0] == 3 || collision_corners[1] == 3 || collision_corners[2] == 3 || collision_corners[3] == 3) {
                     //X Inverter Collision
                     this.player_velocity_x *= -1;
@@ -204,7 +195,6 @@ public class GameState {
                     this.player_dead = true;
                 }
 
-
                 this.player_velocity_y = 0;
                 this.player_inAir = false;
                 this.player_first_gravity_inAir = false;
@@ -212,11 +202,40 @@ public class GameState {
                 //None of the player corners collides with anything
                 this.player_pos_y = this.player_collision_px.top;
                 this.player_inAir = true;
+                this.player_onBoost = false;
             }
             this.player_pos_x = this.player_collision_px.left;
         } else {
             //Player is out of bounds => DIE!
             this.player_dead = true;
+        }
+    }
+
+    /**
+     * Boosts the player speed by a factor of 1.5 if going right, otherwise slows down by factor of 0.66
+     * Only works once per boost platform
+     */
+    private void boostPlayerRight() {
+        if (this.player_velocity_x > 0 && !this.player_onBoost) {
+            this.player_boost_x *= 1.5; //TODO
+            this.player_onBoost = true;
+        } else if (this.player_velocity_x < 0 && !this.player_onBoost) {
+            this.player_boost_x *= (2f / 3);
+            this.player_onBoost = true;
+        }
+    }
+
+    /**
+     * Boosts the player speed by a factor of 1.5 if going left, otherwise slows down by factor of 0.66
+     * Only works once per boost platform
+     */
+    private void boostPlayerLeft() {
+        if (this.player_velocity_x < 0 && !this.player_onBoost) {
+            this.player_boost_x *= 1.5; //TODO
+            this.player_onBoost = true;
+        } else if (this.player_velocity_x > 0 && !this.player_onBoost) {
+            this.player_boost_x *= (2f / 3);
+            this.player_onBoost = true;
         }
     }
 
@@ -368,6 +387,7 @@ public class GameState {
         this.player_acceleration_y = 10;
         this.player_dead = false;
         this.player_inAir = true;
+        this.player_onBoost = false;
         this.player_first_gravity_inAir = false;
         this.gravity = 1;
 
@@ -391,6 +411,7 @@ public class GameState {
         this.player_acceleration_y = 10;
         this.player_dead = false;
         this.player_inAir = true;
+        this.player_onBoost = false;
         this.player_first_gravity_inAir = false;
         this.gravity = 1;
 
