@@ -9,6 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MMUESB10">
+        <activity android:name=".SoundPool"></activity>
+        <activity android:name=".MediaPlayer" />
         <activity
             android:name=".MainActivity"
             android:screenOrientation="landscape"
@@ -22,8 +24,7 @@
         <activity
             android:name=".GameActivity"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
-        </activity>
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
     </application>
 
 </manifest>

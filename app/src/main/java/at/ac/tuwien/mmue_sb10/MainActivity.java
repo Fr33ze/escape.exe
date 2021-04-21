@@ -27,4 +27,15 @@ public class MainActivity extends Activity {
     public void onClickQuit(View v) {
         finish();
     }
+
+    public void onClickMediaPlayer(View v) {
+        Intent i = new Intent(MainActivity.this, MediaPlayer.class);
+        i.putExtra("selectedSong", R.raw.techno02); // Change this to play specific song
+        MainActivity.this.startActivity(i);
+    }
+
+    public void onClickSoundPool(View v) {
+        Intent i = new Intent(MainActivity.this, SoundPool.class);
+        MainActivity.this.startActivity(i);
+    }
 }

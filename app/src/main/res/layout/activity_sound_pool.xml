@@ -4,45 +4,48 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".CustomMediaPlayer">
+    android:orientation="vertical"
+    android:gravity="center"
+    tools:context=".SoundPool">
 
     <Button
-        android:id="@+id/btn_play"
+        android:id="@+id/btn_soundeffect1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="play"
-        android:text="Play"
+        android:onClick="playSoundEffect"
+        android:text="SoundEffect1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.696" />
+        app:layout_constraintVertical_bias="0.484" />
 
     <Button
-        android:id="@+id/btn_mute"
+        android:id="@+id/btn_soundeffect2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="onClickToggleMute"
-        android:text="Mute"
+        android:onClick="playSoundEffect"
+        android:text="SoundEffect2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.499"
+        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.851" />
+        app:layout_constraintVertical_bias="0.581" />
+
 
     <Button
-        android:id="@+id/btn_stop"
+        android:id="@+id/btn_backToMain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="stop"
-        android:text="Stop"
+        android:onClick="onClickBackToMain"
+        android:text="Back To Main"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.499"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.542" />
+        app:layout_constraintVertical_bias="0.904" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
