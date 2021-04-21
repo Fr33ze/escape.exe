@@ -3,7 +3,9 @@ package at.ac.tuwien.mmue_sb10;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.media.AudioAttributes;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
@@ -19,8 +21,22 @@ public class SoundPool extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sound_pool);
 
-        // this way of building the soundpool is outdated but works for current version Build.Version
-        soundPool = new android.media.SoundPool(6, AudioManager.STREAM_MUSIC,0);
+        // new way of building soundpool
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build();
+
+            soundPool = new android.media.SoundPool.Builder()
+                    .setMaxStreams(6)
+                    .setAudioAttributes(audioAttributes)
+                    .build();
+        }
+        // old version of building soundpool
+        else{
+            soundPool = new android.media.SoundPool(6, AudioManager.STREAM_MUSIC,0);
+        }
 
         soundeffect1 = soundPool.load(this,R.raw.testsound1,1);
         soundeffect2 = soundPool.load(this,R.raw.testsound2,1);
