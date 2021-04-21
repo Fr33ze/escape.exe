@@ -28,6 +28,12 @@ public class GameActivity extends Activity {
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        //gameView.pauseGame();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
     }

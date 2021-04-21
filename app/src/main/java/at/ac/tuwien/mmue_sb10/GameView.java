@@ -104,6 +104,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
+    public void pausegame() {
+        if(this.thread != null) {
+            //this.state. //TODO
+        }
+    }
+
     public void endgame() {
         this.thread.setRunning(false);
         try {

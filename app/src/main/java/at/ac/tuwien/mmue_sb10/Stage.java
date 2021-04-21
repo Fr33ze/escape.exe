@@ -33,6 +33,11 @@ public class Stage {
     private Paint background_paint;
     private Context context; //context of the app to get resources
 
+    /**
+     * Initializes the stage and loads the tileset from resources
+     * @param context Context of the app to get resources
+     * @param density Density of the display to scale graphics
+     */
     public Stage(Context context, float density) {
         this.context = context;
         this.stage_scale = density;

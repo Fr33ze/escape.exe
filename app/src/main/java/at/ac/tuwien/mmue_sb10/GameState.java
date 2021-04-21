@@ -39,6 +39,7 @@ public class GameState {
     private Stage stage; //current stage
     private boolean finished; //stage is finished
     private boolean started; //stage is started
+    private boolean paused; //game is paused
 
     /*
      * MISC
@@ -280,8 +281,8 @@ public class GameState {
             this.col_time_y = (this.player_collision_tiles.top * 24 - this.player_pos_y) / this.player_velocity_y;
     }
 
-    private float trans_x = 0;
-    private float trans_y = 0;
+    private float trans_x = 0; //draw-translation on x axis
+    private float trans_y = 0; //draw-translation on y axis
 
     /**
      * Draws the current state of the game onto c
@@ -396,6 +397,7 @@ public class GameState {
         this.start_circle_canvas.drawText(this.stage.stage_name, this.screenWidth / 2, this.screenHeight / 2, this.text_border_paint);
         this.start_circle_canvas.drawText(this.stage.stage_name, this.screenWidth / 2, this.screenHeight / 2, this.text_paint);
 
+        this.paused = false;
         this.finished = false;
     }
 
@@ -415,6 +417,7 @@ public class GameState {
         this.player_first_gravity_inAir = false;
         this.gravity = 1;
 
+        this.paused = false;
         this.finished = false;
     }
 }
