@@ -1,3 +1,8 @@
+/**
+ * Handles the current state of the application.
+ * This class saves information regarding the position of the player on a 2D grid, player velocity, player acceleration, gravity (up or down), is player dead and more.
+ * @author Lukas Lidauer & Jan König
+ */
 package at.ac.tuwien.mmue_sb10;
 
 import android.content.Context;
@@ -27,10 +32,16 @@ public class GameState {
     private float player_boost_x;
     private float player_velocity_y;
     private float player_acceleration_y;
-    private byte gravity; //gravity top or bottom?
+    /**
+     * gravity can either be regular or inverted (or top or bottom)
+     */
+    private byte gravity;
     private boolean player_inAir; //player is in air?
     private boolean player_onBoost; //player touches booster?
-    private boolean player_first_gravity_inAir; //can do 1x gravity change while in air
+    /**
+     * The player is allowed to do only one gravity change in the air until he hits the ground again. This variable keeps track of that.
+     */
+    private boolean player_first_gravity_inAir;
     private boolean player_dead; //player died?
 
     /*
@@ -80,6 +91,7 @@ public class GameState {
      * @param density Pixel density of the screen
      * @param screenWidth Width of the screen in pixel
      * @param screenHeight Heigth of the screen in pixel
+     * @since 0.1
      */
     public GameState(Context context, float density, float screenWidth, float screenHeight) {
         this.context = context;
@@ -122,6 +134,7 @@ public class GameState {
     /**
      * Updates the state of the game depending on the deltaFrameTime. Handles collision detection, gravity, movement, ...
      * @param deltaFrameTime The passed time since the last updated frame.
+     * @since 0.1
      */
     public void update(long deltaFrameTime) {
         if (this.player_dead || this.finished || !this.started) {
@@ -215,6 +228,7 @@ public class GameState {
     /**
      * Boosts the player speed by a factor of 1.5 if going right, otherwise slows down by factor of 0.66
      * Only works once per boost platform
+     * @since 0.1
      */
     private void boostPlayerRight() {
         if (this.player_velocity_x > 0 && !this.player_onBoost) {
@@ -229,6 +243,7 @@ public class GameState {
     /**
      * Boosts the player speed by a factor of 1.5 if going left, otherwise slows down by factor of 0.66
      * Only works once per boost platform
+     * @since 0.1
      */
     private void boostPlayerLeft() {
         if (this.player_velocity_x < 0 && !this.player_onBoost) {
@@ -242,6 +257,7 @@ public class GameState {
 
     /**
      * When player object collides with tiles on Y axis (basically when it is walking on the ground), adjust Y position to be exactly
+     * @since 0.1
      */
     private void adjustPositionY() {
         if (this.player_velocity_y > 0)
@@ -252,6 +268,7 @@ public class GameState {
 
     /**
      * When player object collides with a wall horizontally, player dies
+     * @since 0.1
      */
     private void checkCollisionX() {
         if ((this.collision_corners[0] == 1 && this.collision_corners[3] == 1) || (this.collision_corners[1] == 1 && this.collision_corners[2] == 1)) {
@@ -262,6 +279,7 @@ public class GameState {
     /**
      * Calculates the exact time it took the player object to collide with the tile object on x axis
      * Player object might overlap the collided object, this calculates exact time it takes to collide without overlap
+     * @since 0.1
      */
     private void calcCollisionTimeX() {
         if(this.player_velocity_x < 0)
@@ -273,6 +291,7 @@ public class GameState {
     /**
      * Calculates the exact time it took the player object to collide with the tile object on y axis
      * Player object might overlap the collided object, this calculates exact time it takes to collide without overlap
+     * @since 0.1
      */
     private void calcCollisionTimeY() {
         if(this.player_velocity_y < 0)
@@ -287,6 +306,7 @@ public class GameState {
     /**
      * Draws the current state of the game onto c
      * @param c The Canvas that is drawed onto
+     * @since 0.1
      */
     public void draw(Canvas c) {
         if (this.player_velocity_x > 0) {
@@ -327,6 +347,7 @@ public class GameState {
     /**
      * Inverts the gravity of the game to face upside down. Also marks the player to be in air
      * Only works if player is not in air when method call happens
+     * @since 0.1
      */
     private void invertGravity() {
         if (!this.player_inAir || !this.player_first_gravity_inAir) {
@@ -339,6 +360,7 @@ public class GameState {
     /**
      * Sets the vertical velocity of the player to make a small jump. Also marks the player to be in air
      * Only works if player is not in air when method call happens
+     * @since 0.1
      */
     private void jump() {
         if (!this.player_inAir) {
@@ -350,6 +372,7 @@ public class GameState {
     /**
      * Manipulates the state of the game depending on incoming MotionEvents
      * @param event Incoming MotionEvent
+     * @since 0.1
      */
     public void onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -374,6 +397,7 @@ public class GameState {
     /**
      * Loads the GameState and the a stage for the first use only
      * @param level The ID of the stage to be loaded. Starts with 0
+     * @since 0.1
      */
     public void load(int level) {
         this.started = false;
@@ -403,6 +427,7 @@ public class GameState {
 
     /**
      * Resets all changed values since the start of the level. Restarts the stage
+     * @since 0.1
      */
     private void retry() {
         this.player_pos_x = stage.player_start_x * 24;

@@ -1,3 +1,8 @@
+/**
+ * Handles the current stage of the game and stores all the data like name of the stage, level of the stage and so on.
+ * @author Lukas Lidauer
+ */
+
 package at.ac.tuwien.mmue_sb10;
 
 import android.content.Context;

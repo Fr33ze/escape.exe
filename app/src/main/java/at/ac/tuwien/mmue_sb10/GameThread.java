@@ -1,3 +1,9 @@
+/**
+ * Processes the game state therefore GameState must be delivered to this class.
+ * This class handles frametime to ensure that the app is running smoothly on all devices
+ * @author Lukas Lidauer
+ */
+
 package at.ac.tuwien.mmue_sb10;
 
 import android.graphics.Canvas;

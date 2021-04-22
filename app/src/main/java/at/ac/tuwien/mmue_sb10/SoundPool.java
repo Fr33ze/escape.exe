@@ -1,3 +1,8 @@
+/**
+ * This class provides a sound pool for sound effects.
+ * Currently it works as a standalone sound pool that can be accessed via main menu.
+ * @author Jan König
+ */
 package at.ac.tuwien.mmue_sb10;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,7 +20,12 @@ public class SoundPool extends AppCompatActivity {
     private int soundeffect1ID, soundeffect2ID; // needed to pause sounds on call of different sound
 
 
-
+    /**
+     * The sound pool needs to be created in respect due to the build version of the device.
+     * The onCreate methods is overwrittent to do so.
+     * Also this method loads sound effects (in this version this is static)
+     * @since 0.1
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,11 +52,22 @@ public class SoundPool extends AppCompatActivity {
         soundeffect2 = soundPool.load(this,R.raw.testsound2,1);
     }
 
+    /**
+     * This function leads the user back to the main menu.
+     * @param v the view as used by this method
+     * @since 0.1
+     */
     public void onClickBackToMain(View v){
         Intent i2 = new Intent(SoundPool.this, MainActivity.class);
         SoundPool.this.startActivity(i2);
     }
 
+    /**
+     * Depending on the sound effect that was specified by the user (by clicking a button) triggers the playing of said sound effect
+     * Currently this is bound to buttons but in future versions it shall be triggered by the game loop
+     * @param v the view as used by this method
+     * @since 0.1
+     */
     public void playSoundEffect(View v) {
         switch(v.getId()) {
             case R.id.btn_soundeffect1:
@@ -60,6 +81,10 @@ public class SoundPool extends AppCompatActivity {
         }
     }
 
+    /**
+     * The default onDestroy function of the build in sound pool gets overwritten to allow for releasing resources.
+     * @since 0.1
+     */
     @Override
     protected void onDestroy() { // releases resources!!!
         super.onDestroy();
