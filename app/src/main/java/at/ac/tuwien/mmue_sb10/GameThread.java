@@ -22,20 +22,40 @@ public class GameThread extends Thread {
     private Canvas canvas;
     private boolean running;
 
+    /**
+     * Creates a new GameThread instance
+     * @param state GameState instance that will be updated and rendered
+     * @param holder SurfaceHolder of the SurfaceView
+     * @param fps Refreshrate of the sceen
+     */
     public GameThread(GameState state, SurfaceHolder holder, float fps) {
         this.state = state;
         this.holder = holder;
         this.frametime = 1000 / fps;
     }
 
+    /**
+     * Sets the thread to be running or not. Thread will stop if this is set to false.
+     * @param active boolean that sets the thread to running
+     * @since 0.1
+     */
     public void setRunning(boolean active) {
         this.running = active;
     }
 
+    /**
+     *
+     * @return boolean that indicates, whether the thread is running or not
+     * @since 0.1
+     */
     public boolean isRunning() {
         return running;
     }
 
+    /**
+     * Renderloop that renders the gamestate onto the screen
+     * @since 0.1
+     */
     @Override
     public void run() {
         long currentFrameTime, deltaFrameTime, lastFrameTime = System.currentTimeMillis();

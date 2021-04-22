@@ -99,11 +99,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         setFocusable(true);
     }
 
-    /**
-     *
-     * @param holder
-     * @since 0.1
-     */
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
         this.state = new GameState(getContext(), this.density, this.screenWidth, this.screenHeigth);
@@ -112,35 +107,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         startgame(); //TODO
     }
 
-    /**
-     *
-     * @param holder
-     * @param format
-     * @param width
-     * @param height
-     * @since 0.1
-     */
     @Override
     public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
 
     }
 
-    /**
-     *
-     * @param holder
-     * @since 0.1
-     */
     @Override
     public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
 
     }
 
-    /**
-     *
-     * @param event
-     * @return
-     * @since 0.1
-     */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
