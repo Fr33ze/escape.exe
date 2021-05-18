@@ -68,7 +68,7 @@ public class GameThread extends Thread {
             try {
                 canvas = holder.lockCanvas();
                 synchronized (holder) {
-                    state.draw(canvas);
+                    state.draw(canvas, deltaFrameTime);
                 }
             } finally {
                 if (canvas != null) {

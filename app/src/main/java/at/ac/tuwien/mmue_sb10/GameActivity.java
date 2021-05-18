@@ -47,8 +47,7 @@ public class GameActivity extends Activity {
     // TODO: add dialog to make sure user doesn't accidentally closes the app
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        //gameView.pauseGame();
+        gameView.onBackPressed();
     }
 
     /**

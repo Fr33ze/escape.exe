@@ -152,9 +152,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
      * Pauses the game - method needs to be implemented in the future, currently not working
      * @since 0.1
      */
-    public void pausegame() {
+    public void onBackPressed() {
         if(this.thread != null) {
-            //this.state. //TODO
+            this.state.onBackPressed();
         }
     }
 

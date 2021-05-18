@@ -5,4 +5,6 @@
     <string name="continue_game">Continue</string>
     <string name="quit_game">Quit</string>
     <string name="player_died">You died, Retry?</string>
+    <string name="pause_game">Game Paused!</string>
+    <string name="back_to_menu">Exit</string>
 </resources>

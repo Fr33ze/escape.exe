@@ -7,8 +7,10 @@ package at.ac.tuwien.mmue_sb10;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -30,17 +32,21 @@ public class GameState {
     private float player_boost_x;
     private float player_velocity_y;
     private float player_acceleration_y;
-    /**
-     * gravity can either be regular or inverted (or top or bottom)
-     */
-    private byte gravity;
+
+    private byte gravity; //gravity can either be regular or inverted (or top or bottom)
     private boolean player_inAir; //player is in air?
     private boolean player_onBoost; //player touches booster?
-    /**
-     * The player is allowed to do only one gravity change in the air until he hits the ground again. This variable keeps track of that.
-     */
-    private boolean player_first_gravity_inAir;
+
+    private boolean player_first_gravity_inAir; //player is allowed to do only one gravity change in the air until he hits the ground again. This variable keeps track of that.
     private boolean player_dead; //player died?
+
+    private PlayerState player_state; //current state of the player. (mainly) used for animations
+    private PlayerState player_last_state; //last state of player
+    private Bitmap[] player_frames; //all frames of the player animations
+    private float player_anim_time; //time counter used for animations
+    private int player_current_frame; //current frame of the player to be drawn
+    private Matrix player_draw_matrix; //transformation of player
+    private float player_draw_scale;
 
     /*
      * CURRENT STAGE
@@ -48,7 +54,13 @@ public class GameState {
     private Stage stage; //current stage
     private boolean finished; //stage is finished
     private boolean started; //stage is started
-    private boolean paused; //game is paused
+
+    /*
+     * PAUSE MENU
+     */
+    public boolean paused; //game is paused
+    private RectF continue_touch_zone; //rectangle of the continue button
+    private RectF exit_touch_zone; //rectangle of the exit button
 
     /*
      * MISC
@@ -103,8 +115,8 @@ public class GameState {
         this.collision_corners = new int[4];
 
         this.player_paint = new Paint();
-        this.player_paint.setColor(Color.RED);
-        this.player_paint.setStyle(Paint.Style.FILL_AND_STROKE);
+        this.player_paint.setAntiAlias(true);
+        loadPlayerFrames();
 
         this.text_paint = new Paint();
         this.text_paint.setColor(Color.RED);
@@ -127,6 +139,32 @@ public class GameState {
 
         this.start_circle_bmp = Bitmap.createBitmap((int)this.screenWidth, (int)this.screenHeight, Bitmap.Config.ARGB_8888);
         this.start_circle_canvas = new Canvas(this.start_circle_bmp);
+
+        this.draw_src = new Rect();
+        this.draw_tar = new Rect();
+
+        this.continue_touch_zone = new RectF(this.screenWidth * 0.33f - 60 * this.density, this.screenHeight / 2, this.screenWidth * 0.33f + 60 * this.density, this.screenHeight / 2 + 40 * this.density);
+        this.exit_touch_zone = new RectF(this.screenWidth * 0.66f - 60 * this.density, this.screenHeight / 2, this.screenWidth * 0.66f + 60 * this.density, this.screenHeight / 2 + 40 * this.density);
+        this.player_state = PlayerState.RUNNING;
+        this.player_anim_time = 0;
+        this.player_draw_matrix = new Matrix();
+        this.player_draw_scale = 18f / 13f;
+    }
+
+    private void loadPlayerFrames() {
+        BitmapFactory.Options o = new BitmapFactory.Options();
+        o.inScaled = false;
+        Bitmap player_sheet = BitmapFactory.decodeResource(context.getResources(), R.drawable.hero_sheet, o);
+        int h = player_sheet.getWidth() / 13;
+        int v = player_sheet.getHeight() / 17;
+        this.player_frames = new Bitmap[h * v];
+        int framenumber = 0;
+        for(int y = 0; y < v; y++) {
+            for(int x = 0; x < h; x++) {
+                this.player_frames[framenumber] = Bitmap.createBitmap(player_sheet, x * 13, y * 17, 13, 17);
+                framenumber++;
+            }
+        }
     }
 
     /**
@@ -142,12 +180,14 @@ public class GameState {
             //Black circle at start of level is expanding. After 1 second the screen is fully visible
             this.start_circle_radius += (float)deltaFrameTime / 1000;
             return;
+        } else if(this.paused) {
+            return;
         }
 
         this.player_velocity_y += ((float) deltaFrameTime / 1000) * this.player_acceleration_y * this.gravity;
 
         //Player position after this deltatime-step
-        this.player_collision_px.set(this.player_pos_x + this.player_velocity_x * this.player_boost_x * ((float) deltaFrameTime / 1000), this.player_pos_y + this.player_velocity_y, this.player_pos_x + this.player_velocity_x * this.player_boost_x * ((float) deltaFrameTime / 1000) + 24, this.player_pos_y + this.player_velocity_y + 24);
+        this.player_collision_px.set(this.player_pos_x + this.player_velocity_x * this.player_boost_x * ((float) deltaFrameTime / 1000), this.player_pos_y + this.player_velocity_y, this.player_pos_x + this.player_velocity_x * this.player_boost_x * ((float) deltaFrameTime / 1000) + 18, this.player_pos_y + this.player_velocity_y + 24);
         this.player_collision_tiles.set((int) (this.player_collision_px.left / 24), (int) (this.player_collision_px.top / 24), (int) (this.player_collision_px.right / 24), (int) (this.player_collision_px.bottom / 24));
 
         if (this.player_collision_tiles.left >= 0 && this.player_collision_tiles.top >= 0 && this.player_collision_tiles.right < this.stage.stage_collision.length && this.player_collision_tiles.bottom <= this.stage.stage_collision[0].length) {
@@ -179,10 +219,11 @@ public class GameState {
                     //Only one corner collided, can be either X or Y first
                     calcCollisionTimeX();
                     calcCollisionTimeY();
-
                     if (this.col_time_y < 0 && this.col_time_x > 0) {
                         //no valid collision on Y, collision on X
                         this.player_dead = true;
+                        this.player_pos_x = this.player_collision_px.left;
+                        this.player_pos_y = this.player_collision_px.top;
                     } else {
                         //Y before X => Y Solid Collosion => Position adjustment
                         adjustPositionY();
@@ -202,9 +243,13 @@ public class GameState {
                 } else if (collision_corners[0] == 6 || collision_corners[1] == 6 || collision_corners[2] == 6 || collision_corners[3] == 6) {
                     //X Finish Collision
                     this.finished = true;
+                    this.player_pos_x = this.player_collision_px.left;
+                    this.player_pos_y = this.player_collision_px.top;
                 } else if (collision_corners[0] == 2 || collision_corners[1] == 2 || collision_corners[2] == 2 || collision_corners[3] == 2) {
                     //X Death Collision (spikes)
                     this.player_dead = true;
+                    this.player_pos_x = this.player_collision_px.left;
+                    this.player_pos_y = this.player_collision_px.top;
                 }
 
                 this.player_velocity_y = 0;
@@ -220,6 +265,8 @@ public class GameState {
         } else {
             //Player is out of bounds => DIE!
             this.player_dead = true;
+            this.player_pos_x = this.player_collision_px.left;
+            this.player_pos_y = this.player_collision_px.top;
         }
     }
 
@@ -262,6 +309,9 @@ public class GameState {
             this.player_pos_y = this.player_collision_px.top - this.player_collision_px.top % 24;
         else
             this.player_pos_y = this.player_collision_px.top + (24 - this.player_collision_px.top % 24);
+
+        this.player_last_state = this.player_state;
+        this.player_state = PlayerState.RUNNING;
     }
 
     /**
@@ -271,6 +321,8 @@ public class GameState {
     private void checkCollisionX() {
         if ((this.collision_corners[0] == 1 && this.collision_corners[3] == 1) || (this.collision_corners[1] == 1 && this.collision_corners[2] == 1)) {
             this.player_dead = true;
+            this.player_pos_x = this.player_collision_px.left;
+            this.player_pos_y = this.player_collision_px.top;
         }
     }
 
@@ -283,7 +335,7 @@ public class GameState {
         if(this.player_velocity_x < 0)
             this.col_time_x = (this.player_collision_tiles.right * 24 - this.player_pos_x) / (this.player_velocity_x * this.player_boost_x);
         else
-            this.col_time_x = (this.player_collision_tiles.left * 24 - this.player_pos_x) / (this.player_velocity_x * this.player_boost_x);
+            this.col_time_x = (this.player_collision_tiles.left * 24 + 6 - this.player_pos_x) / (this.player_velocity_x * this.player_boost_x);
     }
 
     /**
@@ -300,45 +352,151 @@ public class GameState {
 
     private float trans_x = 0; //draw-translation on x axis
     private float trans_y = 0; //draw-translation on y axis
+    private float trans_x_unscaled = 0;
+    private float trans_y_unscaled = 0;
+
+    private Rect draw_src;
+    private Rect draw_tar;
+
+    private static final float FRAME_TIME = 200f;
 
     /**
      * Draws the current state of the game onto c
      * @param c The Canvas that is drawed onto
      * @since 0.1
      */
-    public void draw(Canvas c) {
-        if (this.player_velocity_x > 0) {
-            this.trans_x = this.player_pos_x * this.stage.stage_scale - this.stage.tile_size_scaled * 4;
+    public void draw(Canvas c, float deltaFrameTime) {
+        if (this.paused) {
+            c.drawColor(Color.BLACK);
+            c.drawText(context.getResources().getText(R.string.pause_game).toString(), this.screenWidth / 2, this.screenHeight / 3, this.text_border_paint);
+            c.drawText(context.getResources().getText(R.string.pause_game).toString(), this.screenWidth / 2, this.screenHeight / 3, this.text_paint);
+            c.drawRoundRect(this.continue_touch_zone, 10, 10, player_paint);
+            c.drawRoundRect(this.exit_touch_zone, 10, 10, player_paint);
         } else {
-            this.trans_x = this.player_pos_x * this.stage.stage_scale - (c.getWidth() - this.stage.tile_size_scaled * 5);
-        }
-        if (this.trans_x < 0) this.trans_x = 0;
-        else if (this.trans_x > this.stage.stage_foreground.getWidth() - c.getWidth()) this.trans_x = this.stage.stage_foreground.getWidth() - c.getWidth();
+            if (this.player_velocity_x > 0) {
+                this.trans_x = this.player_pos_x * this.stage.stage_scale - 96 * this.stage.stage_scale;
+            } else {
+                this.trans_x = this.player_pos_x * this.stage.stage_scale - (c.getWidth() - 120 * this.stage.stage_scale);
+            }
+            if (this.trans_x < 0) this.trans_x = 0;
+            else if (this.trans_x > this.stage.stage_foreground.getWidth() * this.stage.stage_scale - c.getWidth())
+                this.trans_x = this.stage.stage_foreground.getWidth() * this.stage.stage_scale - c.getWidth();
 
-        if (this.player_pos_y * this.stage.stage_scale - this.trans_y > this.trans_y + c.getHeight() - this.stage.tile_size_scaled * 2)
-            this.trans_y += (this.player_pos_y * this.stage.stage_scale - this.trans_y) - (this.trans_y + c.getHeight() - this.stage.tile_size_scaled * 2);
-        else if (this.player_pos_y * this.stage.stage_scale - this.trans_y < this.trans_y + this.stage.tile_size_scaled)
-            this.trans_y += (this.player_pos_y * this.stage.stage_scale - this.trans_y) - (this.trans_y + this.stage.tile_size_scaled);
+            if (this.player_pos_y * this.stage.stage_scale - this.trans_y > this.trans_y + c.getHeight() - 48 * this.stage.stage_scale)
+                this.trans_y += (this.player_pos_y * this.stage.stage_scale - this.trans_y) - (this.trans_y + c.getHeight() - 48 * this.stage.stage_scale);
+            else if (this.player_pos_y * this.stage.stage_scale - this.trans_y < this.trans_y + 24 * this.stage.stage_scale)
+                this.trans_y += (this.player_pos_y * this.stage.stage_scale - this.trans_y) - (this.trans_y + 24 * this.stage.stage_scale);
 
-        c.drawBitmap(this.stage.stage_foreground, -this.trans_x, -this.trans_y, null);
-        c.drawRect(
-                this.player_pos_x * this.stage.stage_scale - this.trans_x,
-                this.player_pos_y * this.stage.stage_scale - this.trans_y,
-                (this.player_pos_x + 24) * this.stage.stage_scale - this.trans_x,
-                (this.player_pos_y + 24) * this.stage.stage_scale - this.trans_y,
-                player_paint);
+            this.trans_x_unscaled = this.trans_x / this.stage.stage_scale;
+            this.trans_y_unscaled = this.trans_y / this.stage.stage_scale;
 
-        if(this.player_dead) {
-            //Player is dead. Draw retry message
-            c.drawText(this.you_died_retry, this.screenWidth / 2, this.screenHeight / 2, this.text_border_paint);
-            c.drawText(this.you_died_retry, this.screenWidth / 2, this.screenHeight / 2, this.text_paint);
-        } else if (this.finished) {
-            c.drawText(this.stage.stage_name + " finished!\nTap to continue.", this.screenWidth / 2, this.screenHeight / 2, this.text_border_paint); //TODO: Replace string
-            c.drawText(this.stage.stage_name + " finished!\nTap to continue.", this.screenWidth / 2, this.screenHeight / 2, this.text_paint); //TODO: Replace string
-        } else if(this.start_circle_radius < 1) {
-            //Stage has started. Draw expanding circle first second
-            this.start_circle_canvas.drawCircle((this.player_pos_x + 24) * this.stage.stage_scale, (this.player_pos_y + 24) * this.stage.stage_scale, this.start_circle_radius * this.screenWidth, trans_paint);
-            c.drawBitmap(start_circle_bmp, 0, 0, null);
+            this.draw_src.set((int) (this.trans_x_unscaled), (int) (this.trans_y_unscaled), (int) (c.getWidth() / this.stage.stage_scale + this.trans_x_unscaled), (int) (c.getHeight() / this.stage.stage_scale + this.trans_y_unscaled));
+            this.draw_tar.set(0, 0, c.getWidth(), c.getHeight());
+
+            //c.drawBitmap(this.stage.stage_foreground, -this.trans_x, -this.trans_y, null);
+            c.drawBitmap(
+                    this.stage.stage_foreground,
+                    this.draw_src,
+                    this.draw_tar,
+                    null);
+
+            this.player_draw_matrix.reset();
+            if (this.player_velocity_x > 0) {
+                this.player_draw_matrix.setTranslate(this.player_pos_x * this.stage.stage_scale - this.trans_x, this.player_pos_y * this.stage.stage_scale - this.trans_y);
+                this.player_draw_matrix.preScale(this.player_draw_scale * this.stage.stage_scale, this.player_draw_scale * this.stage.stage_scale);
+            } else {
+                this.player_draw_matrix.setTranslate((this.player_pos_x + 18) * this.stage.stage_scale - this.trans_x, this.player_pos_y * this.stage.stage_scale - this.trans_y);
+                this.player_draw_matrix.preScale(-this.player_draw_scale * this.stage.stage_scale, this.player_draw_scale * this.stage.stage_scale);
+            }
+
+            if(this.player_last_state == PlayerState.JUMPING && this.player_state == PlayerState.RUNNING) {
+                //LANDING
+                this.player_state = PlayerState.START_END_JUMP;
+                this.player_anim_time = 0;
+            }
+
+            this.player_anim_time = (this.player_anim_time + deltaFrameTime) % 1000;
+            switch (this.player_state) {
+                case RUNNING:
+                    this.player_current_frame = (int)((this.player_anim_time / FRAME_TIME) % 6);
+                    if(this.gravity < 0) {
+                        this.player_draw_matrix.postTranslate(0, 24 * this.stage.stage_scale);
+                        this.player_draw_matrix.preScale(1, -1);
+                    }
+                    break;
+                case JUMPING:
+                    if(this.player_velocity_y < 0 && this.gravity > 0 || this.player_velocity_y > 0 && this.gravity < 0) {
+                        //JUMP UP
+                        this.player_current_frame = (int)(this.player_anim_time / FRAME_TIME) % 3 + 18;
+                    } else if (this.player_velocity_y < 0 && this.gravity < 0 || this.player_velocity_y > 0 && this.gravity > 0) {
+                        //JUMP DOWN
+                        this.player_current_frame = (int)(this.player_anim_time / FRAME_TIME) % 3 + 12;
+                    }
+                    if(this.gravity < 0) {
+                        this.player_draw_matrix.postTranslate(0, 24 * this.stage.stage_scale);
+                        this.player_draw_matrix.preScale(1, -1);
+                    }
+                    break;
+                case START_END_JUMP:
+                    if(this.player_anim_time > FRAME_TIME * 2) {
+                        if(this.player_last_state == PlayerState.JUMPING) {
+                            this.player_last_state = this.player_state;
+                            this.player_state = PlayerState.RUNNING;
+                        } else if (this.player_last_state == PlayerState.RUNNING) {
+                            this.player_last_state = this.player_state;
+                            this.player_state = PlayerState.JUMPING;
+                        }
+                        this.player_anim_time = 0;
+                    }
+                    this.player_current_frame = (int)((this.player_anim_time) / FRAME_TIME) % 3 + 15;
+                    if(this.gravity < 0) {
+                        this.player_draw_matrix.postTranslate(0, 24 * this.stage.stage_scale);
+                        this.player_draw_matrix.preScale(1, -1);
+                    }
+                    break;
+                case GRAVITY:
+                    if(this.gravity < 0) {
+                        this.player_current_frame = (int)(this.player_anim_time / FRAME_TIME) % 3 + 6;
+                    } else {
+                        this.player_current_frame = (int)(this.player_anim_time / FRAME_TIME) % 3 + 9;
+                    }
+                    break;
+                case DYING:
+                    break;
+            }
+
+            c.drawBitmap(this.player_frames[this.player_current_frame], player_draw_matrix, this.player_paint);
+
+            /*c.drawBitmap(
+                    this.player_frames[this.player_current_frame],
+                    null,
+                    new RectF(
+                            this.player_pos_x * this.stage.stage_scale - this.trans_x,
+                            this.player_pos_y * this.stage.stage_scale - this.trans_y,
+                            (this.player_pos_x + 18) * this.stage.stage_scale - this.trans_x,
+                            (this.player_pos_y + 24) * this.stage.stage_scale - this.trans_y),
+                    this.player_paint);*/
+
+            /*c.drawRect(
+                    this.player_pos_x * this.stage.stage_scale - this.trans_x,
+                    this.player_pos_y * this.stage.stage_scale - this.trans_y,
+                    (this.player_pos_x + 18) * this.stage.stage_scale - this.trans_x,
+                    (this.player_pos_y + 24) * this.stage.stage_scale - this.trans_y,
+                    player_paint);*/
+
+
+            if (this.player_dead) {
+                //Player is dead. Draw retry message
+                c.drawText(this.you_died_retry, this.screenWidth / 2, this.screenHeight / 2, this.text_border_paint);
+                c.drawText(this.you_died_retry, this.screenWidth / 2, this.screenHeight / 2, this.text_paint);
+            } else if (this.finished) {
+                c.drawText(this.stage.stage_name + " finished!\nTap to continue.", this.screenWidth / 2, this.screenHeight / 2, this.text_border_paint); //TODO: Replace string
+                c.drawText(this.stage.stage_name + " finished!\nTap to continue.", this.screenWidth / 2, this.screenHeight / 2, this.text_paint); //TODO: Replace string
+            } else if (this.start_circle_radius < 1) {
+                //Stage has started. Draw expanding circle first second
+                this.start_circle_canvas.drawCircle((this.player_pos_x + 24) * this.stage.stage_scale, (this.player_pos_y + 24) * this.stage.stage_scale, this.start_circle_radius * this.screenWidth, trans_paint);
+                c.drawBitmap(start_circle_bmp, 0, 0, null);
+            }
         }
     }
 
@@ -352,6 +510,10 @@ public class GameState {
             this.gravity *= -1;
             this.player_inAir = true;
             this.player_first_gravity_inAir = true;
+
+            this.player_last_state = this.player_state;
+            this.player_state = PlayerState.GRAVITY;
+            this.player_anim_time = 0;
         }
     }
 
@@ -364,6 +526,10 @@ public class GameState {
         if (!this.player_inAir) {
             this.player_velocity_y -= 5 * gravity; //TODO: Change to proper value
             this.player_inAir = true;
+
+            this.player_last_state = this.player_state;
+            this.player_state = PlayerState.START_END_JUMP;
+            this.player_anim_time = 0;
         }
     }
 
@@ -380,15 +546,26 @@ public class GameState {
                 this.load(this.stage.stage_level + 1);
             } else if (!this.started) {
                 this.started = true;
-            } else {
+            } else if (this.paused) {
+                if(this.continue_touch_zone.contains(event.getX(), event.getY())) {
+                    this.paused = false;
+                } else if(this.exit_touch_zone.contains(event.getX(), event.getY())) {
+                    //TODO end game
+                }
+            }
+            else {
                 if (event.getX() < this.screenWidth / 2) {
                     this.invertGravity();
                 } else {
                     this.jump();
                 }
             }
-        } else {
-            //TODO: Other Events?
+        }
+    }
+
+    public void onBackPressed() {
+        if(!this.paused) {
+            this.paused = true;
         }
     }
 
