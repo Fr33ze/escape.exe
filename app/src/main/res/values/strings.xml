@@ -7,4 +7,5 @@
     <string name="player_died">You died, Retry?</string>
     <string name="pause_game">Game Paused!</string>
     <string name="back_to_menu">Exit</string>
+    <string name="next_level"> finished! Tap to continue.</string>
 </resources>

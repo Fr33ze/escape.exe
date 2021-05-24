@@ -113,8 +113,7 @@ public class Stage {
                         this.stage_collision = new int[stage_width_tiles][stage_heigth_tiles];
                         break;
                     case "#tiles":
-                        //canvas.drawRect(0, 0, this.stage_foreground.getWidth(), this.stage_foreground.getHeight(), this.background_paint);
-                        canvas.drawColor(Color.WHITE);
+                        canvas.drawRect(0, 0, this.stage_foreground.getWidth(), this.stage_foreground.getHeight(), this.background_paint);
                         for (int y = 0; y < this.stage_heigth_tiles; y++) {
                             line = reader.readLine();
                             String[] tilesInLine = line.split(" ");

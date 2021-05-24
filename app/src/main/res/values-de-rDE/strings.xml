@@ -7,4 +7,5 @@
     <string name="player_died">Du bist gestorben! Erneut versuchen?</string>
     <string name="pause_game">Pause!</string>
     <string name="back_to_menu">Zurück zum Menü</string>
+    <string name="next_level"> geschafft! Berühre um fortzufahren.</string>
 </resources>
