@@ -1,6 +1,7 @@
 /**
  * Handles the current state of the application.
  * This class saves information regarding the position of the player on a 2D grid, player velocity, player acceleration, gravity (up or down), is player dead and more.
+ *
  * @author Lukas Lidauer & Jan König
  */
 package at.ac.tuwien.mmue_sb10;
@@ -43,7 +44,7 @@ public class GameState {
     private boolean player_first_gravity_inAir; //player is allowed to do only one gravity change in the air until he hits the ground again. This variable keeps track of that.
     private boolean player_dead; //player died
     private boolean player_no_input; //game doesnt accept input for player until stage is finished. starts screen fade out
-    private float fade_out_time; //timer to fade out
+    private float current_fade_out_time; //current timer to fade out
 
     private PlayerState player_state; //current state of the player. used for animations
     private PlayerState player_last_state; //last state of player. used for animations
@@ -60,6 +61,8 @@ public class GameState {
     private boolean finished; //stage is finished
     private boolean started; //stage is started
     public boolean running; //game is running
+    private int deaths_amount; //deaths in the current stage
+    private int total_deaths_amount; //total deaths in all stages so far TODO Load
 
     /*
      * PAUSE MENU
@@ -89,6 +92,7 @@ public class GameState {
     private Bitmap start_circle_bmp; //bitmap for the expanding circle at the start
     private Canvas start_circle_canvas; //canvas to draw on start_circle_bmp
     private boolean player_invisible; //draw player or not
+    private Bitmap death_counter_icon; //icon for the death counter
 
     /*
      * PAINT
@@ -97,6 +101,9 @@ public class GameState {
     private Paint text_paint; //paint for text
     private Paint text_border_paint; //border paint for text
     private Paint trans_paint; //paint for transparency
+    private Paint button_paint; //paint for buttons
+    private Paint button_text_paint; //paint for text on buttons
+    private Paint death_counter_paint; //paint for the death counter
 
     /*
      * STRINGS
@@ -135,6 +142,7 @@ public class GameState {
         this.player_paint = new Paint();
         this.player_paint.setAntiAlias(true);
         loadPlayerFrames();
+        loadDeathCounter();
 
         this.text_paint = new Paint();
         this.text_paint.setColor(Color.RED);
@@ -153,22 +161,41 @@ public class GameState {
         this.trans_paint = new Paint();
         this.trans_paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
 
+        this.button_paint = new Paint();
+        this.button_paint.setAntiAlias(true);
+        this.button_paint.setColor(Color.GRAY);
+
+        this.button_text_paint = new Paint();
+        this.button_text_paint.setColor(Color.BLACK);
+        this.button_text_paint.setStyle(Paint.Style.FILL_AND_STROKE);
+        this.button_text_paint.setTypeface(Typeface.DEFAULT_BOLD);
+        this.button_text_paint.setTextAlign(Paint.Align.CENTER);
+        this.button_text_paint.setTextSize(22 * this.density);
+
+        this.death_counter_paint = new Paint();
+        this.death_counter_paint.setColor(Color.RED);
+        this.death_counter_paint.setStyle(Paint.Style.FILL_AND_STROKE);
+        this.death_counter_paint.setTypeface(Typeface.DEFAULT_BOLD);
+        this.death_counter_paint.setTextSize(this.death_counter_icon.getHeight());
+
         this.you_died_retry = context.getResources().getString(R.string.player_died);
         this.finished_next_level = context.getResources().getString(R.string.next_level);
 
-        this.start_circle_bmp = Bitmap.createBitmap((int)this.screenWidth, (int)this.screenHeight, Bitmap.Config.ARGB_8888);
+        this.start_circle_bmp = Bitmap.createBitmap((int) this.screenWidth, (int) this.screenHeight, Bitmap.Config.ARGB_8888);
         this.start_circle_canvas = new Canvas(this.start_circle_bmp);
 
         this.draw_src = new Rect();
         this.draw_tar = new Rect();
 
-        this.continue_touch_zone = new RectF(this.screenWidth * 0.33f - 60 * this.density, this.screenHeight / 2, this.screenWidth * 0.33f + 60 * this.density, this.screenHeight / 2 + 40 * this.density);
-        this.exit_touch_zone = new RectF(this.screenWidth * 0.66f - 60 * this.density, this.screenHeight / 2, this.screenWidth * 0.66f + 60 * this.density, this.screenHeight / 2 + 40 * this.density);
+        this.continue_touch_zone = new RectF(this.screenWidth * 0.33f, this.screenHeight / 2 - 10 * this.density, this.screenWidth * 0.66f, this.screenHeight / 2 + 50 * this.density);
+        this.exit_touch_zone = new RectF(this.screenWidth * 0.33f, this.screenHeight / 2 + 70 * this.density, this.screenWidth * 0.66f, this.screenHeight / 2 + 130 * this.density);
 
         this.player_state = PlayerState.IDLE;
         this.player_anim_time = 0;
         this.player_draw_matrix = new Matrix();
-        this.player_draw_scale = (float)PLAYER_WIDTH / this.player_frames[0].getWidth();
+        this.player_draw_scale = (float) PLAYER_WIDTH / this.player_frames[0].getWidth();
+
+        this.total_deaths_amount = 0; //TODO
 
         this.running = false;
     }
@@ -184,12 +211,24 @@ public class GameState {
         int v = player_sheet.getHeight() / 17;
         this.player_frames = new Bitmap[h * v];
         int framenumber = 0;
-        for(int y = 0; y < v; y++) {
-            for(int x = 0; x < h; x++) {
+        for (int y = 0; y < v; y++) {
+            for (int x = 0; x < h; x++) {
                 this.player_frames[framenumber] = Bitmap.createBitmap(player_sheet, x * 13, y * 17, 13, 17);
                 framenumber++;
             }
         }
+    }
+
+    /**
+     * Loads the death counter sprite from the resources
+     */
+    private void loadDeathCounter() {
+        BitmapFactory.Options o = new BitmapFactory.Options();
+        o.inScaled = false;
+        Bitmap temp_death = BitmapFactory.decodeResource(context.getResources(), R.drawable.deaths, o);
+        this.death_counter_icon = Bitmap.createScaledBitmap(
+                temp_death, (int)(temp_death.getWidth() * 2 * this.density), (int)(temp_death.getHeight() * 2 * this.density), true
+        );
     }
 
     /**
@@ -201,11 +240,11 @@ public class GameState {
         if (this.player_dead || this.finished || !this.started) {
             //Game over. Proceed to next stage or retry
             return;
-        } else if(this.start_circle_radius < 1) {
+        } else if (this.start_circle_radius < 1) {
             //Black circle at start of level is expanding. After 1 second the screen is fully visible
-            this.start_circle_radius += (float)deltaFrameTime / 1000;
+            this.start_circle_radius += (float) deltaFrameTime / 1000;
             return;
-        } else if(this.paused) {
+        } else if (this.paused) {
             return;
         }
 
@@ -270,7 +309,7 @@ public class GameState {
                     finishStage();
                     this.player_pos_x = this.player_collision_px.left;
                     this.player_pos_y = this.player_collision_px.top;
-                } else if(collision_corners[0] == 7 || collision_corners[1] == 7 || collision_corners[2] == 7 || collision_corners[3] == 7) {
+                } else if (collision_corners[0] == 7 || collision_corners[1] == 7 || collision_corners[2] == 7 || collision_corners[3] == 7) {
                     //X Collision with no-input tile
                     //happens before finish line for running out of screen effect
                     setNoPlayerInput();
@@ -361,7 +400,7 @@ public class GameState {
      * @since 0.1
      */
     private void calcCollisionTimeX() {
-        if(this.player_velocity_x < 0)
+        if (this.player_velocity_x < 0)
             this.col_time_x = (this.player_collision_tiles.right * 24 - this.player_pos_x) / (this.player_velocity_x * this.player_boost_x);
         else
             this.col_time_x = (this.player_collision_tiles.left * 24 + (24 - PLAYER_WIDTH) - this.player_pos_x) / (this.player_velocity_x * this.player_boost_x); //TODO: (24 - PLAYER_WIDTH) only works with PLAYER_WIDTH < 24
@@ -373,7 +412,7 @@ public class GameState {
      * @since 0.1
      */
     private void calcCollisionTimeY() {
-        if(this.player_velocity_y < 0)
+        if (this.player_velocity_y < 0)
             this.col_time_y = (this.player_collision_tiles.bottom * 24 - this.player_pos_y) / this.player_velocity_y;
         else
             this.col_time_y = (this.player_collision_tiles.top * 24 - this.player_pos_y) / this.player_velocity_y;
@@ -386,37 +425,17 @@ public class GameState {
      * @since 0.1
      */
     public void draw(Canvas c, float deltaFrameTime) {
-        if (this.paused) {
-            drawPauseScreen(c);
-        } else {
-            if(!this.player_no_input) {
-                translateX(c);
-                translateY(c);
-            }
-
-            drawMap(c);
-
-            if(!this.player_invisible)
-                drawPlayer(c, deltaFrameTime);
-
-            if(this.player_no_input) {
-                this.fade_out_time += deltaFrameTime;
-                c.drawARGB(Math.min((int)((this.fade_out_time / 3500) * 255), 255), 0, 0, 0);
-            }
-
-            if (this.player_dead) {
-                //Player is dead. Draw retry message
-                c.drawText(this.you_died_retry, this.screenWidth / 2, this.screenHeight / 2, this.text_border_paint);
-                c.drawText(this.you_died_retry, this.screenWidth / 2, this.screenHeight / 2, this.text_paint);
-            } else if (this.finished) {
-                c.drawText(this.stage.stage_name + " " + finished_next_level, this.screenWidth / 2, this.screenHeight / 2, this.text_border_paint);
-                c.drawText(this.stage.stage_name + " " + finished_next_level, this.screenWidth / 2, this.screenHeight / 2, this.text_paint);
-            } else if (this.start_circle_radius < 1) {
-                //Stage has started. Draw expanding circle first second
-                this.start_circle_canvas.drawCircle((this.player_pos_x + PLAYER_WIDTH / 2) * this.stage.stage_scale, (this.player_pos_y + PLAYER_HEIGTH / 2) * this.stage.stage_scale, this.start_circle_radius * this.screenWidth, trans_paint);
-                c.drawBitmap(start_circle_bmp, 0, 0, null);
-            }
+        if (!this.player_no_input) {
+            translateX(c);
+            translateY(c);
         }
+
+        drawMap(c);
+
+        if (!this.player_invisible)
+            drawPlayer(c, deltaFrameTime);
+
+        drawHUD(c, deltaFrameTime);
     }
 
     /**
@@ -441,9 +460,9 @@ public class GameState {
      * @param c Canvas that needs to be translated (needed for width and heigth)
      */
     private void translateY(Canvas c) {
-        if(this.player_pos_y * this.stage.stage_scale + PLAYER_HEIGTH * this.stage.stage_scale > this.trans_y + c.getHeight() - 48 * this.stage.stage_scale)
+        if (this.player_pos_y * this.stage.stage_scale + PLAYER_HEIGTH * this.stage.stage_scale > this.trans_y + c.getHeight() - 48 * this.stage.stage_scale)
             this.trans_y = this.player_pos_y * this.stage.stage_scale + PLAYER_HEIGTH * this.stage.stage_scale - c.getHeight() + 48 * this.stage.stage_scale;
-        else if(this.player_pos_y * this.stage.stage_scale < this.trans_y + 48 * this.stage.stage_scale)
+        else if (this.player_pos_y * this.stage.stage_scale < this.trans_y + 48 * this.stage.stage_scale)
             this.trans_y = this.player_pos_y * this.stage.stage_scale - 48 * this.stage.stage_scale;
         if (this.trans_y < 0) this.trans_y = 0;
         else if (this.trans_y > this.stage.stage_foreground.getHeight() * this.stage.stage_scale - c.getHeight())
@@ -457,15 +476,27 @@ public class GameState {
      * @param c Canvas to draw the level onto
      */
     private void drawMap(Canvas c) {
-        this.draw_src.set((int) (this.trans_x_unscaled), (int) (this.trans_y_unscaled), (int) (c.getWidth() / this.stage.stage_scale + this.trans_x_unscaled), (int) (c.getHeight() / this.stage.stage_scale + this.trans_y_unscaled));
-        this.draw_tar.set(0, 0, c.getWidth(), c.getHeight());
+        this.draw_src.set(
+                (int) (this.trans_x_unscaled),
+                (int) (this.trans_y_unscaled),
+                (int) (c.getWidth() / this.stage.stage_scale + this.trans_x_unscaled),
+                (int) (c.getHeight() / this.stage.stage_scale + this.trans_y_unscaled)
+        );
+
+        this.draw_tar.set(
+                0,
+                0,
+                c.getWidth(),
+                c.getHeight()
+        );
 
         //c.drawBitmap(this.stage.stage_foreground, -this.trans_x, -this.trans_y, null);
         c.drawBitmap(
                 this.stage.stage_foreground,
                 this.draw_src,
                 this.draw_tar,
-                null);
+                null
+        );
     }
 
     /**
@@ -483,7 +514,7 @@ public class GameState {
             this.player_draw_matrix.preScale(-this.player_draw_scale * this.stage.stage_scale, this.player_draw_scale * this.stage.stage_scale);
         }
 
-        if(this.player_last_state == PlayerState.JUMPING && this.player_state == PlayerState.RUNNING) {
+        if (this.player_last_state == PlayerState.JUMPING && this.player_state == PlayerState.RUNNING) {
             //LANDING
             this.player_state = PlayerState.START_END_JUMP;
             this.player_anim_time = 0;
@@ -492,34 +523,34 @@ public class GameState {
         this.player_anim_time = (this.player_anim_time + deltaFrameTime) % 1000;
         switch (this.player_state) {
             case IDLE:
-                this.player_current_frame = (int)((this.player_anim_time / FRAME_TIME) % 11) + 8;
+                this.player_current_frame = (int) ((this.player_anim_time / FRAME_TIME) % 11) + 8;
                 break;
             case WAKEUP:
-                this.player_current_frame = (int)((this.player_anim_time / FRAME_TIME) % 8) + 20;
+                this.player_current_frame = (int) ((this.player_anim_time / FRAME_TIME) % 8) + 20;
                 break;
             case RUNNING:
-                this.player_current_frame = (int)((this.player_anim_time / FRAME_TIME) % 6) + 42;
-                if(this.gravity < 0) {
+                this.player_current_frame = (int) ((this.player_anim_time / FRAME_TIME) % 6) + 42;
+                if (this.gravity < 0) {
                     this.player_draw_matrix.postTranslate(0, PLAYER_HEIGTH * this.stage.stage_scale);
                     this.player_draw_matrix.preScale(1, -1);
                 }
                 break;
             case JUMPING:
-                if(this.player_velocity_y < 0 && this.gravity > 0 || this.player_velocity_y > 0 && this.gravity < 0) {
+                if (this.player_velocity_y < 0 && this.gravity > 0 || this.player_velocity_y > 0 && this.gravity < 0) {
                     //JUMP UP
-                    this.player_current_frame = (int)(this.player_anim_time / FRAME_TIME) % 3 + 39;
+                    this.player_current_frame = (int) (this.player_anim_time / FRAME_TIME) % 3 + 39;
                 } else if (this.player_velocity_y < 0 && this.gravity < 0 || this.player_velocity_y > 0 && this.gravity > 0) {
                     //JUMP DOWN
-                    this.player_current_frame = (int)(this.player_anim_time / FRAME_TIME) % 2 + 34;
+                    this.player_current_frame = (int) (this.player_anim_time / FRAME_TIME) % 2 + 34;
                 }
-                if(this.gravity < 0) {
+                if (this.gravity < 0) {
                     this.player_draw_matrix.postTranslate(0, 24 * this.stage.stage_scale);
                     this.player_draw_matrix.preScale(1, -1);
                 }
                 break;
             case START_END_JUMP:
-                if(this.player_anim_time > FRAME_TIME * 2) {
-                    if(this.player_last_state == PlayerState.JUMPING) {
+                if (this.player_anim_time > FRAME_TIME * 2) {
+                    if (this.player_last_state == PlayerState.JUMPING) {
                         this.player_last_state = this.player_state;
                         this.player_state = PlayerState.RUNNING;
                     } else if (this.player_last_state == PlayerState.RUNNING) {
@@ -528,26 +559,26 @@ public class GameState {
                     }
                     this.player_anim_time = 0;
                 }
-                this.player_current_frame = (int)((this.player_anim_time) / FRAME_TIME) % 3 + 36;
-                if(this.gravity < 0) {
+                this.player_current_frame = (int) ((this.player_anim_time) / FRAME_TIME) % 3 + 36;
+                if (this.gravity < 0) {
                     this.player_draw_matrix.postTranslate(0, PLAYER_HEIGTH * this.stage.stage_scale);
                     this.player_draw_matrix.preScale(1, -1);
                 }
                 break;
             case GRAVITY:
-                if(this.gravity < 0) {
-                    this.player_current_frame = (int)(this.player_anim_time / FRAME_TIME) % 3 + 31;
+                if (this.gravity < 0) {
+                    this.player_current_frame = (int) (this.player_anim_time / FRAME_TIME) % 3 + 31;
                 } else {
-                    this.player_current_frame = (int)(this.player_anim_time / FRAME_TIME) % 3 + 28;
+                    this.player_current_frame = (int) (this.player_anim_time / FRAME_TIME) % 3 + 28;
                 }
                 break;
             case DYING:
-                if(this.player_anim_time > FRAME_TIME * 7) {
+                if (this.player_anim_time > FRAME_TIME * 7) {
                     this.player_invisible = true;
                 } else {
                     this.player_current_frame = (int) ((this.player_anim_time / FRAME_TIME) % 8);
                 }
-                if(this.gravity < 0) {
+                if (this.gravity < 0) {
                     this.player_draw_matrix.postTranslate(0, PLAYER_HEIGTH * this.stage.stage_scale);
                     this.player_draw_matrix.preScale(1, -1);
                 }
@@ -558,15 +589,83 @@ public class GameState {
     }
 
     /**
+     * Draws the HUD on the canvas
+     * HUD includes pausescreen, deathscreen, finishedscreen, fadeins, fadeouts, deathcounter, ...
+     * @param c Canvas to draw the HUD onto
+     * @param deltaFrameTime Passed time since the last frame
+     */
+    private void drawHUD(Canvas c, float deltaFrameTime) {
+        drawDeathCounter(c);
+
+        if (this.paused) {
+            drawFadeout(c, deltaFrameTime, 200, 128);
+            drawPauseScreen(c);
+        } else if (this.player_dead) {
+            //Player is dead. Draw retry message
+            drawFadeout(c, deltaFrameTime, 1000, 255, 300);
+            c.drawText(this.you_died_retry, this.screenWidth / 2, this.screenHeight / 2, this.text_border_paint);
+            c.drawText(this.you_died_retry, this.screenWidth / 2, this.screenHeight / 2, this.text_paint);
+        } else if (this.finished) {
+            drawFadeout(c, deltaFrameTime, 3500, 255);
+            c.drawText(this.stage.stage_name + " " + finished_next_level, this.screenWidth / 2, this.screenHeight / 2, this.text_border_paint);
+            c.drawText(this.stage.stage_name + " " + finished_next_level, this.screenWidth / 2, this.screenHeight / 2, this.text_paint);
+        } else if (this.start_circle_radius < 1) {
+            //Stage has started. Draw expanding circle first second
+            this.start_circle_canvas.drawCircle((this.player_pos_x + PLAYER_WIDTH / 2) * this.stage.stage_scale, (this.player_pos_y + PLAYER_HEIGTH / 2) * this.stage.stage_scale, this.start_circle_radius * this.screenWidth, trans_paint);
+            c.drawBitmap(start_circle_bmp, 0, 0, null);
+        } else if (this.player_no_input) {
+            drawFadeout(c, deltaFrameTime, 3500, 255);
+        }
+    }
+
+    /**
+     * Draws the death counter onthe canvas
+     * @param c Canvas to draw the death counter onto
+     */
+    private void drawDeathCounter(Canvas c) {
+        c.drawBitmap(this.death_counter_icon, c.getWidth() - this.death_counter_icon.getWidth() - 70 * this.density, 20 * this.density, null);
+        c.drawText("x" + this.deaths_amount, c.getWidth() - 65 * this.density, this.death_counter_icon.getHeight() + 15 * this.density, this.death_counter_paint);
+    }
+
+    /**
      * Draws the pause screen on the canvas
      * @param c Canvas to draw the pause screen onto
      */
     private void drawPauseScreen(Canvas c) {
-        c.drawColor(Color.BLACK);
         c.drawText(context.getResources().getText(R.string.pause_game).toString(), this.screenWidth / 2, this.screenHeight / 3, this.text_border_paint);
         c.drawText(context.getResources().getText(R.string.pause_game).toString(), this.screenWidth / 2, this.screenHeight / 3, this.text_paint);
-        c.drawRoundRect(this.continue_touch_zone, 10, 10, player_paint);
-        c.drawRoundRect(this.exit_touch_zone, 10, 10, player_paint);
+        c.drawRoundRect(this.continue_touch_zone, 15 * this.density, 15 * this.density, this.button_paint);
+        c.drawRoundRect(this.exit_touch_zone, 15 * this.density, 15 * this.density, this.button_paint);
+        c.drawText(context.getResources().getText(R.string.continue_game).toString(), this.continue_touch_zone.centerX(), this.continue_touch_zone.centerY() - this.button_text_paint.ascent() / 2, this.button_text_paint);
+        c.drawText(context.getResources().getText(R.string.back_to_menu).toString(), this.exit_touch_zone.centerX(), this.exit_touch_zone.centerY() - this.button_text_paint.ascent() / 2, this.button_text_paint);
+
+    }
+
+    /**
+     * Draws the fadeout animation on the canvas
+     * @param c Canvas to draw the fadeout animation onto
+     * @param deltaFrameTime The passed time since the last frame
+     * @param fade_out_time Time for the screen to fully turn black
+     * @param max_alpha Maximum alpha for the fadeout effect
+     */
+    private void drawFadeout(Canvas c, float deltaFrameTime, int fade_out_time, int max_alpha) {
+        this.current_fade_out_time += deltaFrameTime;
+        c.drawARGB(Math.min((int) ((this.current_fade_out_time / fade_out_time) * max_alpha), max_alpha), 0, 0, 0);
+    }
+
+    /**
+     * Draws the fadeout animation on the canvas
+     * @param c Canvas to draw the fadeout animation onto
+     * @param deltaFrameTime The passed time since the last frame
+     * @param fade_out_time Time in ms for the screen to fully turn black
+     * @param max_alpha Maximum alpha for the fadeout effect
+     * @param wait_time Time in ms to wait before starting the fadeout effect
+     */
+    private void drawFadeout(Canvas c, float deltaFrameTime, int fade_out_time, int max_alpha, int wait_time) {
+        this.current_fade_out_time += deltaFrameTime;
+        if(this.current_fade_out_time > wait_time) {
+            c.drawARGB(Math.min((int) (((this.current_fade_out_time - wait_time) / fade_out_time) * max_alpha), max_alpha), 0, 0, 0);
+        }
     }
 
     /**
@@ -588,7 +687,7 @@ public class GameState {
     }
 
     /**
-     * Sets the player to dead and applies the dying animation
+     * Sets the player to dead and applies the dying animation. Can be called multiple times
      */
     private void killPlayer() {
         this.player_dead = true;
@@ -638,12 +737,13 @@ public class GameState {
     public void onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             if (this.paused) {
-                if(this.continue_touch_zone.contains(event.getX(), event.getY())) {
+                if (this.continue_touch_zone.contains(event.getX(), event.getY())) {
                     this.paused = false;
-                } else if(this.exit_touch_zone.contains(event.getX(), event.getY())) {
+                    this.current_fade_out_time = 0;
+                } else if (this.exit_touch_zone.contains(event.getX(), event.getY())) {
                     this.running = false;
                 }
-            } else if(this.player_dead) {
+            } else if (this.player_dead) {
                 this.retry();
             } else if (this.finished) {
                 this.load(this.stage.stage_level + 1);
@@ -666,7 +766,7 @@ public class GameState {
      * Is forwarded from activity. Called when the "back" button is pressed on the device
      */
     public void onBackPressed() {
-        if(!this.paused) {
+        if (!this.paused && this.started) {
             this.paused = true;
         } else {
             this.running = false;
@@ -695,6 +795,8 @@ public class GameState {
         this.player_first_gravity_inAir = false;
         this.gravity = 1;
 
+        this.deaths_amount = 0;
+
         this.start_circle_radius = 0.1f;
         this.start_circle_canvas.drawColor(Color.BLACK);
         this.start_circle_canvas.drawText(this.stage.stage_name, this.screenWidth / 2, this.screenHeight / 2, this.text_border_paint);
@@ -705,7 +807,7 @@ public class GameState {
         this.player_anim_time = 0;
         this.player_invisible = false;
         this.player_no_input = false;
-        this.fade_out_time = 0;
+        this.current_fade_out_time = 0;
 
         this.paused = false;
         this.finished = false;
@@ -727,11 +829,13 @@ public class GameState {
         this.player_onBoost = false;
         this.player_first_gravity_inAir = false;
         this.gravity = 1;
+        this.deaths_amount++;
 
         this.player_last_state = this.player_state;
         this.player_state = PlayerState.WAKEUP;
         this.player_anim_time = 0;
         this.player_invisible = false;
+        this.current_fade_out_time = 0;
 
         this.paused = false;
         this.finished = false;
