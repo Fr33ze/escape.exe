@@ -18,6 +18,7 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.media.MediaPlayer;
 import android.view.MotionEvent;
 
 public class GameState {
@@ -77,6 +78,8 @@ public class GameState {
     private Context context; //context of the app
     private float screenWidth; //screen width of the smartphone in px
     private float screenHeight; //screen heigth of the smartphone in px
+    private MediaPlayer mediaPlayer; //for playing background music
+    private int music_position; //to pause and resume music
 
     /*
      * DRAW
@@ -196,6 +199,7 @@ public class GameState {
         this.player_draw_scale = (float) PLAYER_WIDTH / this.player_frames[0].getWidth();
 
         this.total_deaths_amount = 0; //TODO
+        this.music_position = 0;
 
         this.running = false;
     }
@@ -740,6 +744,7 @@ public class GameState {
                 if (this.continue_touch_zone.contains(event.getX(), event.getY())) {
                     this.paused = false;
                     this.current_fade_out_time = 0;
+                    this.mediaPlayer.start();
                 } else if (this.exit_touch_zone.contains(event.getX(), event.getY())) {
                     this.running = false;
                 }
@@ -768,9 +773,17 @@ public class GameState {
     public void onBackPressed() {
         if (!this.paused && this.started) {
             this.paused = true;
+            this.mediaPlayer.pause();
+            this.music_position = mediaPlayer.getCurrentPosition();
         } else {
             this.running = false;
+            releaseMediaPlayer();
         }
+    }
+
+    public void releaseMediaPlayer() {
+        this.mediaPlayer.stop();
+        this.mediaPlayer.release();
     }
 
     /**
@@ -782,6 +795,14 @@ public class GameState {
         this.started = false;
 
         this.stage.load(level);
+
+        if(this.mediaPlayer != null)
+            this.mediaPlayer.release();
+
+        this.mediaPlayer = MediaPlayer.create(this.context, this.stage.current_music_id);
+        this.mediaPlayer.setLooping(true);
+        this.mediaPlayer.setVolume(1, 1);
+        this.mediaPlayer.start();
 
         this.player_pos_x = stage.player_start_x * 24;
         this.player_pos_y = stage.player_start_y * 24 + 24 - PLAYER_HEIGTH;

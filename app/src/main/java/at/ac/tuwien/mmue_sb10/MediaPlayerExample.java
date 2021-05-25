@@ -12,7 +12,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-public class MediaPlayer extends AppCompatActivity {
+public class MediaPlayerExample extends AppCompatActivity {
     // Variables
     /**
      * Is the instance of the media player
@@ -36,8 +36,8 @@ public class MediaPlayer extends AppCompatActivity {
      * @since 0.1
      */
     public void onClickBackToMain(View v){
-        Intent i2 = new Intent(MediaPlayer.this, MainActivity.class);
-        MediaPlayer.this.startActivity(i2);
+        Intent i2 = new Intent(MediaPlayerExample.this, MainActivity.class);
+        MediaPlayerExample.this.startActivity(i2);
     }
 
     /**

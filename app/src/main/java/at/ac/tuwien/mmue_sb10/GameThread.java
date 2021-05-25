@@ -46,15 +46,6 @@ public class GameThread extends Thread {
     }
 
     /**
-     *
-     * @return boolean that indicates, whether the thread is running or not
-     * @since 0.1
-     */
-    public boolean isRunning() {
-        return this.state.running;
-    }
-
-    /**
      * Renderloop that renders the gamestate onto the screen
      * @since 0.1
      */
@@ -88,6 +79,7 @@ public class GameThread extends Thread {
     }
 
     private void end() {
+        state.releaseMediaPlayer();
         ((Activity)context).finish();
     }
 }

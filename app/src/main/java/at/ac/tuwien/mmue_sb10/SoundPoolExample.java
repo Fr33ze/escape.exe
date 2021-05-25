@@ -14,7 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
-public class SoundPool extends AppCompatActivity {
+public class SoundPoolExample extends AppCompatActivity {
     private android.media.SoundPool soundPool;
     private int soundeffect1, soundeffect2;
     private int soundeffect1ID, soundeffect2ID; // needed to pause sounds on call of different sound
@@ -58,8 +58,8 @@ public class SoundPool extends AppCompatActivity {
      * @since 0.1
      */
     public void onClickBackToMain(View v){
-        Intent i2 = new Intent(SoundPool.this, MainActivity.class);
-        SoundPool.this.startActivity(i2);
+        Intent i2 = new Intent(SoundPoolExample.this, MainActivity.class);
+        SoundPoolExample.this.startActivity(i2);
     }
 
     /**

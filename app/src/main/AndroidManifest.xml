@@ -9,8 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MMUESB10">
-        <activity android:name=".SoundPool"></activity>
-        <activity android:name=".MediaPlayer" />
+        <activity android:name=".SoundPoolExample"></activity>
+        <activity android:name=".MediaPlayerExample" />
         <activity
             android:name=".MainActivity"
             android:screenOrientation="landscape"

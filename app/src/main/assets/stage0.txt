@@ -1,6 +1,7 @@
 #info
 name=Chapter 0: Tutorial
 scale=1.3
+music=techno03
 background=bg1
 
 #player

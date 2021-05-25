@@ -1,6 +1,7 @@
 #info
 name=Chapter 1: Spiky Hell
 scale=1.3
+music=techno03
 background=bg0
 
 #player
