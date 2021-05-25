@@ -26,7 +26,8 @@ public class GameActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
-        gameView = (GameView) findViewById(R.id.gameView);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        gameView = findViewById(R.id.gameView);
     }
 
     /**
@@ -36,7 +37,6 @@ public class GameActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        gameView.endgame();
     }
 
     /**
@@ -44,7 +44,6 @@ public class GameActivity extends Activity {
      * Currently no dialog to ensure user actually wants to exit the application.
      * @since 0.1
      */
-    // TODO: add dialog to make sure user doesn't accidentally closes the app
     @Override
     public void onBackPressed() {
         gameView.onBackPressed();

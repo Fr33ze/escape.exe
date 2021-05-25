@@ -20,13 +20,12 @@ import android.graphics.Typeface;
 import android.view.MotionEvent;
 
 public class GameState {
-
-    private static final String TAG = GameState.class.getSimpleName();
-    private static final int PLAYER_WIDTH = 18;
-    private static final int PLAYER_HEIGTH = 24;
+    private static final int PLAYER_WIDTH = 18; //player width in pixels
+    private static final int PLAYER_HEIGTH = 24; //player heigth in pixel (24 is maximum because of collision)
+    private static final float FRAME_TIME = 83f; //player animation. 83f is default for 12fps
 
     /*
-     * PLAYER STATE: POSITION, VELOCITY, ACCELERATION, ... in pixels
+     * PLAYER: POSITION, VELOCITY, ACCELERATION
      */
     private float player_pos_x;
     private float player_pos_y;
@@ -35,20 +34,24 @@ public class GameState {
     private float player_velocity_y;
     private float player_acceleration_y;
 
+    /*
+     * PLAYER: STATE
+     */
     private byte gravity; //gravity can either be regular or inverted (or top or bottom)
     private boolean player_inAir; //player is in air?
     private boolean player_onBoost; //player touches booster?
-
     private boolean player_first_gravity_inAir; //player is allowed to do only one gravity change in the air until he hits the ground again. This variable keeps track of that.
-    private boolean player_dead; //player died?
+    private boolean player_dead; //player died
+    private boolean player_no_input; //game doesnt accept input for player until stage is finished. starts screen fade out
+    private float fade_out_time; //timer to fade out
 
-    private PlayerState player_state; //current state of the player. (mainly) used for animations
-    private PlayerState player_last_state; //last state of player
+    private PlayerState player_state; //current state of the player. used for animations
+    private PlayerState player_last_state; //last state of player. used for animations
     private Bitmap[] player_frames; //all frames of the player animations
     private float player_anim_time; //time counter used for animations
     private int player_current_frame; //current frame of the player to be drawn
     private Matrix player_draw_matrix; //transformation of player
-    private float player_draw_scale;
+    private float player_draw_scale; //factor to scale the player bitmap
 
     /*
      * CURRENT STAGE
@@ -56,6 +59,7 @@ public class GameState {
     private Stage stage; //current stage
     private boolean finished; //stage is finished
     private boolean started; //stage is started
+    public boolean running; //game is running
 
     /*
      * PAUSE MENU
@@ -68,17 +72,28 @@ public class GameState {
      * MISC
      */
     private Context context; //context of the app
-    private float density; //density of the smartphone screen
     private float screenWidth; //screen width of the smartphone in px
     private float screenHeight; //screen heigth of the smartphone in px
+
+    /*
+     * DRAW
+     */
+    private float density; //density of the smartphone screen
+    private float trans_x = 0; //draw-translation on x axis
+    private float trans_y = 0; //draw-translation on y axis
+    private float trans_x_unscaled = 0; //draw-translation on x axis unscaled
+    private float trans_y_unscaled = 0; //draw-translation on y axis unscaled
+    private Rect draw_src; //source rectangle for the region of the map to draw
+    private Rect draw_tar; //target rectangle on the screen (full screen)
     private float start_circle_radius; //interpolates between 0 and 1
     private Bitmap start_circle_bmp; //bitmap for the expanding circle at the start
     private Canvas start_circle_canvas; //canvas to draw on start_circle_bmp
+    private boolean player_invisible; //draw player or not
 
     /*
      * PAINT
      */
-    private Paint player_paint; //TODO: Remove when player sprite is implemented
+    private Paint player_paint; //paint for antialiasing
     private Paint text_paint; //paint for text
     private Paint text_border_paint; //border paint for text
     private Paint trans_paint; //paint for transparency
@@ -149,12 +164,18 @@ public class GameState {
 
         this.continue_touch_zone = new RectF(this.screenWidth * 0.33f - 60 * this.density, this.screenHeight / 2, this.screenWidth * 0.33f + 60 * this.density, this.screenHeight / 2 + 40 * this.density);
         this.exit_touch_zone = new RectF(this.screenWidth * 0.66f - 60 * this.density, this.screenHeight / 2, this.screenWidth * 0.66f + 60 * this.density, this.screenHeight / 2 + 40 * this.density);
+
         this.player_state = PlayerState.IDLE;
         this.player_anim_time = 0;
         this.player_draw_matrix = new Matrix();
         this.player_draw_scale = (float)PLAYER_WIDTH / this.player_frames[0].getWidth();
+
+        this.running = false;
     }
 
+    /**
+     * Loads the player frames from the sprite sheet into the player_frames array
+     */
     private void loadPlayerFrames() {
         BitmapFactory.Options o = new BitmapFactory.Options();
         o.inScaled = false;
@@ -246,9 +267,13 @@ public class GameState {
                     this.player_velocity_x *= -1;
                 } else if (collision_corners[0] == 6 || collision_corners[1] == 6 || collision_corners[2] == 6 || collision_corners[3] == 6) {
                     //X Finish Collision
-                    this.finished = true;
+                    finishStage();
                     this.player_pos_x = this.player_collision_px.left;
                     this.player_pos_y = this.player_collision_px.top;
+                } else if(collision_corners[0] == 7 || collision_corners[1] == 7 || collision_corners[2] == 7 || collision_corners[3] == 7) {
+                    //X Collision with no-input tile
+                    //happens before finish line for running out of screen effect
+                    setNoPlayerInput();
                 } else if (collision_corners[0] == 2 || collision_corners[1] == 2 || collision_corners[2] == 2 || collision_corners[3] == 2) {
                     //X Death Collision (spikes)
                     killPlayer();
@@ -354,38 +379,30 @@ public class GameState {
             this.col_time_y = (this.player_collision_tiles.top * 24 - this.player_pos_y) / this.player_velocity_y;
     }
 
-    private void killPlayer() {
-        this.player_dead = true;
-        this.player_last_state = this.player_state;
-        this.player_state = PlayerState.DYING;
-        this.player_anim_time = 0;
-    }
-
-    private float trans_x = 0; //draw-translation on x axis
-    private float trans_y = 0; //draw-translation on y axis
-    private float trans_x_unscaled = 0; //draw-translation on x axis unscaled
-    private float trans_y_unscaled = 0; //draw-translation on y axis unscaled
-
-    private Rect draw_src; //source rectangle for the region of the map to draw
-    private Rect draw_tar; //target rectangle on the screen (full screen)
-
-    private static final float FRAME_TIME = 83f; //83f is default for 12fps
-
     /**
      * Draws the current state of the game onto c
      * @param c The Canvas that is drawed onto
+     * @param deltaFrameTime The passed time since the last frame
      * @since 0.1
      */
     public void draw(Canvas c, float deltaFrameTime) {
         if (this.paused) {
             drawPauseScreen(c);
         } else {
-            translateX(c);
-            translateY(c);
+            if(!this.player_no_input) {
+                translateX(c);
+                translateY(c);
+            }
 
             drawMap(c);
 
-            drawPlayer(c, deltaFrameTime);
+            if(!this.player_invisible)
+                drawPlayer(c, deltaFrameTime);
+
+            if(this.player_no_input) {
+                this.fade_out_time += deltaFrameTime;
+                c.drawARGB(Math.min((int)((this.fade_out_time / 3500) * 255), 255), 0, 0, 0);
+            }
 
             if (this.player_dead) {
                 //Player is dead. Draw retry message
@@ -402,6 +419,10 @@ public class GameState {
         }
     }
 
+    /**
+     * Translates the X drawing area to fit the current player position
+     * @param c Canvas that needs to be translated (needed for width and heigth)
+     */
     private void translateX(Canvas c) {
         if (this.player_velocity_x > 0) {
             this.trans_x = this.player_pos_x * this.stage.stage_scale - 96 * this.stage.stage_scale;
@@ -415,6 +436,10 @@ public class GameState {
         this.trans_x_unscaled = this.trans_x / this.stage.stage_scale;
     }
 
+    /**
+     * Translates the Y drawing area to fit the current player position
+     * @param c Canvas that needs to be translated (needed for width and heigth)
+     */
     private void translateY(Canvas c) {
         if(this.player_pos_y * this.stage.stage_scale + PLAYER_HEIGTH * this.stage.stage_scale > this.trans_y + c.getHeight() - 48 * this.stage.stage_scale)
             this.trans_y = this.player_pos_y * this.stage.stage_scale + PLAYER_HEIGTH * this.stage.stage_scale - c.getHeight() + 48 * this.stage.stage_scale;
@@ -427,6 +452,10 @@ public class GameState {
         this.trans_y_unscaled = this.trans_y / this.stage.stage_scale;
     }
 
+    /**
+     * Draws the level including background
+     * @param c Canvas to draw the level onto
+     */
     private void drawMap(Canvas c) {
         this.draw_src.set((int) (this.trans_x_unscaled), (int) (this.trans_y_unscaled), (int) (c.getWidth() / this.stage.stage_scale + this.trans_x_unscaled), (int) (c.getHeight() / this.stage.stage_scale + this.trans_y_unscaled));
         this.draw_tar.set(0, 0, c.getWidth(), c.getHeight());
@@ -439,6 +468,11 @@ public class GameState {
                 null);
     }
 
+    /**
+     * Draws the current player frame fully transformed
+     * @param c Canvas to draw the player frame onto
+     * @param deltaFrameTime The passed time since the last frame
+     */
     private void drawPlayer(Canvas c, float deltaFrameTime) {
         this.player_draw_matrix.reset();
         if (this.player_velocity_x > 0) {
@@ -509,8 +543,7 @@ public class GameState {
                 break;
             case DYING:
                 if(this.player_anim_time > FRAME_TIME * 7) {
-                    this.player_current_frame = 7;
-                    this.player_anim_time = FRAME_TIME * 8; //ensure that animation does not loop
+                    this.player_invisible = true;
                 } else {
                     this.player_current_frame = (int) ((this.player_anim_time / FRAME_TIME) % 8);
                 }
@@ -524,12 +557,44 @@ public class GameState {
         c.drawBitmap(this.player_frames[this.player_current_frame], player_draw_matrix, this.player_paint);
     }
 
+    /**
+     * Draws the pause screen on the canvas
+     * @param c Canvas to draw the pause screen onto
+     */
     private void drawPauseScreen(Canvas c) {
         c.drawColor(Color.BLACK);
         c.drawText(context.getResources().getText(R.string.pause_game).toString(), this.screenWidth / 2, this.screenHeight / 3, this.text_border_paint);
         c.drawText(context.getResources().getText(R.string.pause_game).toString(), this.screenWidth / 2, this.screenHeight / 3, this.text_paint);
         c.drawRoundRect(this.continue_touch_zone, 10, 10, player_paint);
         c.drawRoundRect(this.exit_touch_zone, 10, 10, player_paint);
+    }
+
+    /**
+     * Sets the stage to finished
+     */
+    private void finishStage() {
+        this.finished = true;
+        this.player_last_state = this.player_state;
+        this.player_state = PlayerState.DYING; //Same animation as dying is played
+        this.player_anim_time = 0;
+    }
+
+    /**
+     * Prepares finishing a stage by not allowing any more input
+     */
+    private void setNoPlayerInput() {
+        this.player_no_input = true;
+        this.gravity = 1;
+    }
+
+    /**
+     * Sets the player to dead and applies the dying animation
+     */
+    private void killPlayer() {
+        this.player_dead = true;
+        this.player_last_state = this.player_state;
+        this.player_state = PlayerState.DYING;
+        this.player_anim_time = 0;
     }
 
     /**
@@ -572,7 +637,13 @@ public class GameState {
      */
     public void onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            if(this.player_dead) {
+            if (this.paused) {
+                if(this.continue_touch_zone.contains(event.getX(), event.getY())) {
+                    this.paused = false;
+                } else if(this.exit_touch_zone.contains(event.getX(), event.getY())) {
+                    this.running = false;
+                }
+            } else if(this.player_dead) {
                 this.retry();
             } else if (this.finished) {
                 this.load(this.stage.stage_level + 1);
@@ -581,14 +652,7 @@ public class GameState {
                 this.player_last_state = this.player_state;
                 this.player_state = PlayerState.WAKEUP;
                 this.player_anim_time = 0;
-            } else if (this.paused) {
-                if(this.continue_touch_zone.contains(event.getX(), event.getY())) {
-                    this.paused = false;
-                } else if(this.exit_touch_zone.contains(event.getX(), event.getY())) {
-                    //TODO end game
-                }
-            }
-            else {
+            } else if (!this.player_no_input) {
                 if (event.getX() < this.screenWidth / 2) {
                     this.invertGravity();
                 } else {
@@ -598,9 +662,14 @@ public class GameState {
         }
     }
 
+    /**
+     * Is forwarded from activity. Called when the "back" button is pressed on the device
+     */
     public void onBackPressed() {
         if(!this.paused) {
             this.paused = true;
+        } else {
+            this.running = false;
         }
     }
 
@@ -634,6 +703,9 @@ public class GameState {
         this.player_last_state = this.player_state;
         this.player_state = PlayerState.IDLE;
         this.player_anim_time = 0;
+        this.player_invisible = false;
+        this.player_no_input = false;
+        this.fade_out_time = 0;
 
         this.paused = false;
         this.finished = false;
@@ -659,6 +731,7 @@ public class GameState {
         this.player_last_state = this.player_state;
         this.player_state = PlayerState.WAKEUP;
         this.player_anim_time = 0;
+        this.player_invisible = false;
 
         this.paused = false;
         this.finished = false;
