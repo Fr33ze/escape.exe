@@ -103,8 +103,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
         this.state = new GameState(getContext(), this.density, this.screenWidth, this.screenHeigth);
         this.state.load(0);
-        this.thread = new GameThread(state, holder, fps);
-        startgame(); //TODO
+        this.thread = new GameThread(state, holder, getContext());
+        startgame();
     }
 
     @Override
@@ -114,19 +114,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
-
+        endgame();
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
-            if(!this.thread.isRunning()) {
-                startgame();
-            } else {
-                this.state.onTouchEvent(event);
-            }
-        } else {
-            //TODO: ???
+            this.state.onTouchEvent(event);
         }
         return super.onTouchEvent(event);
     }
@@ -141,7 +135,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         if(this.thread == null) {
             this.state = new GameState(getContext(), this.density, this.screenWidth, this.screenHeigth); //TODO: Load from saved instance?
             this.state.load(0); //TODO
-            this.thread = new GameThread(state, getHolder(), fps);
+            this.thread = new GameThread(state, getHolder(), getContext());
         } else {
             this.thread.setRunning(true);
             this.thread.start();
@@ -164,10 +158,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
      */
     public void endgame() {
         this.thread.setRunning(false);
-        try {
-            this.thread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        this.thread = null;
     }
 }
