@@ -8,4 +8,15 @@
     <string name="pause_game">Pause!</string>
     <string name="back_to_menu">Zurück zum Menü</string>
     <string name="next_level"> geschafft! Berühre um fortzufahren.</string>
+
+    <string name="btn_continue"> Spiel fortsetzen </string>
+    <string name="btn_newgame"> Neues Spiel </string>
+    <string name="btn_highscores"> Bestenliste </string>
+    <string name="btn_settings"> Einstellungen </string>
+    <string name="btn_quit"> Beenden </string>
+    <string name="text_createnewplayer"> Wähle einen Namen </string>
+    <string name="text_currentplayer"> Aktueller Spielstand </string>
+    <string name="btn_backtomain"> Hauptmenü </string>
+    <string name="btn_savename"> Name festlegen </string>
+    <string name="btn_deleteplayer"> Spielstand löschen </string>
 </resources>

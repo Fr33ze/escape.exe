@@ -8,4 +8,15 @@
     <string name="pause_game">Game Paused!</string>
     <string name="back_to_menu">Exit</string>
     <string name="next_level"> finished! Tap to continue.</string>
+
+    <string name="btn_continue"> Continue </string>
+    <string name="btn_newgame"> New Game </string>
+    <string name="btn_highscores"> Highscores </string>
+    <string name="btn_settings"> Settings </string>
+    <string name="btn_quit"> Quit </string>
+    <string name="text_createnewplayer"> Create New Player </string>
+    <string name="text_currentplayer"> Current Player </string>
+    <string name="btn_backtomain"> Main Menu </string>
+    <string name="btn_savename"> Save Name </string>
+    <string name="btn_deleteplayer"> Delete Player </string>
 </resources>

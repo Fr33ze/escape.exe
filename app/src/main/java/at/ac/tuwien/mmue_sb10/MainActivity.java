@@ -12,6 +12,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebView;
 
+import at.ac.tuwien.mmue_sb10.activities.SubmenuContinue;
+import at.ac.tuwien.mmue_sb10.activities.SubmenuNewGame;
+
 public class MainActivity extends Activity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -20,17 +23,19 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_mainmenu); // .activity_main for the other menu
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         WebView webView = findViewById(R.id.player_web_view);
-        webView.loadUrl("file:///android_asset/player_title.html");
-        webView.setBackgroundColor(Color.TRANSPARENT);
-        webView.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
+
+        // for other menu, uncomment these lines
+        // webView.loadUrl("file:///android_asset/player_title.html");
+        // webView.setBackgroundColor(Color.TRANSPARENT);
+        // webView.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
         initMediaPlayer();
     }
 
     /**
-     * When clicked starts a new game.
+     * When clicked starts a new game by creating a new player profile first.
      * @param v the view as used by this method
      * @since 0.1
      */
@@ -40,11 +45,22 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * Currently not implemented as there is not database for save files yet.
+     * When clicked starts a new game by creating a new player profile first.
      * @param v the view as used by this method
+     * @since 0.1
+     */
+    public void onClickNewGameJan(View v) {
+        Intent i = new Intent(this, SubmenuNewGame.class);
+        startActivity(i);
+    }
+
+    /**
+     * When clicked takes you to current players overview and allows you to start the game from there
+     * @param v the view as used by this method
+     * @since 0.2
      */
     public void onClickContinue(View v) {
-
+        startActivity(new Intent(this, SubmenuContinue.class));
     }
 
     /**
