@@ -18,7 +18,9 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.view.MotionEvent;
 
 public class GameState {
@@ -71,6 +73,7 @@ public class GameState {
     public boolean paused; //game is paused
     private RectF continue_touch_zone; //rectangle of the continue button
     private RectF exit_touch_zone; //rectangle of the exit button
+    private RectF mute_touch_zone; //rectangle of the mute button
 
     /*
      * MISC
@@ -78,8 +81,6 @@ public class GameState {
     private Context context; //context of the app
     private float screenWidth; //screen width of the smartphone in px
     private float screenHeight; //screen heigth of the smartphone in px
-    private MediaPlayer mediaPlayer; //for playing background music
-    private int music_position; //to pause and resume music
 
     /*
      * DRAW
@@ -122,6 +123,21 @@ public class GameState {
     private int[] collision_corners; //0=TopLeft, 1=TopRight, 2=BottomRight, 3=BottomLeft
     private float col_time_x; //collision time on x-axis
     private float col_time_y; //collision time on y-axis
+
+    /*
+     * SOUND
+     */
+    private MediaPlayer mediaPlayer; //for playing background music
+    private int music_position; //to pause and resume music
+    private SoundPool soundPool; //plays all the in-game sounds
+    private int sound_step_1;
+    private int sound_step_2;
+    private int sound_jump;
+    private int sound_land;
+    private int sound_die;
+    private int sound_gravity_up;
+    private int sound_gravity_down;
+    private int sound_button;
 
     /**
      * Creates a new GameState instance
@@ -192,6 +208,7 @@ public class GameState {
 
         this.continue_touch_zone = new RectF(this.screenWidth * 0.33f, this.screenHeight / 2 - 10 * this.density, this.screenWidth * 0.66f, this.screenHeight / 2 + 50 * this.density);
         this.exit_touch_zone = new RectF(this.screenWidth * 0.33f, this.screenHeight / 2 + 70 * this.density, this.screenWidth * 0.66f, this.screenHeight / 2 + 130 * this.density);
+        this.mute_touch_zone = new RectF(10 * this.density, 10 * this.density, 20 * this.density, 20 * this.density);
 
         this.player_state = PlayerState.IDLE;
         this.player_anim_time = 0;
@@ -233,6 +250,16 @@ public class GameState {
         this.death_counter_icon = Bitmap.createScaledBitmap(
                 temp_death, (int)(temp_death.getWidth() * 2 * this.density), (int)(temp_death.getHeight() * 2 * this.density), true
         );
+    }
+
+    /**
+     * Initialises the soundpool
+     */
+    private void initSoundPool() {
+        this.soundPool = new SoundPool(2, AudioManager.STREAM_MUSIC, 0);
+        this.sound_step_1 = this.soundPool.load(this.context, R.raw.step1, 1);
+        this.sound_step_2 = this.soundPool.load(this.context, R.raw.step2, 1);
+        this.sound_button = this.soundPool.load(this.context, R.raw.button, 1);
     }
 
     /**
@@ -688,6 +715,7 @@ public class GameState {
     private void setNoPlayerInput() {
         this.player_no_input = true;
         this.gravity = 1;
+        this.player_velocity_y = 0;
     }
 
     /**
@@ -744,6 +772,9 @@ public class GameState {
                 if (this.continue_touch_zone.contains(event.getX(), event.getY())) {
                     this.paused = false;
                     this.current_fade_out_time = 0;
+                    this.mediaPlayer = MediaPlayer.create(this.context, this.stage.current_music_id);
+                    this.mediaPlayer.setLooping(true);
+                    this.mediaPlayer.seekTo(this.music_position);
                     this.mediaPlayer.start();
                 } else if (this.exit_touch_zone.contains(event.getX(), event.getY())) {
                     this.running = false;
@@ -773,13 +804,17 @@ public class GameState {
     public void onBackPressed() {
         if (!this.paused && this.started && !this.player_dead) {
             this.paused = true;
-            this.mediaPlayer.pause();
+            this.mediaPlayer.stop();
             this.music_position = mediaPlayer.getCurrentPosition();
+            this.mediaPlayer.release();
         } else {
             this.running = false;
         }
     }
 
+    /**
+     * Stops the mediaplayer and releases the music resource
+     */
     public void releaseMediaPlayer() {
         this.mediaPlayer.stop();
         this.mediaPlayer.release();
