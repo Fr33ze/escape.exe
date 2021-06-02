@@ -1,17 +1,16 @@
 package at.ac.tuwien.mmue_sb10.activities;
 
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 import at.ac.tuwien.mmue_sb10.GameActivity;
 import at.ac.tuwien.mmue_sb10.MainActivity;
 import at.ac.tuwien.mmue_sb10.R;
 
-public class SubmenuContinue extends AppCompatActivity {
+public class SubmenuContinue extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +25,7 @@ public class SubmenuContinue extends AppCompatActivity {
      * @since 0.2
      */
     public void onClickBackToMain(View v) {
-        startActivity(new Intent(this, MainActivity.class));
+        finish();
     }
 
     /**

@@ -9,14 +9,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MMUESB10">
-        <activity android:name=".SoundPoolExample"></activity>
-        <activity android:name=".MediaPlayerExample" />
         <activity
             android:name=".activities.SubmenuContinue"
-            android:screenOrientation="landscape" />
-        <activity
-            android:name=".activities.SubmenuNewGame"
-            android:screenOrientation="landscape" />
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
         <activity
             android:name=".MainActivity"
             android:screenOrientation="landscape"

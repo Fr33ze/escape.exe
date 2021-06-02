@@ -771,13 +771,12 @@ public class GameState {
      * Is forwarded from activity. Called when the "back" button is pressed on the device
      */
     public void onBackPressed() {
-        if (!this.paused && this.started) {
+        if (!this.paused && this.started && !this.player_dead) {
             this.paused = true;
             this.mediaPlayer.pause();
             this.music_position = mediaPlayer.getCurrentPosition();
         } else {
             this.running = false;
-            releaseMediaPlayer();
         }
     }
 
@@ -793,6 +792,8 @@ public class GameState {
      */
     public void load(int level) {
         this.started = false;
+        this.paused = false;
+        this.finished = false;
 
         this.stage.load(level);
 
@@ -829,9 +830,6 @@ public class GameState {
         this.player_invisible = false;
         this.player_no_input = false;
         this.current_fade_out_time = 0;
-
-        this.paused = false;
-        this.finished = false;
     }
 
     /**
