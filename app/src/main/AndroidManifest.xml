@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MMUESB10">
         <activity
-            android:name=".activities.SubmenuContinue"
+            android:name=".SubContinueActivity"
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
         <activity

@@ -18,6 +18,8 @@ import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 
+import at.ac.tuwien.mmue_sb10.persistence.User;
+
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private static final String TAG = GameView.class.getSimpleName();
@@ -40,6 +42,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
      * The screen height of the device this program is running on
      */
     private int screenHeigth;
+    /**
+     * Indicates if the game is ready to be started
+     */
+    private boolean ready;
+    /**
+     * User of the gamestate
+     */
+    private User user;
 
     /**
      *
@@ -102,9 +112,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
         this.state = new GameState(getContext(), this.density, this.screenWidth, this.screenHeigth);
-        this.state.load(0);
         this.thread = new GameThread(state, holder, getContext());
-        startgame();
+        if(this.ready)
+            startgame();
+        else
+            this.ready = true;
     }
 
     @Override
@@ -126,20 +138,28 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     /**
+     * Sets the user of the gamestate. Starts the game if surface has been created already
+     * @param user
+     */
+    public void setUser(User user) {
+        this.user = user;
+        if(this.ready)
+            startgame();
+        else
+            this.ready = true;
+    }
+
+    /**
      * Starts the game and while doing so sets density, FPS and screen ration.
      * This method also handles which level will be loaded but currently is static since no database is yet implemented
      * After loading a level it sets the main thread to running.
      * @since 0.1
      */
     public void startgame() {
-        if(this.thread == null) {
-            this.state = new GameState(getContext(), this.density, this.screenWidth, this.screenHeigth); //TODO: Load from saved instance?
-            this.state.load(0); //TODO
-            this.thread = new GameThread(state, getHolder(), getContext());
-        } else {
-            this.thread.setRunning(true);
-            this.thread.start();
-        }
+        this.state.setUser(user);
+        this.state.load(user.currentLevel);
+        this.thread.setRunning(true);
+        this.thread.start();
     }
 
     /**

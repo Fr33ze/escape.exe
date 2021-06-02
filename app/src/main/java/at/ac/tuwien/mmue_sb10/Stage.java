@@ -29,7 +29,6 @@ public class Stage {
     public int[][] stage_collision; //array of tile behavior
     public Bitmap stage_foreground; //stage tiles put together (scaled)
     public Bitmap stage_background; //stage background (scaled)
-    public int lastmusic_id; //resource id of the last bg music (if its the same, it will just continue playing)
     public int current_music_id; //resource id of the bg music
 
     private Bitmap[] tiles_textures; //all tiles of the tileset in 24x24 format
@@ -91,7 +90,6 @@ public class Stage {
                         line = reader.readLine();
                         this.stage_scale = this.density * Float.parseFloat(line.split("=")[1]);
                         line = reader.readLine();
-                        this.lastmusic_id = this.current_music_id;
                         this.current_music_id = context.getResources().getIdentifier(line.split("=")[1], "raw", context.getPackageName());
                         line = reader.readLine();
                         BitmapFactory.Options o = new BitmapFactory.Options();

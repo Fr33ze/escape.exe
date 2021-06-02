@@ -19,4 +19,15 @@
     <string name="btn_backtomain"> Hauptmenü </string>
     <string name="btn_savename"> Name festlegen </string>
     <string name="btn_deleteplayer"> Spielstand löschen </string>
+
+    <string name="new_game_warning"> Es gibt bereits einen Spielstand! Ein neues Spiel wird den aktuellen Spielstand überschreiben! Trotzdem fortfahren? </string>
+    <string name="yes"> Ja </string>
+    <string name="no"> Nein </string>
+    <string name="ok"> Ok </string>
+    <string name="cancel"> Abbrechen </string>
+    <string name="deaths_level"> Tode </string>
+    <string name="deaths_total"> Tode Gesamt </string>
+    <string name="enter_player_name"> Bitte geben Sie Ihren Namen ein. </string>
+    <string name="player_name"> Spielername... </string>
+
 </resources>

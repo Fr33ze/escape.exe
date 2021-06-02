@@ -23,6 +23,11 @@ import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.view.MotionEvent;
 
+import at.ac.tuwien.mmue_sb10.persistence.EscapeDatabase;
+import at.ac.tuwien.mmue_sb10.persistence.Highscore;
+import at.ac.tuwien.mmue_sb10.persistence.User;
+import at.ac.tuwien.mmue_sb10.util.Concurrency;
+
 public class GameState {
     private static final int PLAYER_WIDTH = 18; //player width in pixels
     private static final int PLAYER_HEIGTH = 24; //player heigth in pixel (24 is maximum because of collision)
@@ -64,8 +69,6 @@ public class GameState {
     private boolean finished; //stage is finished
     private boolean started; //stage is started
     public boolean running; //game is running
-    private int deaths_amount; //deaths in the current stage
-    private int total_deaths_amount; //total deaths in all stages so far TODO Load
 
     /*
      * PAUSE MENU
@@ -73,12 +76,13 @@ public class GameState {
     public boolean paused; //game is paused
     private RectF continue_touch_zone; //rectangle of the continue button
     private RectF exit_touch_zone; //rectangle of the exit button
-    private RectF mute_touch_zone; //rectangle of the mute button
+    private RectF mute_pause_touch_zone; //rectangle of the mute button
 
     /*
      * MISC
      */
     private Context context; //context of the app
+    private User user; //current save
     private float screenWidth; //screen width of the smartphone in px
     private float screenHeight; //screen heigth of the smartphone in px
 
@@ -208,17 +212,19 @@ public class GameState {
 
         this.continue_touch_zone = new RectF(this.screenWidth * 0.33f, this.screenHeight / 2 - 10 * this.density, this.screenWidth * 0.66f, this.screenHeight / 2 + 50 * this.density);
         this.exit_touch_zone = new RectF(this.screenWidth * 0.33f, this.screenHeight / 2 + 70 * this.density, this.screenWidth * 0.66f, this.screenHeight / 2 + 130 * this.density);
-        this.mute_touch_zone = new RectF(10 * this.density, 10 * this.density, 20 * this.density, 20 * this.density);
+        this.mute_pause_touch_zone = new RectF(10 * this.density, 10 * this.density, 20 * this.density, 20 * this.density);
 
         this.player_state = PlayerState.IDLE;
         this.player_anim_time = 0;
         this.player_draw_matrix = new Matrix();
         this.player_draw_scale = (float) PLAYER_WIDTH / this.player_frames[0].getWidth();
 
-        this.total_deaths_amount = 0; //TODO
         this.music_position = 0;
 
         this.running = false;
+
+        this.soundPool = new SoundPool(2, AudioManager.STREAM_MUSIC, 0);
+        initSounds();
     }
 
     /**
@@ -253,10 +259,9 @@ public class GameState {
     }
 
     /**
-     * Initialises the soundpool
+     * Initialises the sounds
      */
-    private void initSoundPool() {
-        this.soundPool = new SoundPool(2, AudioManager.STREAM_MUSIC, 0);
+    private void initSounds() {
         this.sound_step_1 = this.soundPool.load(this.context, R.raw.step1, 1);
         this.sound_step_2 = this.soundPool.load(this.context, R.raw.step2, 1);
         this.sound_button = this.soundPool.load(this.context, R.raw.button, 1);
@@ -655,7 +660,7 @@ public class GameState {
      */
     private void drawDeathCounter(Canvas c) {
         c.drawBitmap(this.death_counter_icon, c.getWidth() - this.death_counter_icon.getWidth() - 70 * this.density, 20 * this.density, null);
-        c.drawText("x" + this.deaths_amount, c.getWidth() - 65 * this.density, this.death_counter_icon.getHeight() + 15 * this.density, this.death_counter_paint);
+        c.drawText("x" + this.user.deathsCurrentLevel, c.getWidth() - 65 * this.density, this.death_counter_icon.getHeight() + 15 * this.density, this.death_counter_paint);
     }
 
     /**
@@ -707,6 +712,13 @@ public class GameState {
         this.player_last_state = this.player_state;
         this.player_state = PlayerState.DYING; //Same animation as dying is played
         this.player_anim_time = 0;
+
+        Highscore highscore = new Highscore(this.user.name, this.user.currentLevel, this.user.deathsCurrentLevel);
+        Concurrency.executeAsync(() -> insertHighscore(highscore));
+
+        this.user.currentLevel++;
+        this.user.deathsCurrentLevel = 0;
+        Concurrency.executeAsync(() -> updateUser(this.user));
     }
 
     /**
@@ -778,7 +790,13 @@ public class GameState {
                     this.mediaPlayer.start();
                 } else if (this.exit_touch_zone.contains(event.getX(), event.getY())) {
                     this.running = false;
+                } else if (this.mute_pause_touch_zone.contains(event.getX(), event.getY())) {
+                    //TODO: Toggle Mute
                 }
+            } else if (this.mute_pause_touch_zone.contains(event.getX(), event.getY())) {
+                this.paused = true;
+                releaseMediaPlayer();
+                releaseSoundPool();
             } else if (this.player_dead) {
                 this.retry();
             } else if (this.finished) {
@@ -804,10 +822,12 @@ public class GameState {
     public void onBackPressed() {
         if (!this.paused && this.started && !this.player_dead) {
             this.paused = true;
-            this.mediaPlayer.stop();
-            this.music_position = mediaPlayer.getCurrentPosition();
-            this.mediaPlayer.release();
+            releaseMediaPlayer();
+            releaseSoundPool();
         } else {
+            this.user.deathsCurrentLevel++;
+            this.user.deathsTotal++;
+            Concurrency.executeAsync(() -> updateUser(this.user));
             this.running = false;
         }
     }
@@ -817,7 +837,15 @@ public class GameState {
      */
     public void releaseMediaPlayer() {
         this.mediaPlayer.stop();
+        this.music_position = mediaPlayer.getCurrentPosition();
         this.mediaPlayer.release();
+    }
+
+    /**
+     * Releases the soundpool resources
+     */
+    public void releaseSoundPool() {
+        this.soundPool.release();
     }
 
     /**
@@ -852,8 +880,6 @@ public class GameState {
         this.player_first_gravity_inAir = false;
         this.gravity = 1;
 
-        this.deaths_amount = 0;
-
         this.start_circle_radius = 0.1f;
         this.start_circle_canvas.drawColor(Color.BLACK);
         this.start_circle_canvas.drawText(this.stage.stage_name, this.screenWidth / 2, this.screenHeight / 2, this.text_border_paint);
@@ -883,7 +909,10 @@ public class GameState {
         this.player_onBoost = false;
         this.player_first_gravity_inAir = false;
         this.gravity = 1;
-        this.deaths_amount++;
+
+        this.user.deathsCurrentLevel++;
+        this.user.deathsTotal++;
+        Concurrency.executeAsync(() -> updateUser(this.user));
 
         this.player_last_state = this.player_state;
         this.player_state = PlayerState.WAKEUP;
@@ -893,5 +922,21 @@ public class GameState {
 
         this.paused = false;
         this.finished = false;
+    }
+
+    /**
+     * Sets the user of the gamestate
+     * @param user User of the gamestate
+     */
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    private void updateUser(User user) {
+        EscapeDatabase.getInstance(context).userDao().update(user);
+    }
+
+    private void insertHighscore(Highscore highscore) {
+        EscapeDatabase.getInstance(context).highscoreDao().insert(highscore);
     }
 }

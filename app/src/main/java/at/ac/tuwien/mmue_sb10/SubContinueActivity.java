@@ -1,21 +1,30 @@
-package at.ac.tuwien.mmue_sb10.activities;
+package at.ac.tuwien.mmue_sb10;
 
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import at.ac.tuwien.mmue_sb10.GameActivity;
 import at.ac.tuwien.mmue_sb10.MainActivity;
 import at.ac.tuwien.mmue_sb10.R;
+import at.ac.tuwien.mmue_sb10.persistence.User;
 
-public class SubmenuContinue extends Activity {
+public class SubContinueActivity extends Activity {
+
+    User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_submenucontinue);
+        user = (User)getIntent().getSerializableExtra("user");
+        ((TextView)findViewById(R.id.currentPlayer)).setText(user.name);
+        ((TextView)findViewById(R.id.level)).setText("Level: " + user.currentLevel);
+        ((TextView)findViewById(R.id.totaldeaths)).setText(getResources().getText(R.string.deaths_total).toString() + ": " + user.deathsTotal);
+        ((TextView)findViewById(R.id.leveldeaths)).setText(getResources().getText(R.string.deaths_level).toString() + ": " + user.deathsCurrentLevel);
     }
 
 
@@ -34,6 +43,8 @@ public class SubmenuContinue extends Activity {
      * @since 0.2
      */
     public void onClickPlay(View v) {
-        startActivity(new Intent(this, GameActivity.class));
+        Intent intent = new Intent(this, GameActivity.class);
+        intent.putExtra("user", user);
+        startActivity(intent);
     }
 }

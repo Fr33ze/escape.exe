@@ -80,6 +80,7 @@ public class GameThread extends Thread {
 
     private void end() {
         state.releaseMediaPlayer();
+        state.releaseSoundPool();
         ((Activity)context).finish();
     }
 }

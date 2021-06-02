@@ -13,6 +13,8 @@ import android.view.Display;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 
+import at.ac.tuwien.mmue_sb10.persistence.User;
+
 public class GameActivity extends Activity {
 
     private static final String TAG = GameActivity.class.getSimpleName();
@@ -28,6 +30,7 @@ public class GameActivity extends Activity {
         setContentView(R.layout.activity_game);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         gameView = findViewById(R.id.gameView);
+        gameView.setUser((User)getIntent().getSerializableExtra("user"));
     }
 
     /**
