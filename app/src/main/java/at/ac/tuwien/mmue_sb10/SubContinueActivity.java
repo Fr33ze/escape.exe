@@ -14,7 +14,7 @@ import at.ac.tuwien.mmue_sb10.persistence.User;
 
 public class SubContinueActivity extends Activity {
 
-    User user;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +43,6 @@ public class SubContinueActivity extends Activity {
      * @since 0.2
      */
     public void onClickPlay(View v) {
-        Intent intent = new Intent(this, GameActivity.class);
-        intent.putExtra("user", user);
-        startActivity(intent);
+        startActivity(new Intent(this, GameActivity.class));
     }
 }

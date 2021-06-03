@@ -7,6 +7,7 @@
 
 package at.ac.tuwien.mmue_sb10;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -18,7 +19,12 @@ import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 
+import java.util.List;
+
+import at.ac.tuwien.mmue_sb10.persistence.EscapeDatabase;
+import at.ac.tuwien.mmue_sb10.persistence.OnUserLoadedListener;
 import at.ac.tuwien.mmue_sb10.persistence.User;
+import at.ac.tuwien.mmue_sb10.util.Concurrency;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -42,14 +48,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
      * The screen height of the device this program is running on
      */
     private int screenHeigth;
-    /**
-     * Indicates if the game is ready to be started
-     */
-    private boolean ready;
-    /**
-     * User of the gamestate
-     */
-    private User user;
+
+    private final OnUserLoadedListener onUserLoadedListener = this::onUserLoaded;
 
     /**
      *
@@ -111,12 +111,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
+        Concurrency.executeAsync(() -> {
+            User user = loadUser();
+            ((Activity)getContext()).runOnUiThread(() -> onUserLoadedListener.onUserLoaded(user));
+        });
         this.state = new GameState(getContext(), this.density, this.screenWidth, this.screenHeigth);
         this.thread = new GameThread(state, holder, getContext());
-        if(this.ready)
-            startgame();
-        else
-            this.ready = true;
     }
 
     @Override
@@ -138,15 +138,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     /**
-     * Sets the user of the gamestate. Starts the game if surface has been created already
-     * @param user
+     * Is called when the user finished loading from SQLite DB
+     * @param user User that has been loaded
      */
-    public void setUser(User user) {
-        this.user = user;
-        if(this.ready)
-            startgame();
-        else
-            this.ready = true;
+    private void onUserLoaded(User user) {
+        this.state.setUser(user);
+        startgame();
     }
 
     /**
@@ -156,8 +153,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
      * @since 0.1
      */
     public void startgame() {
-        this.state.setUser(user);
-        this.state.load(user.currentLevel);
         this.thread.setRunning(true);
         this.thread.start();
     }
@@ -179,5 +174,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public void endgame() {
         this.thread.setRunning(false);
         this.thread = null;
+    }
+
+    /**
+     * Loads the current user from the database
+     * @return User or null, if it does not exist
+     */
+    private User loadUser() {
+        List<User> users = EscapeDatabase.getInstance(getContext()).userDao().selectAllUsers();
+        User user;
+        if(users.size() > 0)
+            user = users.get(0);
+        else
+            user = null;
+        return user;
     }
 }

@@ -30,7 +30,6 @@ public class GameActivity extends Activity {
         setContentView(R.layout.activity_game);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         gameView = findViewById(R.id.gameView);
-        gameView.setUser((User)getIntent().getSerializableExtra("user"));
     }
 
     /**

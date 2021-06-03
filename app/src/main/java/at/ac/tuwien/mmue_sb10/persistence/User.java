@@ -15,13 +15,11 @@ public class User implements Serializable {
     public int currentLevel;
     public int deathsTotal;
     public int deathsCurrentLevel;
-    public boolean muted;
 
     public User(String name) {
         this.name = name;
         this.currentLevel = 1;
         this.deathsCurrentLevel = 0;
         this.deathsTotal = 0;
-        this.muted = false;
     }
 }

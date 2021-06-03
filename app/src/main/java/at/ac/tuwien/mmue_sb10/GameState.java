@@ -7,6 +7,7 @@
 package at.ac.tuwien.mmue_sb10;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -22,6 +23,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.view.MotionEvent;
+
 
 import at.ac.tuwien.mmue_sb10.persistence.EscapeDatabase;
 import at.ac.tuwien.mmue_sb10.persistence.Highscore;
@@ -82,7 +84,8 @@ public class GameState {
      * MISC
      */
     private Context context; //context of the app
-    private User user; //current save
+    private User user; //current savefile
+    private boolean update_user; //indicates wheter the user needs to be updated
     private float screenWidth; //screen width of the smartphone in px
     private float screenHeight; //screen heigth of the smartphone in px
 
@@ -101,6 +104,8 @@ public class GameState {
     private Canvas start_circle_canvas; //canvas to draw on start_circle_bmp
     private boolean player_invisible; //draw player or not
     private Bitmap death_counter_icon; //icon for the death counter
+    private Bitmap icon_mute; //icon for the mute function
+    private Bitmap icon_sound; //icon for the unmute function
 
     /*
      * PAINT
@@ -131,6 +136,7 @@ public class GameState {
     /*
      * SOUND
      */
+    private boolean muted; //indicates if the sound is muted. saved in preferences
     private MediaPlayer mediaPlayer; //for playing background music
     private int music_position; //to pause and resume music
     private SoundPool soundPool; //plays all the in-game sounds
@@ -143,11 +149,13 @@ public class GameState {
     private int sound_gravity_down;
     private int sound_button;
 
+
     /**
      * Creates a new GameState instance
-     * @param context Context of the App to get resources
-     * @param density Pixel density of the screen
-     * @param screenWidth Width of the screen in pixel
+     *
+     * @param context      Context of the App to get resources
+     * @param density      Pixel density of the screen
+     * @param screenWidth  Width of the screen in pixel
      * @param screenHeight Heigth of the screen in pixel
      * @since 0.1
      */
@@ -166,6 +174,9 @@ public class GameState {
         this.player_paint.setAntiAlias(true);
         loadPlayerFrames();
         loadDeathCounter();
+
+        SharedPreferences sp = this.context.getSharedPreferences("escapePrefs", 0);
+        this.muted = sp.getBoolean("muted", false);
 
         this.text_paint = new Paint();
         this.text_paint.setColor(Color.RED);
@@ -212,19 +223,17 @@ public class GameState {
 
         this.continue_touch_zone = new RectF(this.screenWidth * 0.33f, this.screenHeight / 2 - 10 * this.density, this.screenWidth * 0.66f, this.screenHeight / 2 + 50 * this.density);
         this.exit_touch_zone = new RectF(this.screenWidth * 0.33f, this.screenHeight / 2 + 70 * this.density, this.screenWidth * 0.66f, this.screenHeight / 2 + 130 * this.density);
-        this.mute_pause_touch_zone = new RectF(10 * this.density, 10 * this.density, 20 * this.density, 20 * this.density);
+        this.mute_pause_touch_zone = new RectF(10 * this.density, 10 * this.density, 40 * this.density, 40 * this.density);
+        loadMuteIcons();
 
         this.player_state = PlayerState.IDLE;
         this.player_anim_time = 0;
         this.player_draw_matrix = new Matrix();
         this.player_draw_scale = (float) PLAYER_WIDTH / this.player_frames[0].getWidth();
 
-        this.music_position = 0;
-
         this.running = false;
 
-        this.soundPool = new SoundPool(2, AudioManager.STREAM_MUSIC, 0);
-        initSounds();
+        initSoundPool();
     }
 
     /**
@@ -254,21 +263,29 @@ public class GameState {
         o.inScaled = false;
         Bitmap temp_death = BitmapFactory.decodeResource(context.getResources(), R.drawable.deaths, o);
         this.death_counter_icon = Bitmap.createScaledBitmap(
-                temp_death, (int)(temp_death.getWidth() * 2 * this.density), (int)(temp_death.getHeight() * 2 * this.density), true
+                temp_death, (int) (temp_death.getWidth() * 2 * this.density), (int) (temp_death.getHeight() * 2 * this.density), true
         );
     }
 
     /**
-     * Initialises the sounds
+     * Loads the mute and unmute icons from the resources
      */
-    private void initSounds() {
-        this.sound_step_1 = this.soundPool.load(this.context, R.raw.step1, 1);
-        this.sound_step_2 = this.soundPool.load(this.context, R.raw.step2, 1);
-        this.sound_button = this.soundPool.load(this.context, R.raw.button, 1);
+    private void loadMuteIcons() {
+        BitmapFactory.Options o = new BitmapFactory.Options();
+        o.inScaled = false;
+        Bitmap temp_mute = BitmapFactory.decodeResource(context.getResources(), R.drawable.icon_mute, o);
+        this.icon_mute = Bitmap.createScaledBitmap(
+                temp_mute, (int) (this.mute_pause_touch_zone.width()), (int) (mute_pause_touch_zone.height()), true
+        );
+        temp_mute = BitmapFactory.decodeResource(context.getResources(), R.drawable.icon_sound, o);
+        this.icon_sound = Bitmap.createScaledBitmap(
+                temp_mute, (int) (30 * this.density), (int) (30 * this.density), true
+        );
     }
 
     /**
      * Updates the state of the game depending on the deltaFrameTime. Handles collision detection, gravity, movement, ...
+     *
      * @param deltaFrameTime The passed time since the last updated frame.
      * @since 0.1
      */
@@ -377,6 +394,7 @@ public class GameState {
     /**
      * Boosts the player speed by a factor of 1.5 if going right, otherwise slows down by factor of 0.66
      * Only works once per boost platform
+     *
      * @since 0.1
      */
     private void boostPlayerRight() {
@@ -392,6 +410,7 @@ public class GameState {
     /**
      * Boosts the player speed by a factor of 1.5 if going left, otherwise slows down by factor of 0.66
      * Only works once per boost platform
+     *
      * @since 0.1
      */
     private void boostPlayerLeft() {
@@ -406,6 +425,7 @@ public class GameState {
 
     /**
      * When player object collides with tiles on Y axis (basically when it is walking on the ground), adjust Y position to be exactly
+     *
      * @since 0.1
      */
     private void adjustPositionY() {
@@ -420,6 +440,7 @@ public class GameState {
 
     /**
      * When player object collides with a wall horizontally, player dies
+     *
      * @since 0.1
      */
     private void checkCollisionX() {
@@ -433,6 +454,7 @@ public class GameState {
     /**
      * Calculates the exact time it took the player object to collide with the tile object on x axis
      * Player object might overlap the collided object, this calculates exact time it takes to collide without overlap
+     *
      * @since 0.1
      */
     private void calcCollisionTimeX() {
@@ -445,6 +467,7 @@ public class GameState {
     /**
      * Calculates the exact time it took the player object to collide with the tile object on y axis
      * Player object might overlap the collided object, this calculates exact time it takes to collide without overlap
+     *
      * @since 0.1
      */
     private void calcCollisionTimeY() {
@@ -456,7 +479,8 @@ public class GameState {
 
     /**
      * Draws the current state of the game onto c
-     * @param c The Canvas that is drawed onto
+     *
+     * @param c              The Canvas that is drawed onto
      * @param deltaFrameTime The passed time since the last frame
      * @since 0.1
      */
@@ -476,6 +500,7 @@ public class GameState {
 
     /**
      * Translates the X drawing area to fit the current player position
+     *
      * @param c Canvas that needs to be translated (needed for width and heigth)
      */
     private void translateX(Canvas c) {
@@ -493,6 +518,7 @@ public class GameState {
 
     /**
      * Translates the Y drawing area to fit the current player position
+     *
      * @param c Canvas that needs to be translated (needed for width and heigth)
      */
     private void translateY(Canvas c) {
@@ -509,6 +535,7 @@ public class GameState {
 
     /**
      * Draws the level including background
+     *
      * @param c Canvas to draw the level onto
      */
     private void drawMap(Canvas c) {
@@ -537,7 +564,8 @@ public class GameState {
 
     /**
      * Draws the current player frame fully transformed
-     * @param c Canvas to draw the player frame onto
+     *
+     * @param c              Canvas to draw the player frame onto
      * @param deltaFrameTime The passed time since the last frame
      */
     private void drawPlayer(Canvas c, float deltaFrameTime) {
@@ -627,7 +655,8 @@ public class GameState {
     /**
      * Draws the HUD on the canvas
      * HUD includes pausescreen, deathscreen, finishedscreen, fadeins, fadeouts, deathcounter, ...
-     * @param c Canvas to draw the HUD onto
+     *
+     * @param c              Canvas to draw the HUD onto
      * @param deltaFrameTime Passed time since the last frame
      */
     private void drawHUD(Canvas c, float deltaFrameTime) {
@@ -656,6 +685,7 @@ public class GameState {
 
     /**
      * Draws the death counter onthe canvas
+     *
      * @param c Canvas to draw the death counter onto
      */
     private void drawDeathCounter(Canvas c) {
@@ -665,6 +695,7 @@ public class GameState {
 
     /**
      * Draws the pause screen on the canvas
+     *
      * @param c Canvas to draw the pause screen onto
      */
     private void drawPauseScreen(Canvas c) {
@@ -674,15 +705,20 @@ public class GameState {
         c.drawRoundRect(this.exit_touch_zone, 15 * this.density, 15 * this.density, this.button_paint);
         c.drawText(context.getResources().getText(R.string.continue_game).toString(), this.continue_touch_zone.centerX(), this.continue_touch_zone.centerY() - this.button_text_paint.ascent() / 2, this.button_text_paint);
         c.drawText(context.getResources().getText(R.string.back_to_menu).toString(), this.exit_touch_zone.centerX(), this.exit_touch_zone.centerY() - this.button_text_paint.ascent() / 2, this.button_text_paint);
-
+        if (this.muted) {
+            c.drawBitmap(this.icon_mute, this.mute_pause_touch_zone.left, this.mute_pause_touch_zone.top, null);
+        } else {
+            c.drawBitmap(this.icon_sound, this.mute_pause_touch_zone.left, this.mute_pause_touch_zone.top, null);
+        }
     }
 
     /**
      * Draws the fadeout animation on the canvas
-     * @param c Canvas to draw the fadeout animation onto
+     *
+     * @param c              Canvas to draw the fadeout animation onto
      * @param deltaFrameTime The passed time since the last frame
-     * @param fade_out_time Time for the screen to fully turn black
-     * @param max_alpha Maximum alpha for the fadeout effect
+     * @param fade_out_time  Time for the screen to fully turn black
+     * @param max_alpha      Maximum alpha for the fadeout effect
      */
     private void drawFadeout(Canvas c, float deltaFrameTime, int fade_out_time, int max_alpha) {
         this.current_fade_out_time += deltaFrameTime;
@@ -691,15 +727,16 @@ public class GameState {
 
     /**
      * Draws the fadeout animation on the canvas
-     * @param c Canvas to draw the fadeout animation onto
+     *
+     * @param c              Canvas to draw the fadeout animation onto
      * @param deltaFrameTime The passed time since the last frame
-     * @param fade_out_time Time in ms for the screen to fully turn black
-     * @param max_alpha Maximum alpha for the fadeout effect
-     * @param wait_time Time in ms to wait before starting the fadeout effect
+     * @param fade_out_time  Time in ms for the screen to fully turn black
+     * @param max_alpha      Maximum alpha for the fadeout effect
+     * @param wait_time      Time in ms to wait before starting the fadeout effect
      */
     private void drawFadeout(Canvas c, float deltaFrameTime, int fade_out_time, int max_alpha, int wait_time) {
         this.current_fade_out_time += deltaFrameTime;
-        if(this.current_fade_out_time > wait_time) {
+        if (this.current_fade_out_time > wait_time) {
             c.drawARGB(Math.min((int) (((this.current_fade_out_time - wait_time) / fade_out_time) * max_alpha), max_alpha), 0, 0, 0);
         }
     }
@@ -713,12 +750,15 @@ public class GameState {
         this.player_state = PlayerState.DYING; //Same animation as dying is played
         this.player_anim_time = 0;
 
-        Highscore highscore = new Highscore(this.user.name, this.user.currentLevel, this.user.deathsCurrentLevel);
-        Concurrency.executeAsync(() -> insertHighscore(highscore));
+        if (this.update_user) {
+            Highscore highscore = new Highscore(this.user.name, this.user.currentLevel, this.user.deathsCurrentLevel);
+            Concurrency.executeAsync(() -> insertHighscore(highscore));
 
-        this.user.currentLevel++;
-        this.user.deathsCurrentLevel = 0;
-        Concurrency.executeAsync(() -> updateUser(this.user));
+            this.user.currentLevel++;
+            this.user.deathsCurrentLevel = 0;
+            Concurrency.executeAsync(() -> updateUser(this.user));
+        }
+        this.update_user = false;
     }
 
     /**
@@ -738,11 +778,19 @@ public class GameState {
         this.player_last_state = this.player_state;
         this.player_state = PlayerState.DYING;
         this.player_anim_time = 0;
+
+        if (this.update_user) {
+            this.user.deathsCurrentLevel++;
+            this.user.deathsTotal++;
+            Concurrency.executeAsync(() -> updateUser(this.user));
+        }
+        this.update_user = false;
     }
 
     /**
      * Inverts the gravity of the game to face upside down. Also marks the player to be in air
      * Only works if player is not in air when method call happens
+     *
      * @since 0.1
      */
     private void invertGravity() {
@@ -760,6 +808,7 @@ public class GameState {
     /**
      * Sets the vertical velocity of the player to make a small jump. Also marks the player to be in air
      * Only works if player is not in air when method call happens
+     *
      * @since 0.1
      */
     private void jump() {
@@ -775,6 +824,7 @@ public class GameState {
 
     /**
      * Manipulates the state of the game depending on incoming MotionEvents
+     *
      * @param event Incoming MotionEvent
      * @since 0.1
      */
@@ -784,23 +834,19 @@ public class GameState {
                 if (this.continue_touch_zone.contains(event.getX(), event.getY())) {
                     this.paused = false;
                     this.current_fade_out_time = 0;
-                    this.mediaPlayer = MediaPlayer.create(this.context, this.stage.current_music_id);
-                    this.mediaPlayer.setLooping(true);
-                    this.mediaPlayer.seekTo(this.music_position);
-                    this.mediaPlayer.start();
+                    initMediaPlayer();
                 } else if (this.exit_touch_zone.contains(event.getX(), event.getY())) {
                     this.running = false;
                 } else if (this.mute_pause_touch_zone.contains(event.getX(), event.getY())) {
-                    //TODO: Toggle Mute
+                    toggleMute();
                 }
             } else if (this.mute_pause_touch_zone.contains(event.getX(), event.getY())) {
                 this.paused = true;
                 releaseMediaPlayer();
-                releaseSoundPool();
             } else if (this.player_dead) {
                 this.retry();
             } else if (this.finished) {
-                this.load(this.stage.stage_level + 1);
+                this.load(this.user.currentLevel);
             } else if (!this.started) {
                 this.started = true;
                 this.player_last_state = this.player_state;
@@ -832,24 +878,70 @@ public class GameState {
         }
     }
 
+    public void toggleMute() {
+        if (!this.muted) {
+            releaseMediaPlayer();
+            releaseSoundPool();
+        } else {
+            initMediaPlayer();
+            initSoundPool();
+        }
+
+        this.muted = !this.muted;
+        SharedPreferences sp = this.context.getSharedPreferences("escapePrefs", 0);
+        sp.edit().putBoolean("muted", muted).apply();
+    }
+
+    public void initMediaPlayer() {
+        if(this.muted)
+            return;
+
+        this.mediaPlayer = MediaPlayer.create(this.context, this.stage.current_music_id);
+        this.mediaPlayer.seekTo(this.music_position);
+        this.mediaPlayer.setLooping(true);
+        this.mediaPlayer.setVolume(1, 1);
+        this.mediaPlayer.start();
+    }
+
     /**
      * Stops the mediaplayer and releases the music resource
      */
     public void releaseMediaPlayer() {
-        this.mediaPlayer.stop();
-        this.music_position = mediaPlayer.getCurrentPosition();
-        this.mediaPlayer.release();
+        try {
+            this.music_position = mediaPlayer.getCurrentPosition();
+            this.mediaPlayer.release();
+        } catch (IllegalStateException | NullPointerException exc) {
+            exc.printStackTrace();
+        }
     }
 
     /**
      * Releases the soundpool resources
      */
     public void releaseSoundPool() {
-        this.soundPool.release();
+        try {
+            this.soundPool.release();
+        } catch (IllegalStateException | NullPointerException exc) {
+            exc.printStackTrace();
+        }
+    }
+
+    /**
+     * Initializes the soundpool resources
+     */
+    public void initSoundPool() {
+        if(this.muted)
+            return;
+
+        this.soundPool = new SoundPool(2, AudioManager.STREAM_MUSIC, 0);
+        this.sound_step_1 = this.soundPool.load(this.context, R.raw.step1, 1);
+        this.sound_step_2 = this.soundPool.load(this.context, R.raw.step2, 1);
+        this.sound_button = this.soundPool.load(this.context, R.raw.button, 1);
     }
 
     /**
      * Loads the GameState and the a stage for the first use only
+     *
      * @param level The ID of the stage to be loaded. Starts with 0
      * @since 0.1
      */
@@ -860,13 +952,9 @@ public class GameState {
 
         this.stage.load(level);
 
-        if(this.mediaPlayer != null)
-            this.mediaPlayer.release();
-
-        this.mediaPlayer = MediaPlayer.create(this.context, this.stage.current_music_id);
-        this.mediaPlayer.setLooping(true);
-        this.mediaPlayer.setVolume(1, 1);
-        this.mediaPlayer.start();
+        releaseMediaPlayer();
+        this.music_position = 0;
+        initMediaPlayer();
 
         this.player_pos_x = stage.player_start_x * 24;
         this.player_pos_y = stage.player_start_y * 24 + 24 - PLAYER_HEIGTH;
@@ -891,10 +979,13 @@ public class GameState {
         this.player_invisible = false;
         this.player_no_input = false;
         this.current_fade_out_time = 0;
+
+        this.update_user = true;
     }
 
     /**
      * Resets all changed values since the start of the level. Restarts the stage
+     *
      * @since 0.1
      */
     private void retry() {
@@ -910,10 +1001,6 @@ public class GameState {
         this.player_first_gravity_inAir = false;
         this.gravity = 1;
 
-        this.user.deathsCurrentLevel++;
-        this.user.deathsTotal++;
-        Concurrency.executeAsync(() -> updateUser(this.user));
-
         this.player_last_state = this.player_state;
         this.player_state = PlayerState.WAKEUP;
         this.player_anim_time = 0;
@@ -922,14 +1009,13 @@ public class GameState {
 
         this.paused = false;
         this.finished = false;
+
+        this.update_user = true;
     }
 
-    /**
-     * Sets the user of the gamestate
-     * @param user User of the gamestate
-     */
     public void setUser(User user) {
         this.user = user;
+        load(this.user.currentLevel);
     }
 
     private void updateUser(User user) {
