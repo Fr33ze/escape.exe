@@ -346,6 +346,7 @@ public class GameState {
                 if (collision_corners[0] == 3 || collision_corners[1] == 3 || collision_corners[2] == 3 || collision_corners[3] == 3) {
                     //X Inverter Collision
                     this.player_velocity_x *= -1;
+                    this.player_pos_y = this.player_collision_px.top;
                 } else if (collision_corners[0] == 6 || collision_corners[1] == 6 || collision_corners[2] == 6 || collision_corners[3] == 6) {
                     //X Finish Collision
                     finishStage();
@@ -355,6 +356,8 @@ public class GameState {
                     //X Collision with no-input tile
                     //happens before finish line for running out of screen effect
                     setNoPlayerInput();
+                    this.player_pos_x = this.player_collision_px.left;
+                    this.player_pos_y = this.player_collision_px.top;
                 } else if (collision_corners[0] == 2 || collision_corners[1] == 2 || collision_corners[2] == 2 || collision_corners[3] == 2) {
                     //X Death Collision (spikes)
                     killPlayer();
@@ -849,6 +852,7 @@ public class GameState {
                     EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).snd_button);
                 } else if (this.exit_touch_zone.contains(event.getX(), event.getY())) {
                     this.running = false;
+                    EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).snd_button);
                 } else if (this.mute_pause_touch_zone.contains(event.getX(), event.getY())) {
                     EscapeSoundManager.getInstance(this.context).toggleMute(this.stage.current_music_id);
                     EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).snd_button);
@@ -883,11 +887,13 @@ public class GameState {
         if (!this.paused && this.started && !this.player_dead) {
             this.paused = true;
             EscapeSoundManager.getInstance(this.context).stopSoundLoop();
+            EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).snd_button);
         } else {
             this.user.deathsCurrentLevel++;
             this.user.deathsTotal++;
             Concurrency.executeAsync(() -> updateUser(this.user));
             this.running = false;
+            EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).snd_button);
         }
     }
 

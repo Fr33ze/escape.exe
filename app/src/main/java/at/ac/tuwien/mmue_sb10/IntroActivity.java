@@ -65,7 +65,7 @@ public class IntroActivity extends Activity {
     }
 
     public void onClickSkip(View view) {
-        EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
+        //EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
         videoView.stopPlayback();
         videoView.suspend();
         startActivity(new Intent(this, MainActivity.class));
