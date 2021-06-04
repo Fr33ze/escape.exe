@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.core.content.res.ResourcesCompat;
+
 import at.ac.tuwien.mmue_sb10.GameActivity;
 import at.ac.tuwien.mmue_sb10.MainActivity;
 import at.ac.tuwien.mmue_sb10.R;
@@ -27,6 +29,31 @@ public class SubContinueActivity extends Activity {
         ((TextView)findViewById(R.id.leveldeaths)).setText(getResources().getText(R.string.deaths_level).toString() + ": " + user.deathsCurrentLevel);
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        finish();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        //TODO Mute Button Below
+
+        if (!EscapeSoundManager.getInstance(this).isMuted()) {
+            EscapeSoundManager.getInstance(this).initMediaPlayer(R.raw.mmenu_bgmusic, true);
+        }
+
+        EscapeSoundManager.getInstance(this).lock();
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
+    }
 
     /**
      * When clicked brings you back to the main menu.
@@ -34,6 +61,7 @@ public class SubContinueActivity extends Activity {
      * @since 0.2
      */
     public void onClickBackToMain(View v) {
+        EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
         finish();
     }
 
@@ -43,6 +71,7 @@ public class SubContinueActivity extends Activity {
      * @since 0.2
      */
     public void onClickPlay(View v) {
+        EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
         startActivity(new Intent(this, GameActivity.class));
     }
 }

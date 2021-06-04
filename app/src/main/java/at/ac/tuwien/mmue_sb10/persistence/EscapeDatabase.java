@@ -9,7 +9,7 @@ import androidx.room.RoomDatabase;
 
 import java.util.HashMap;
 
-@Database(entities = {User.class, Highscore.class}, version = 1)
+@Database(entities = {User.class, Highscore.class}, version = 1, exportSchema = false)
 public abstract class EscapeDatabase extends RoomDatabase {
     public abstract UserDao userDao();
     public abstract HighscoreDao highscoreDao();

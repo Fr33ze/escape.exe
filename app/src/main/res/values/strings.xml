@@ -8,6 +8,7 @@
     <string name="pause_game">Game Paused!</string>
     <string name="back_to_menu">Exit</string>
     <string name="next_level"> finished! Tap to continue.</string>
+    <string name="skip_intro"> Tap here to skip.. </string>
 
     <string name="btn_continue"> Continue </string>
     <string name="btn_newgame"> New Game </string>

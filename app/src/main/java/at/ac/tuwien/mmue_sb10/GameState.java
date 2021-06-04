@@ -106,13 +106,13 @@ public class GameState {
     private Canvas start_circle_canvas; //canvas to draw on start_circle_bmp
     private boolean player_invisible; //draw player or not
     private Bitmap death_counter_icon; //icon for the death counter
-    private Bitmap icon_mute; //icon for the mute function
-    private Bitmap icon_sound; //icon for the unmute function
+    private Bitmap icon_mute; //icon for the mute button
+    private Bitmap icon_sound; //icon for the unmute button
+    private Bitmap icon_pause; //icon for the pause button
 
     /*
      * PAINT
      */
-    private Paint player_paint; //paint for antialiasing
     private Paint text_paint; //paint for text
     private Paint text_border_paint; //border paint for text
     private Paint trans_paint; //paint for transparency
@@ -155,8 +155,6 @@ public class GameState {
         this.player_collision_tiles = new Rect();
         this.collision_corners = new int[4];
 
-        this.player_paint = new Paint();
-        this.player_paint.setAntiAlias(true);
         loadPlayerFrames();
         loadDeathCounter();
 
@@ -192,9 +190,8 @@ public class GameState {
 
         this.death_counter_paint = new Paint();
         this.death_counter_paint.setColor(Color.BLACK);
-        this.death_counter_paint.setStyle(Paint.Style.FILL_AND_STROKE);
         this.death_counter_paint.setTypeface(font_joystix);
-        this.death_counter_paint.setTextSize(this.death_counter_icon.getHeight());
+        this.death_counter_paint.setTextSize(this.death_counter_icon.getHeight() * 0.65f);
 
         this.you_died_retry = context.getResources().getString(R.string.player_died);
         this.finished_next_level = context.getResources().getString(R.string.next_level);
@@ -216,6 +213,7 @@ public class GameState {
         this.player_draw_scale = (float) PLAYER_WIDTH / this.player_frames[0].getWidth();
 
         this.running = false;
+        EscapeSoundManager.getInstance(this.context).unlock();
     }
 
     /**
@@ -262,6 +260,15 @@ public class GameState {
         temp_mute = BitmapFactory.decodeResource(context.getResources(), R.drawable.icon_sound, o);
         this.icon_sound = Bitmap.createScaledBitmap(
                 temp_mute, (int) (30 * this.density), (int) (30 * this.density), true
+        );
+    }
+
+    private void loadPauseIcon() {
+        BitmapFactory.Options o = new BitmapFactory.Options();
+        o.inScaled = false;
+        Bitmap temp_pause = BitmapFactory.decodeResource(context.getResources(), R.drawable.icon_pause, o);
+        this.death_counter_icon = Bitmap.createScaledBitmap(
+                temp_pause, (int) (30 * this.density), (int) (30 * this.density), true
         );
     }
 
@@ -363,6 +370,8 @@ public class GameState {
                 this.player_pos_y = this.player_collision_px.top;
                 this.player_inAir = true;
                 this.player_onBoost = false;
+
+                EscapeSoundManager.getInstance(this.context).stopSoundLoop();
             }
             this.player_pos_x = this.player_collision_px.left;
         } else {
@@ -418,6 +427,8 @@ public class GameState {
 
         this.player_last_state = this.player_state;
         this.player_state = PlayerState.RUNNING;
+
+        EscapeSoundManager.getInstance(this.context).playSoundLoop(EscapeSoundManager.getInstance(this.context).snd_steps);
     }
 
     /**
@@ -631,7 +642,7 @@ public class GameState {
                 break;
         }
 
-        c.drawBitmap(this.player_frames[this.player_current_frame], player_draw_matrix, this.player_paint);
+        c.drawBitmap(this.player_frames[this.player_current_frame], player_draw_matrix, null);
     }
 
     /**
@@ -661,7 +672,8 @@ public class GameState {
             this.start_circle_canvas.drawCircle((this.player_pos_x + PLAYER_WIDTH / 2) * this.stage.stage_scale, (this.player_pos_y + PLAYER_HEIGTH / 2) * this.stage.stage_scale, this.start_circle_radius * this.screenWidth, trans_paint);
             c.drawBitmap(start_circle_bmp, 0, 0, null);
         } else if (this.player_no_input) {
-            drawFadeout(c, deltaFrameTime, 3500, 255);
+            drawFadeout(c, deltaFrameTime, 2500, 255);
+            EscapeSoundManager.getInstance(this.context).fadeSoundLoop(this.current_fade_out_time, 3500, 0f);
         }
     }
 
@@ -672,7 +684,7 @@ public class GameState {
      */
     private void drawDeathCounter(Canvas c) {
         c.drawBitmap(this.death_counter_icon, 10 * this.density, c.getHeight() - this.death_counter_icon.getHeight() - 10 * this.density, null);
-        c.drawText("x" + this.user.deathsCurrentLevel, c.getWidth() - 65 * this.density, this.death_counter_icon.getHeight() + 15 * this.density, this.death_counter_paint);
+        c.drawText("" + this.user.deathsCurrentLevel, 48 * this.density, c.getHeight() - 13 * this.density - this.death_counter_icon.getHeight() / 2f - this.death_counter_paint.ascent() / 2, this.death_counter_paint);
     }
 
     /**
@@ -733,6 +745,8 @@ public class GameState {
         this.player_anim_time = 0;
 
         if (this.update_user) {
+            EscapeSoundManager.getInstance(this.context).stopSoundLoop();
+
             Highscore highscore = new Highscore(this.user.name, this.user.currentLevel, this.user.deathsCurrentLevel);
             Concurrency.executeAsync(() -> insertHighscore(highscore));
 
@@ -747,6 +761,11 @@ public class GameState {
      * Prepares finishing a stage by not allowing any more input
      */
     private void setNoPlayerInput() {
+        if(!this.player_no_input) {
+            EscapeSoundManager.getInstance(this.context).pauseMediaPlayer();
+            EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).msc_level_beat);
+        }
+
         this.player_no_input = true;
         this.gravity = 1;
         this.player_velocity_y = 0;
@@ -762,6 +781,10 @@ public class GameState {
         this.player_anim_time = 0;
 
         if (this.update_user) {
+            EscapeSoundManager.getInstance(this.context).pauseMediaPlayer();
+            EscapeSoundManager.getInstance(this.context).stopSoundLoop();
+            EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).snd_death);
+            EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).msc_death);
             this.user.deathsCurrentLevel++;
             this.user.deathsTotal++;
             Concurrency.executeAsync(() -> updateUser(this.user));
@@ -784,6 +807,11 @@ public class GameState {
             this.player_last_state = this.player_state;
             this.player_state = PlayerState.GRAVITY;
             this.player_anim_time = 0;
+
+            if (this.gravity < 0)
+                EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).snd_gravity_up);
+            else
+                EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).snd_gravity_down);
         }
     }
 
@@ -801,6 +829,8 @@ public class GameState {
             this.player_last_state = this.player_state;
             this.player_state = PlayerState.START_END_JUMP;
             this.player_anim_time = 0;
+
+            EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).snd_jump);
         }
     }
 
@@ -816,13 +846,16 @@ public class GameState {
                 if (this.continue_touch_zone.contains(event.getX(), event.getY())) {
                     this.paused = false;
                     this.current_fade_out_time = 0;
+                    EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).snd_button);
                 } else if (this.exit_touch_zone.contains(event.getX(), event.getY())) {
                     this.running = false;
                 } else if (this.mute_pause_touch_zone.contains(event.getX(), event.getY())) {
                     EscapeSoundManager.getInstance(this.context).toggleMute(this.stage.current_music_id);
+                    EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).snd_button);
                 }
             } else if (this.mute_pause_touch_zone.contains(event.getX(), event.getY())) {
                 this.paused = true;
+                EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).snd_button);
             } else if (this.player_dead) {
                 this.retry();
             } else if (this.finished) {
@@ -832,6 +865,7 @@ public class GameState {
                 this.player_last_state = this.player_state;
                 this.player_state = PlayerState.WAKEUP;
                 this.player_anim_time = 0;
+                EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).snd_button);
             } else if (!this.player_no_input) {
                 if (event.getX() < this.screenWidth / 2) {
                     this.invertGravity();
@@ -848,6 +882,7 @@ public class GameState {
     public void onBackPressed() {
         if (!this.paused && this.started && !this.player_dead) {
             this.paused = true;
+            EscapeSoundManager.getInstance(this.context).stopSoundLoop();
         } else {
             this.user.deathsCurrentLevel++;
             this.user.deathsTotal++;
@@ -870,7 +905,7 @@ public class GameState {
         this.stage.load(level);
 
         EscapeSoundManager.getInstance(this.context).releaseMediaPlayer();
-        EscapeSoundManager.getInstance(this.context).initMediaPlayer(this.stage.current_music_id);
+        EscapeSoundManager.getInstance(this.context).initMediaPlayer(this.stage.current_music_id, true);
 
         this.player_pos_x = stage.player_start_x * 24;
         this.player_pos_y = stage.player_start_y * 24 + 24 - PLAYER_HEIGTH;
@@ -927,6 +962,8 @@ public class GameState {
         this.finished = false;
 
         this.update_user = true;
+
+        EscapeSoundManager.getInstance(this.context).resumeMediaPlayer();
     }
 
     public void setUser(User user) {

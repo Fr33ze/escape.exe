@@ -10,16 +10,22 @@ public class EscapeSoundManager {
     private static EscapeSoundManager sInstance;
 
     public int snd_button;
+    public int snd_death;
     public int snd_steps;
     public int snd_jump;
     public int snd_land;
     public int snd_gravity_up;
     public int snd_gravity_down;
+    public int msc_level_beat;
+    public int msc_death;
 
     private Context context;
     private MediaPlayer mediaPlayer;
     private SoundPool soundPool;
+
+    private boolean locked;
     private boolean muted;
+    private int loop_stream_id;
 
     private EscapeSoundManager(Context context) {
         this.context = context.getApplicationContext();
@@ -36,27 +42,87 @@ public class EscapeSoundManager {
         return sInstance;
     }
 
+    /**
+     * Locks the SoundManager. No new MediaPlayer or SoundPool can be initialized while it is locked
+     */
+    public void lock() {
+        this.locked = true;
+    }
+
+    /**
+     * Unlocks the SoundManager. New MediaPlayers or SoundPools can be initialized while its unlocked
+     */
+    public void unlock() {
+        this.locked = false;
+    }
+
+    /**
+     * Checks if the SoundManager is muted
+     * @return true if the SoundManager is muted
+     */
     public boolean isMuted() {
         return muted;
     }
 
+    /**
+     * Mutes or Unmutes the SoundManager. Also saves the status in the preferences
+     */
+    public void toggleMute() {
+        muted = !muted;
+        if (muted)
+            release();
+
+        SharedPreferences sp = context.getSharedPreferences("escapePrefs", 0);
+        sp.edit().putBoolean("muted", muted).apply();
+    }
+
+    /**
+     * Mutes or Unmutes the SoundManager. Also saves the status in the preferences
+     * @param music_resource Resource of the music to be played if it is unmuted
+     */
     public void toggleMute(int music_resource) {
         muted = !muted;
         if (muted) {
             release();
         } else {
-            initMediaPlayer(music_resource);
+            initMediaPlayer(music_resource, true);
             initSoundPool();
         }
         SharedPreferences sp = context.getSharedPreferences("escapePrefs", 0);
         sp.edit().putBoolean("muted", muted).apply();
     }
 
+    /**
+     * Pause the MediaPlayer instance without releasing it
+     */
+    public void pauseMediaPlayer() {
+        if (muted)
+            return;
+
+        mediaPlayer.pause();
+    }
+
+    /**
+     * Resumes the MediaPlayer instance from where it has been paused
+     */
+    public void resumeMediaPlayer() {
+        if (muted)
+            return;
+
+        mediaPlayer.start();
+    }
+
+    /**
+     * Releases all MediaPlayer and SoundPool Resources
+     */
     public void release() {
         releaseMediaPlayer();
         releaseSoundPool();
     }
 
+    /**
+     * Only releases the MediaPlayer instance
+     */
     public void releaseMediaPlayer() {
         try {
             mediaPlayer.release();
@@ -65,6 +131,9 @@ public class EscapeSoundManager {
         }
     }
 
+    /**
+     * Only releases the SoundPool instance
+     */
     public void releaseSoundPool() {
         try {
             soundPool.release();
@@ -73,40 +142,98 @@ public class EscapeSoundManager {
         }
     }
 
-    public void initMediaPlayer(int music_resource) {
-        if (muted)
+    /**
+     * Releases and then initializes a new MediaPlayer isntance. Does nothing if the SoundManager is locked or muted
+     * @param music_resource Resource of the music to be played after initialization
+     * @param loop Indicates if the track should be looped
+     */
+    public void initMediaPlayer(int music_resource, boolean loop) {
+        if (muted || locked)
             return;
 
         try {
+            releaseMediaPlayer();
             mediaPlayer = MediaPlayer.create(context, music_resource);
             mediaPlayer.setVolume(1, 1);
-            mediaPlayer.setLooping(true);
+            mediaPlayer.setLooping(loop);
             mediaPlayer.start();
         } catch (NullPointerException | IllegalStateException exc) {
             exc.printStackTrace();
         }
     }
 
+    /**
+     * Releases and then initializes a new SoundPool instance with all sounds in the app. Does nothing if the SoundManager is locked or muted
+     */
     public void initSoundPool() {
-        if (muted)
+        if (muted || locked)
             return;
 
         try {
-            soundPool = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
-            snd_button = soundPool.load(context, R.raw.button_click, 1);
-            snd_gravity_up = soundPool.load(context, R.raw.gravity_to_invert, 1);
-            snd_gravity_down = soundPool.load(context, R.raw.gravity_to_normal, 1);
+            releaseSoundPool();
+            soundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
+            snd_button = soundPool.load(context, R.raw.button_click, 3);
+            snd_death = soundPool.load(context, R.raw.death_sound, 2);
+            snd_jump = soundPool.load(context, R.raw.jump, 1);
+            snd_gravity_up = soundPool.load(context, R.raw.gravity_to_invert, 2);
+            snd_gravity_down = soundPool.load(context, R.raw.gravity_to_normal, 2);
+            snd_steps = soundPool.load(context, R.raw.steps, 1);
+            msc_death = soundPool.load(context, R.raw.death_music, 2);
+            msc_level_beat = soundPool.load(context, R.raw.level_beat_music, 2);
 
+            loop_stream_id = -1;
 
         } catch (NullPointerException | IllegalStateException exc) {
             exc.printStackTrace();
         }
     }
 
+    /**
+     * Plays a sound. Does nothing if the SoundManager is muted
+     * @param sound_id of the sound to be played
+     */
     public void playSound(int sound_id) {
         if (muted)
             return;
 
         soundPool.play(sound_id, 1, 1, 0, 0, 1);
+    }
+
+    /**
+     * Plays a sound on loop. Does nothing if the SoundManager is muted or if one other sound is already being played on loop
+     * @param sound_id
+     */
+    public void playSoundLoop(int sound_id) {
+        if (muted || loop_stream_id != -1)
+            return;
+
+        loop_stream_id = soundPool.play(sound_id, 1, 1, 0, -1, 1);
+    }
+
+    /**
+     * Fades out currently looping sound effect slowly
+     *
+     * @param current_fade_out_time currently progressed time since the fadeout started in ms
+     * @param fade_out_time         total time for the fadeout process in ms
+     * @param max_fadeout           maximum fadeout factor. 0.5 means it will fade the sound to 50% volume
+     */
+    public void fadeSoundLoop(float current_fade_out_time, int fade_out_time, float max_fadeout) {
+        if (muted)
+            return;
+
+        float fade = Math.max(1 - (current_fade_out_time / fade_out_time), max_fadeout);
+
+        soundPool.setVolume(loop_stream_id, fade, fade);
+    }
+
+    /**
+     * Stops a sound that is being played on loop. Does nothing if the SoundManager is muted
+     */
+    public void stopSoundLoop() {
+        if (muted)
+            return;
+
+        soundPool.stop(loop_stream_id);
+        loop_stream_id = -1;
     }
 }

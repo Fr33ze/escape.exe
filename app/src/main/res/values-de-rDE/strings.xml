@@ -8,6 +8,7 @@
     <string name="pause_game">Pause!</string>
     <string name="back_to_menu">Zurück zum Menü</string>
     <string name="next_level"> geschafft! Berühre um fortzufahren.</string>
+    <string name="skip_intro"> Zum Überspringen drücke hier.. </string>
 
     <string name="btn_continue"> Spiel fortsetzen </string>
     <string name="btn_newgame"> Neues Spiel </string>

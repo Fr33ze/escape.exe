@@ -1,7 +1,6 @@
 package at.ac.tuwien.mmue_sb10;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.app.Activity;
 import android.os.Bundle;
 
 import java.util.List;
@@ -9,11 +8,9 @@ import java.util.List;
 import at.ac.tuwien.mmue_sb10.persistence.EscapeDatabase;
 import at.ac.tuwien.mmue_sb10.persistence.Highscore;
 import at.ac.tuwien.mmue_sb10.persistence.OnHighscoresLoadedListener;
-import at.ac.tuwien.mmue_sb10.persistence.OnUserLoadedListener;
-import at.ac.tuwien.mmue_sb10.persistence.User;
 import at.ac.tuwien.mmue_sb10.util.Concurrency;
 
-public class HighscoreActivity extends AppCompatActivity {
+public class HighscoreActivity extends Activity {
 
     private final OnHighscoresLoadedListener onHighscoresLoadedListener = this::onHighscoresLoaded;
 

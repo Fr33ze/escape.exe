@@ -79,7 +79,7 @@ public class GameThread extends Thread {
     }
 
     private void end() {
-        EscapeSoundManager.getInstance(this.context).release();
+        EscapeSoundManager.getInstance(this.context).releaseMediaPlayer();
         ((Activity)context).finish();
     }
 }

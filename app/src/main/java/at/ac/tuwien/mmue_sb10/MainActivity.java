@@ -20,6 +20,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import androidx.core.content.res.ResourcesCompat;
+
 import java.util.List;
 
 import at.ac.tuwien.mmue_sb10.persistence.EscapeDatabase;
@@ -39,6 +41,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        EscapeSoundManager.getInstance(this).initSoundPool();
     }
 
     @Override
@@ -49,28 +53,28 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-
-        EscapeSoundManager.getInstance(this).release();
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
 
         if (EscapeSoundManager.getInstance(this).isMuted()) {
-            findViewById(R.id.btn_mute).setBackground(getResources().getDrawable(R.drawable.icon_mute));
+            findViewById(R.id.btn_mute).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.icon_mute, null));
         } else {
-            findViewById(R.id.btn_mute).setBackground(getResources().getDrawable(R.drawable.icon_sound));
-            EscapeSoundManager.getInstance(this).initMediaPlayer(R.raw.techno02);
-            EscapeSoundManager.getInstance(this).initSoundPool();
+            findViewById(R.id.btn_mute).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.icon_sound, null));
+            EscapeSoundManager.getInstance(this).initMediaPlayer(R.raw.mmenu_bgmusic, true);
         }
+
+        EscapeSoundManager.getInstance(this).lock();
 
         Concurrency.executeAsync(() -> {
             User user = loadUser();
             runOnUiThread(() -> onUserLoadedListener.onUserLoaded(user));
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        EscapeSoundManager.getInstance(this).release();
+        finishAffinity();
     }
 
     /**
@@ -92,6 +96,7 @@ public class MainActivity extends Activity {
             builder.setMessage(R.string.new_game_warning)
                     .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
+                            EscapeSoundManager.getInstance(MainActivity.this).playSound(EscapeSoundManager.getInstance(MainActivity.this).snd_button);
                             Concurrency.executeAsync(() -> deleteUser());
                             Concurrency.executeAsync(() -> saveUser(new User(input.getText().toString())));
                             startActivity(new Intent(getBaseContext(), GameActivity.class));
@@ -100,7 +105,7 @@ public class MainActivity extends Activity {
                     .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             // User cancelled the dialog
-
+                            EscapeSoundManager.getInstance(MainActivity.this).playSound(EscapeSoundManager.getInstance(MainActivity.this).snd_button);
                         }
                     })
                     .setView(input);
@@ -131,12 +136,14 @@ public class MainActivity extends Activity {
         }
     }
 
-    public void onMuteClick(View v) {
-        EscapeSoundManager.getInstance(this).toggleMute(R.raw.techno02);
+    public void onClickMute(View v) {
+        EscapeSoundManager.getInstance(this).unlock();
+        EscapeSoundManager.getInstance(this).toggleMute(R.raw.mmenu_bgmusic);
+        EscapeSoundManager.getInstance(this).lock();
         if (EscapeSoundManager.getInstance(this).isMuted()) {
-            findViewById(R.id.btn_mute).setBackground(getResources().getDrawable(R.drawable.icon_mute));
+            findViewById(R.id.btn_mute).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.icon_mute, null));
         } else {
-            findViewById(R.id.btn_mute).setBackground(getResources().getDrawable(R.drawable.icon_sound));
+            findViewById(R.id.btn_mute).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.icon_sound, null));
         }
     }
 
