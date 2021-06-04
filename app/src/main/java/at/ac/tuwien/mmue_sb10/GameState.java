@@ -25,6 +25,8 @@ import android.media.SoundPool;
 import android.view.MotionEvent;
 
 
+import androidx.core.content.res.ResourcesCompat;
+
 import at.ac.tuwien.mmue_sb10.persistence.EscapeDatabase;
 import at.ac.tuwien.mmue_sb10.persistence.Highscore;
 import at.ac.tuwien.mmue_sb10.persistence.User;
@@ -133,23 +135,6 @@ public class GameState {
     private float col_time_x; //collision time on x-axis
     private float col_time_y; //collision time on y-axis
 
-    /*
-     * SOUND
-     */
-    private boolean muted; //indicates if the sound is muted. saved in preferences
-    private MediaPlayer mediaPlayer; //for playing background music
-    private int music_position; //to pause and resume music
-    private SoundPool soundPool; //plays all the in-game sounds
-    private int sound_step_1;
-    private int sound_step_2;
-    private int sound_jump;
-    private int sound_land;
-    private int sound_die;
-    private int sound_gravity_up;
-    private int sound_gravity_down;
-    private int sound_button;
-
-
     /**
      * Creates a new GameState instance
      *
@@ -175,20 +160,19 @@ public class GameState {
         loadPlayerFrames();
         loadDeathCounter();
 
-        SharedPreferences sp = this.context.getSharedPreferences("escapePrefs", 0);
-        this.muted = sp.getBoolean("muted", false);
+        Typeface font_joystix = ResourcesCompat.getFont(this.context, R.font.joystix_monospace);
 
         this.text_paint = new Paint();
-        this.text_paint.setColor(Color.RED);
+        this.text_paint.setColor(Color.GREEN);
         this.text_paint.setStyle(Paint.Style.FILL_AND_STROKE);
-        this.text_paint.setTypeface(Typeface.DEFAULT_BOLD);
+        this.text_paint.setTypeface(font_joystix);
         this.text_paint.setTextAlign(Paint.Align.CENTER);
         this.text_paint.setTextSize(24 * this.density);
         this.text_border_paint = new Paint();
         this.text_border_paint.setColor(Color.WHITE);
         this.text_border_paint.setTextAlign(Paint.Align.CENTER);
         this.text_border_paint.setTextSize(24 * this.density);
-        this.text_border_paint.setTypeface(Typeface.DEFAULT_BOLD);
+        this.text_border_paint.setTypeface(font_joystix);
         this.text_border_paint.setStyle(Paint.Style.STROKE);
         this.text_border_paint.setStrokeWidth(2 * this.density);
 
@@ -202,14 +186,14 @@ public class GameState {
         this.button_text_paint = new Paint();
         this.button_text_paint.setColor(Color.BLACK);
         this.button_text_paint.setStyle(Paint.Style.FILL_AND_STROKE);
-        this.button_text_paint.setTypeface(Typeface.DEFAULT_BOLD);
+        this.button_text_paint.setTypeface(font_joystix);
         this.button_text_paint.setTextAlign(Paint.Align.CENTER);
         this.button_text_paint.setTextSize(22 * this.density);
 
         this.death_counter_paint = new Paint();
-        this.death_counter_paint.setColor(Color.RED);
+        this.death_counter_paint.setColor(Color.BLACK);
         this.death_counter_paint.setStyle(Paint.Style.FILL_AND_STROKE);
-        this.death_counter_paint.setTypeface(Typeface.DEFAULT_BOLD);
+        this.death_counter_paint.setTypeface(font_joystix);
         this.death_counter_paint.setTextSize(this.death_counter_icon.getHeight());
 
         this.you_died_retry = context.getResources().getString(R.string.player_died);
@@ -232,8 +216,6 @@ public class GameState {
         this.player_draw_scale = (float) PLAYER_WIDTH / this.player_frames[0].getWidth();
 
         this.running = false;
-
-        initSoundPool();
     }
 
     /**
@@ -261,9 +243,9 @@ public class GameState {
     private void loadDeathCounter() {
         BitmapFactory.Options o = new BitmapFactory.Options();
         o.inScaled = false;
-        Bitmap temp_death = BitmapFactory.decodeResource(context.getResources(), R.drawable.deaths, o);
+        Bitmap temp_death = BitmapFactory.decodeResource(context.getResources(), R.drawable.life_counter, o);
         this.death_counter_icon = Bitmap.createScaledBitmap(
-                temp_death, (int) (temp_death.getWidth() * 2 * this.density), (int) (temp_death.getHeight() * 2 * this.density), true
+                temp_death, (int) (temp_death.getWidth() * 0.5f * this.density), (int) (temp_death.getHeight() * 0.5f * this.density), true
         );
     }
 
@@ -689,7 +671,7 @@ public class GameState {
      * @param c Canvas to draw the death counter onto
      */
     private void drawDeathCounter(Canvas c) {
-        c.drawBitmap(this.death_counter_icon, c.getWidth() - this.death_counter_icon.getWidth() - 70 * this.density, 20 * this.density, null);
+        c.drawBitmap(this.death_counter_icon, 10 * this.density, c.getHeight() - this.death_counter_icon.getHeight() - 10 * this.density, null);
         c.drawText("x" + this.user.deathsCurrentLevel, c.getWidth() - 65 * this.density, this.death_counter_icon.getHeight() + 15 * this.density, this.death_counter_paint);
     }
 
@@ -705,7 +687,7 @@ public class GameState {
         c.drawRoundRect(this.exit_touch_zone, 15 * this.density, 15 * this.density, this.button_paint);
         c.drawText(context.getResources().getText(R.string.continue_game).toString(), this.continue_touch_zone.centerX(), this.continue_touch_zone.centerY() - this.button_text_paint.ascent() / 2, this.button_text_paint);
         c.drawText(context.getResources().getText(R.string.back_to_menu).toString(), this.exit_touch_zone.centerX(), this.exit_touch_zone.centerY() - this.button_text_paint.ascent() / 2, this.button_text_paint);
-        if (this.muted) {
+        if (EscapeSoundManager.getInstance(this.context).isMuted()) {
             c.drawBitmap(this.icon_mute, this.mute_pause_touch_zone.left, this.mute_pause_touch_zone.top, null);
         } else {
             c.drawBitmap(this.icon_sound, this.mute_pause_touch_zone.left, this.mute_pause_touch_zone.top, null);
@@ -834,15 +816,13 @@ public class GameState {
                 if (this.continue_touch_zone.contains(event.getX(), event.getY())) {
                     this.paused = false;
                     this.current_fade_out_time = 0;
-                    initMediaPlayer();
                 } else if (this.exit_touch_zone.contains(event.getX(), event.getY())) {
                     this.running = false;
                 } else if (this.mute_pause_touch_zone.contains(event.getX(), event.getY())) {
-                    toggleMute();
+                    EscapeSoundManager.getInstance(this.context).toggleMute(this.stage.current_music_id);
                 }
             } else if (this.mute_pause_touch_zone.contains(event.getX(), event.getY())) {
                 this.paused = true;
-                releaseMediaPlayer();
             } else if (this.player_dead) {
                 this.retry();
             } else if (this.finished) {
@@ -868,75 +848,12 @@ public class GameState {
     public void onBackPressed() {
         if (!this.paused && this.started && !this.player_dead) {
             this.paused = true;
-            releaseMediaPlayer();
-            releaseSoundPool();
         } else {
             this.user.deathsCurrentLevel++;
             this.user.deathsTotal++;
             Concurrency.executeAsync(() -> updateUser(this.user));
             this.running = false;
         }
-    }
-
-    public void toggleMute() {
-        if (!this.muted) {
-            releaseMediaPlayer();
-            releaseSoundPool();
-        } else {
-            initMediaPlayer();
-            initSoundPool();
-        }
-
-        this.muted = !this.muted;
-        SharedPreferences sp = this.context.getSharedPreferences("escapePrefs", 0);
-        sp.edit().putBoolean("muted", muted).apply();
-    }
-
-    public void initMediaPlayer() {
-        if(this.muted)
-            return;
-
-        this.mediaPlayer = MediaPlayer.create(this.context, this.stage.current_music_id);
-        this.mediaPlayer.seekTo(this.music_position);
-        this.mediaPlayer.setLooping(true);
-        this.mediaPlayer.setVolume(1, 1);
-        this.mediaPlayer.start();
-    }
-
-    /**
-     * Stops the mediaplayer and releases the music resource
-     */
-    public void releaseMediaPlayer() {
-        try {
-            this.music_position = mediaPlayer.getCurrentPosition();
-            this.mediaPlayer.release();
-        } catch (IllegalStateException | NullPointerException exc) {
-            exc.printStackTrace();
-        }
-    }
-
-    /**
-     * Releases the soundpool resources
-     */
-    public void releaseSoundPool() {
-        try {
-            this.soundPool.release();
-        } catch (IllegalStateException | NullPointerException exc) {
-            exc.printStackTrace();
-        }
-    }
-
-    /**
-     * Initializes the soundpool resources
-     */
-    public void initSoundPool() {
-        if(this.muted)
-            return;
-
-        this.soundPool = new SoundPool(2, AudioManager.STREAM_MUSIC, 0);
-        this.sound_step_1 = this.soundPool.load(this.context, R.raw.step1, 1);
-        this.sound_step_2 = this.soundPool.load(this.context, R.raw.step2, 1);
-        this.sound_button = this.soundPool.load(this.context, R.raw.button, 1);
     }
 
     /**
@@ -952,9 +869,8 @@ public class GameState {
 
         this.stage.load(level);
 
-        releaseMediaPlayer();
-        this.music_position = 0;
-        initMediaPlayer();
+        EscapeSoundManager.getInstance(this.context).releaseMediaPlayer();
+        EscapeSoundManager.getInstance(this.context).initMediaPlayer(this.stage.current_music_id);
 
         this.player_pos_x = stage.player_start_x * 24;
         this.player_pos_y = stage.player_start_y * 24 + 24 - PLAYER_HEIGTH;

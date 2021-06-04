@@ -33,50 +33,44 @@ public class MainActivity extends Activity {
 
     private final OnUserLoadedListener onUserLoadedListener = this::onUserLoaded;
 
-    private Button btn_continue;
     private User user;
-
-    private MediaPlayer mediaPlayer;
-    private SoundPool soundPool;
-    private boolean muted;
-
-    private int sound_button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
 
-        // for other menu, uncomment these lines
-        // WebView webView = findViewById(R.id.player_web_view);
-        // webView.loadUrl("file:///android_asset/player_title.html");
-        // webView.setBackgroundColor(Color.TRANSPARENT);
-        // webView.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
 
-        SharedPreferences sp = this.getSharedPreferences("escapePrefs", 0);
-        muted = sp.getBoolean("muted", false);
+        EscapeSoundManager.getInstance(this).release();
+    }
 
-        if (muted) {
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        EscapeSoundManager.getInstance(this).release();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (EscapeSoundManager.getInstance(this).isMuted()) {
             findViewById(R.id.btn_mute).setBackground(getResources().getDrawable(R.drawable.icon_mute));
         } else {
             findViewById(R.id.btn_mute).setBackground(getResources().getDrawable(R.drawable.icon_sound));
+            EscapeSoundManager.getInstance(this).initMediaPlayer(R.raw.techno02);
+            EscapeSoundManager.getInstance(this).initSoundPool();
         }
-
-        btn_continue = findViewById(R.id.btn_continue);
 
         Concurrency.executeAsync(() -> {
             User user = loadUser();
             runOnUiThread(() -> onUserLoadedListener.onUserLoaded(user));
         });
-    }
-
-    private void onUserLoaded(User user) {
-        if (user == null)
-            return;
-
-        this.user = user;
-        btn_continue.setEnabled(true);
     }
 
     /**
@@ -85,8 +79,7 @@ public class MainActivity extends Activity {
      * @since 0.1
      */
     public void onClickNewGame(View v) {
-        if (!muted)
-            soundPool.play(sound_button, 1, 1, 0, 0, 1);
+        EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
 
         if (user != null) {
             final EditText input = new EditText(MainActivity.this);
@@ -139,19 +132,12 @@ public class MainActivity extends Activity {
     }
 
     public void onMuteClick(View v) {
-        muted = !muted;
-        if (muted) {
-            v.setBackground(getResources().getDrawable(R.drawable.icon_mute));
-            releaseMediaPlayer();
-            releaseSoundPool();
+        EscapeSoundManager.getInstance(this).toggleMute(R.raw.techno02);
+        if (EscapeSoundManager.getInstance(this).isMuted()) {
+            findViewById(R.id.btn_mute).setBackground(getResources().getDrawable(R.drawable.icon_mute));
         } else {
-            v.setBackground(getResources().getDrawable(R.drawable.icon_sound));
-            initMediaPlayer();
-            initSoundPool();
+            findViewById(R.id.btn_mute).setBackground(getResources().getDrawable(R.drawable.icon_sound));
         }
-
-        SharedPreferences sp = this.getSharedPreferences("escapePrefs", 0);
-        sp.edit().putBoolean("muted", muted).apply();
     }
 
     /**
@@ -160,17 +146,16 @@ public class MainActivity extends Activity {
      * @since 0.2
      */
     public void onClickContinue(View v) {
-        if (!muted)
-            soundPool.play(sound_button, 1, 1, 0, 0, 1);
+        EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
         Intent intent = new Intent(this, SubContinueActivity.class);
         intent.putExtra("user", user);
         startActivity(intent);
     }
 
     public void onClickHighscores(View v) {
-        if (!muted)
-            soundPool.play(sound_button, 1, 1, 0, 0, 1);
-        //TODO: Start highscores activity
+        EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
+        Intent intent = new Intent(this, HighscoreActivity.class);
+        startActivity(intent);
     }
 
     /**
@@ -179,91 +164,16 @@ public class MainActivity extends Activity {
      * @since 0.1
      */
     public void onClickQuit(View v) {
-        if (!muted)
-            soundPool.play(sound_button, 1, 1, 0, 0, 1);
+        EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
         finishAffinity();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    private void onUserLoaded(User user) {
+        if (user == null)
+            return;
 
-        if(!muted) {
-            releaseMediaPlayer();
-            releaseSoundPool();
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        if(!muted) {
-            releaseMediaPlayer();
-            releaseSoundPool();
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        SharedPreferences sp = this.getSharedPreferences("escapePrefs", 0);
-        muted = sp.getBoolean("muted", false);
-        if (muted) {
-            findViewById(R.id.btn_mute).setBackground(getResources().getDrawable(R.drawable.icon_mute));
-        } else {
-            findViewById(R.id.btn_mute).setBackground(getResources().getDrawable(R.drawable.icon_sound));
-            initMediaPlayer();
-            initSoundPool();
-        }
-
-        Concurrency.executeAsync(() -> {
-            User user = loadUser();
-            runOnUiThread(() -> onUserLoadedListener.onUserLoaded(user));
-        });
-    }
-
-    /**
-     * Initialise the MediaPlayer for the main activity
-     */
-    private void initMediaPlayer() {
-        try {
-            mediaPlayer = MediaPlayer.create(this, R.raw.techno02);
-            mediaPlayer.setVolume(1, 1);
-            mediaPlayer.setLooping(true);
-            mediaPlayer.start();
-        } catch (NullPointerException | IllegalStateException exc) {
-            exc.printStackTrace();
-        }
-    }
-
-    /**
-     * Initialize the sound pool for the main activity
-     */
-    private void initSoundPool() {
-        try {
-            soundPool = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
-            sound_button = soundPool.load(this, R.raw.button, 1);
-        } catch (NullPointerException | IllegalStateException exc) {
-            exc.printStackTrace();
-        }
-    }
-
-    private void releaseMediaPlayer() {
-        try {
-            mediaPlayer.release();
-        } catch (NullPointerException | IllegalStateException exc) {
-            exc.printStackTrace();
-        }
-    }
-
-    private void releaseSoundPool() {
-        try {
-            soundPool.release();
-        } catch (NullPointerException | IllegalStateException exc) {
-            exc.printStackTrace();
-        }
+        this.user = user;
+        findViewById(R.id.btn_continue).setEnabled(true);
     }
 
     /**
