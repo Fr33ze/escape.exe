@@ -328,7 +328,6 @@ public class GameState {
                     if (this.col_time_y < 0 && this.col_time_x > 0) {
                         //no valid collision on Y, collision on X
                         killPlayer();
-                        this.player_pos_x = this.player_collision_px.left;
                         this.player_pos_y = this.player_collision_px.top;
                     } else {
                         //Y before X => Y Solid Collosion => Position adjustment
@@ -350,18 +349,15 @@ public class GameState {
                 } else if (collision_corners[0] == 6 || collision_corners[1] == 6 || collision_corners[2] == 6 || collision_corners[3] == 6) {
                     //X Finish Collision
                     finishStage();
-                    this.player_pos_x = this.player_collision_px.left;
                     this.player_pos_y = this.player_collision_px.top;
                 } else if (collision_corners[0] == 7 || collision_corners[1] == 7 || collision_corners[2] == 7 || collision_corners[3] == 7) {
                     //X Collision with no-input tile
                     //happens before finish line for running out of screen effect
                     setNoPlayerInput();
-                    this.player_pos_x = this.player_collision_px.left;
                     this.player_pos_y = this.player_collision_px.top;
                 } else if (collision_corners[0] == 2 || collision_corners[1] == 2 || collision_corners[2] == 2 || collision_corners[3] == 2) {
                     //X Death Collision (spikes)
                     killPlayer();
-                    this.player_pos_x = this.player_collision_px.left;
                     this.player_pos_y = this.player_collision_px.top;
                 }
 
@@ -771,7 +767,8 @@ public class GameState {
 
         this.player_no_input = true;
         this.gravity = 1;
-        this.player_velocity_y = 0;
+        if(this.player_velocity_y < 0)
+            this.player_velocity_y = 0;
     }
 
     /**
