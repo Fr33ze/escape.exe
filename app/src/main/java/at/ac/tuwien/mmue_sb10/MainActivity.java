@@ -37,12 +37,15 @@ public class MainActivity extends Activity {
 
     private User user;
     private TextView mmenu_text;
-    private Animation android_zoom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mmenu_text = findViewById(R.id.mmenu_text);
+        mmenu_text.setText("");
+        mmenu_text.setBackgroundColor(getResources().getColor(R.color.orange));
 
         EscapeSoundManager.getInstance(this).initSoundPool();
     }
@@ -57,12 +60,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        android_zoom = AnimationUtils.loadAnimation(this, R.anim.enlarge_main_activity);
-
-        mmenu_text = findViewById(R.id.mmenu_text);
-        mmenu_text.setText("");
-        mmenu_text.setBackgroundColor(getResources().getColor(R.color.orange));
 
         if (EscapeSoundManager.getInstance(this).isMuted()) {
             findViewById(R.id.btn_mute).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.icon_mute, null));

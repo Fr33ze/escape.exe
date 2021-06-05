@@ -31,6 +31,17 @@ public class HighscoreActivity extends Activity {
         });
     }
 
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.shrink_main_activity, R.anim.fade_out_activity);
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
+
     private void onHighscoresLoaded(List<Highscore> highscores) {
 
         //TODO: display list
