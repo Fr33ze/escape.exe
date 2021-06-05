@@ -3,23 +3,14 @@
     <string name="app_name">escape.exe</string>
     <string name="new_game">New Game</string>
     <string name="continue_game">Continue</string>
+    <string name="highscores"> Highscores </string>
     <string name="quit_game">Quit</string>
+    <string name="backtomain"> Main Menu </string>
     <string name="player_died">You died, Retry?</string>
     <string name="pause_game">Game Paused!</string>
     <string name="back_to_menu">Exit</string>
     <string name="next_level"> finished! Tap to continue.</string>
     <string name="skip_intro"> Tap here to skip.. </string>
-
-    <string name="btn_continue"> Continue </string>
-    <string name="btn_newgame"> New Game </string>
-    <string name="btn_highscores"> Highscores </string>
-    <string name="btn_settings"> Settings </string>
-    <string name="btn_quit"> Quit </string>
-    <string name="text_createnewplayer"> Create New Player </string>
-    <string name="text_currentplayer"> Current Player </string>
-    <string name="btn_backtomain"> Main Menu </string>
-    <string name="btn_savename"> Save Name </string>
-    <string name="btn_deleteplayer"> Delete Player </string>
 
     <string name="new_game_warning"> There is already a saved game! A new game will override your current saved game! Start a new game? </string>
     <string name="yes"> Yes </string>

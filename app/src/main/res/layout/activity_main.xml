@@ -23,60 +23,60 @@
 
     <TextView
         android:id="@+id/text_mmenu"
-        android:layout_width="97dp"
-        android:layout_height="29dp"
+        android:layout_width="90dp"
+        android:layout_height="27dp"
         android:fontFamily="@font/joystix_monospace"
         android:gravity="center"
-        android:text="Highscores"
         android:textColor="@color/android_gray"
-        android:textSize="10dp"
+        android:textSize="10sp"
         app:layout_constraintBottom_toBottomOf="@+id/imageView2"
         app:layout_constraintEnd_toEndOf="@+id/imageView2"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="@+id/imageView2"
         app:layout_constraintTop_toTopOf="@+id/imageView2"
-        app:layout_constraintVertical_bias="0.376" />
+        app:layout_constraintVertical_bias="0.382" />
 
     <Button
         android:id="@+id/btn_newgame"
-        android:layout_width="250dp"
+        android:layout_width="270dp"
         android:layout_height="47dp"
         android:layout_marginTop="45dp"
         android:layout_marginEnd="57dp"
         android:onClick="onClickNewGame"
-        android:text="@string/btn_newgame"
+        android:text="@string/new_game"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/btn_continue"
-        android:layout_width="250dp"
+        android:layout_width="270dp"
         android:layout_height="47dp"
         android:layout_marginTop="45dp"
         android:layout_marginEnd="57dp"
         android:onClick="onClickContinue"
-        android:text="@string/btn_continue"
+        android:text="@string/continue_game"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_newgame" />
 
     <Button
         android:id="@+id/btn_highscores"
-        android:layout_width="250dp"
+        android:layout_width="270dp"
         android:layout_height="47dp"
         android:layout_marginTop="45dp"
         android:layout_marginEnd="57dp"
         android:onClick="onClickHighscores"
-        android:text="@string/btn_highscores"
+        android:text="@string/highscores"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_continue" />
 
     <Button
         android:id="@+id/btn_quit"
-        android:layout_width="250dp"
+        android:layout_width="270dp"
         android:layout_height="47dp"
         android:layout_marginTop="44dp"
         android:layout_marginEnd="57dp"
         android:onClick="onClickQuit"
-        android:text="@string/btn_quit"
+        android:text="@string/quit_game"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_highscores" />
 

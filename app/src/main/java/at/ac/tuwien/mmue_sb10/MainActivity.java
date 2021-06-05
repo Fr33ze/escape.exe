@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.res.ResourcesCompat;
 
 import java.util.List;
@@ -155,8 +156,10 @@ public class MainActivity extends Activity {
 
     public void onClickHighscores(View v) {
         EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
+        Bundle bundle = ActivityOptionsCompat.makeCustomAnimation(this,
+                R.anim.zoom_in, R.anim.zoom_in).toBundle();
         Intent intent = new Intent(this, HighscoreActivity.class);
-        startActivity(intent);
+        startActivity(intent, bundle);
     }
 
     /**
