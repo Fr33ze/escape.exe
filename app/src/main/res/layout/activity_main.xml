@@ -1,96 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".MainActivity"
-    >
+    tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="344dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="32dp"
-        android:text="@string/app_name"
-        android:textAlignment="center"
-        android:textAllCaps="true"
-        android:textColor="#000000"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/btn_continue"
+    <ImageView
+        android:id="@+id/imageView2"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="120dp"
-        android:layout_marginEnd="32dp"
-        android:enabled="false"
-        android:onClick="onClickContinue"
-        android:text="@string/btn_continue"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/btn_newgame"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="32dp"
-        android:onClick="onClickNewGame"
-        android:text="@string/btn_newgame"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_continue" />
-
-    <Button
-        android:id="@+id/btn_highscores"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="256dp"
-        android:layout_marginEnd="32dp"
-        android:onClick="onClickHighscores"
-        android:text="@string/btn_highscores"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/btn_quit"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="32dp"
-        android:onClick="onClickQuit"
-        android:text="@string/btn_quit"
+        android:layout_height="0dp"
+        android:layout_weight="1.00"
+        android:src="@drawable/mmenu_bg"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_highscores"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/btn_continue"
+        android:layout_width="309dp"
+        android:layout_height="47dp"
+        android:layout_marginTop="45dp"
+        android:layout_marginEnd="57dp"
+        android:enabled="false"
+        android:onClick="onClickContinue"
+        android:text="@string/btn_continue"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_newgame"
+        android:layout_width="309dp"
+        android:layout_height="47dp"
+        android:layout_marginTop="45dp"
+        android:layout_marginEnd="57dp"
+        android:onClick="onClickNewGame"
+        android:text="@string/btn_newgame"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_continue" />
+
+    <Button
+        android:id="@+id/btn_highscores"
+        android:layout_width="309dp"
+        android:layout_height="47dp"
+        android:layout_marginTop="45dp"
+        android:layout_marginEnd="57dp"
+        android:onClick="onClickHighscores"
+        android:text="@string/btn_highscores"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_newgame" />
+
+    <Button
+        android:id="@+id/btn_quit"
+        android:layout_width="309dp"
+        android:layout_height="47dp"
+        android:layout_marginTop="44dp"
+        android:layout_marginEnd="57dp"
+        android:onClick="onClickQuit"
+        android:text="@string/btn_quit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_highscores" />
 
     <Button
         android:id="@+id/btn_mute"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="6dp"
         android:background="@drawable/icon_sound"
         android:onClick="onClickMute"
         app:layout_constraintStart_toStartOf="parent"
