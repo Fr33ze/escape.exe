@@ -9,7 +9,7 @@
 
     <ImageView
         android:id="@+id/imageView2"
-        android:layout_width="291dp"
+        android:layout_width="316dp"
         android:layout_height="match_parent"
         android:layout_marginEnd="0dp"
         android:layout_toStartOf="@+id/anchor"
@@ -20,12 +20,13 @@
 
     <TextView
         android:id="@+id/mmenu_text"
-        android:layout_width="89dp"
-        android:layout_height="27dp"
+        android:layout_width="92dp"
+        android:layout_height="31dp"
         android:layout_above="@+id/anchor"
-        android:layout_marginEnd="103dp"
-        android:layout_marginBottom="30dp"
+        android:layout_marginEnd="112dp"
+        android:layout_marginBottom="28dp"
         android:layout_toStartOf="@+id/anchor"
+        android:background="@color/orange"
         android:fontFamily="@font/joystix_monospace"
         android:gravity="center"
         android:textColor="@color/white"

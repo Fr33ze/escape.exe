@@ -27,6 +27,12 @@ public class IntroActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+
         skipView = findViewById(R.id.txt_skip);
         muteBtn = findViewById(R.id.btn_mute_intro);
         videoView = findViewById(R.id.videoView);

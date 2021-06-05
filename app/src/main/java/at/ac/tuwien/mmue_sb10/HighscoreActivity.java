@@ -1,8 +1,13 @@
 package at.ac.tuwien.mmue_sb10;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.WindowManager;
+
+import androidx.core.app.ActivityOptionsCompat;
 
 import java.util.List;
 
@@ -25,6 +30,11 @@ public class HighscoreActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+
         Concurrency.executeAsync(() -> {
             List<Highscore> highscores = loadHighscores();
             runOnUiThread(() -> onHighscoresLoadedListener.onHighscoresLoaded(highscores));
@@ -34,7 +44,16 @@ public class HighscoreActivity extends Activity {
     @Override
     public void finish() {
         super.finish();
-        overridePendingTransition(R.anim.shrink_main_activity, R.anim.fade_out_activity);
+        DisplayMetrics dm = new DisplayMetrics();
+        ((WindowManager)getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRealMetrics(dm);
+        float aspect = (float)dm.widthPixels / dm.heightPixels;
+        if (aspect == 20f/9) {
+            overridePendingTransition(R.anim.shrink_main_activity_xwide, R.anim.fade_out_activity);
+        } else if (aspect == 16f/9){
+            overridePendingTransition(R.anim.shrink_main_activity_wide, R.anim.fade_out_activity);
+        } else {
+            overridePendingTransition(R.anim.shrink_main_activity_wide, R.anim.fade_out_activity);
+        }
     }
 
     @Override

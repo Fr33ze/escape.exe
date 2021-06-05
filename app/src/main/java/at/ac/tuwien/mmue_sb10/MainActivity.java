@@ -6,15 +6,15 @@
 package at.ac.tuwien.mmue_sb10;
 
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.AnimationUtils;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -60,6 +60,11 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
 
         if (EscapeSoundManager.getInstance(this).isMuted()) {
             findViewById(R.id.btn_mute).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.icon_mute, null));
@@ -168,8 +173,17 @@ public class MainActivity extends Activity {
         mmenu_text.setText(R.string.highscores);
         mmenu_text.setBackgroundColor(getResources().getColor(R.color.green));
         EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
-        Bundle bundle = ActivityOptionsCompat.makeCustomAnimation(this,
-                R.anim.fade_in_activity, R.anim.enlarge_main_activity).toBundle();
+        DisplayMetrics dm = new DisplayMetrics();
+        ((WindowManager)getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRealMetrics(dm);
+        float aspect = (float)dm.widthPixels / dm.heightPixels;
+        Bundle bundle;
+        if (aspect == 20f/9) {
+            bundle = ActivityOptionsCompat.makeCustomAnimation(this, R.anim.fade_in_activity, R.anim.enlarge_main_activity_xwide).toBundle();
+        } else if (aspect == 16f/9){
+            bundle = ActivityOptionsCompat.makeCustomAnimation(this, R.anim.fade_in_activity, R.anim.enlarge_main_activity_wide).toBundle();
+        } else {
+            bundle = ActivityOptionsCompat.makeCustomAnimation(this, R.anim.fade_in_activity, R.anim.enlarge_main_activity_wide).toBundle();
+        }
         Intent intent = new Intent(this, HighscoreActivity.class);
         startActivity(intent, bundle);
     }
