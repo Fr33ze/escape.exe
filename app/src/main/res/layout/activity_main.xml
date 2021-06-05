@@ -20,6 +20,20 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
+    <TextView
+        android:id="@+id/text_mmenu"
+        android:layout_width="97dp"
+        android:layout_height="29dp"
+        android:layout_marginStart="108dp"
+        android:layout_marginTop="143dp"
+        android:text="Highscores"
+        android:textColor="@color/android_gray"
+        android:fontFamily="@font/joystix_monospace"
+        android:textSize="10dp"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="@+id/imageView2"
+        app:layout_constraintTop_toTopOf="@+id/imageView2" />
+
     <Button
         android:id="@+id/btn_newgame"
         android:layout_width="309dp"
