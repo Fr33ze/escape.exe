@@ -1,5 +1,0 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Theme.MMUESB10" parent="android:style/Theme.NoTitleBar.Fullscreen">
-        <item name="android:buttonStyle">@style/button</item>
-    </style>
-</resources>
