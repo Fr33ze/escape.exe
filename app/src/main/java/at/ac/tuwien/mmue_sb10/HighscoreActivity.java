@@ -2,6 +2,7 @@ package at.ac.tuwien.mmue_sb10;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
 
 import java.util.List;
 
@@ -23,6 +24,7 @@ public class HighscoreActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+
         Concurrency.executeAsync(() -> {
             List<Highscore> highscores = loadHighscores();
             runOnUiThread(() -> onHighscoresLoadedListener.onHighscoresLoaded(highscores));

@@ -5,14 +5,18 @@
  */
 package at.ac.tuwien.mmue_sb10;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.res.ResourcesCompat;
@@ -31,6 +35,7 @@ public class MainActivity extends Activity {
     private final OnUserLoadedListener onUserLoadedListener = this::onUserLoaded;
 
     private User user;
+    private TextView mmenu_text;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +55,9 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        mmenu_text = findViewById(R.id.mmenu_text);
+        mmenu_text.setText("");
 
         if (EscapeSoundManager.getInstance(this).isMuted()) {
             findViewById(R.id.btn_mute).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.icon_mute, null));
@@ -155,9 +163,11 @@ public class MainActivity extends Activity {
     }
 
     public void onClickHighscores(View v) {
+        mmenu_text.setText(R.string.highscores);
+        mmenu_text.setBackgroundColor(getResources().getColor(R.color.green));
         EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
         Bundle bundle = ActivityOptionsCompat.makeCustomAnimation(this,
-                R.anim.zoom_in, R.anim.zoom_in).toBundle();
+                R.anim.enlarge_activity_from_android, R.anim.enlarge_main_activity).toBundle();
         Intent intent = new Intent(this, HighscoreActivity.class);
         startActivity(intent, bundle);
     }
