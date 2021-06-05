@@ -5,15 +5,16 @@
  */
 package at.ac.tuwien.mmue_sb10;
 
-import android.app.ActionBar;
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -36,6 +37,7 @@ public class MainActivity extends Activity {
 
     private User user;
     private TextView mmenu_text;
+    private Animation android_zoom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,8 +58,11 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
+        android_zoom = AnimationUtils.loadAnimation(this, R.anim.enlarge_main_activity);
+
         mmenu_text = findViewById(R.id.mmenu_text);
         mmenu_text.setText("");
+        mmenu_text.setBackgroundColor(getResources().getColor(R.color.orange));
 
         if (EscapeSoundManager.getInstance(this).isMuted()) {
             findViewById(R.id.btn_mute).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.icon_mute, null));
@@ -167,7 +172,7 @@ public class MainActivity extends Activity {
         mmenu_text.setBackgroundColor(getResources().getColor(R.color.green));
         EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
         Bundle bundle = ActivityOptionsCompat.makeCustomAnimation(this,
-                R.anim.enlarge_activity_from_android, R.anim.enlarge_main_activity).toBundle();
+                R.anim.fade_in_activity, R.anim.enlarge_main_activity).toBundle();
         Intent intent = new Intent(this, HighscoreActivity.class);
         startActivity(intent, bundle);
     }
