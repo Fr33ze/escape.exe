@@ -174,7 +174,7 @@ public class MainActivity extends Activity {
             return;
 
         this.user = user;
-        findViewById(R.id.btn_continue).setEnabled(true);
+        findViewById(R.id.btn_continue).setVisibility(View.VISIBLE);
     }
 
     /**

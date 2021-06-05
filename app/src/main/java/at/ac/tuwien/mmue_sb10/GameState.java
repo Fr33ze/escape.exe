@@ -204,8 +204,9 @@ public class GameState {
 
         this.continue_touch_zone = new RectF(this.screenWidth * 0.33f, this.screenHeight / 2 - 10 * this.density, this.screenWidth * 0.66f, this.screenHeight / 2 + 50 * this.density);
         this.exit_touch_zone = new RectF(this.screenWidth * 0.33f, this.screenHeight / 2 + 70 * this.density, this.screenWidth * 0.66f, this.screenHeight / 2 + 130 * this.density);
-        this.mute_pause_touch_zone = new RectF(10 * this.density, 10 * this.density, 40 * this.density, 40 * this.density);
+        this.mute_pause_touch_zone = new RectF(10 * this.density, 10 * this.density, 50 * this.density, 50 * this.density);
         loadMuteIcons();
+        loadPauseIcon();
 
         this.player_state = PlayerState.IDLE;
         this.player_anim_time = 0;
@@ -259,7 +260,7 @@ public class GameState {
         );
         temp_mute = BitmapFactory.decodeResource(context.getResources(), R.drawable.icon_sound, o);
         this.icon_sound = Bitmap.createScaledBitmap(
-                temp_mute, (int) (30 * this.density), (int) (30 * this.density), true
+                temp_mute, (int) (this.mute_pause_touch_zone.width()), (int) (mute_pause_touch_zone.height()), true
         );
     }
 
@@ -267,8 +268,8 @@ public class GameState {
         BitmapFactory.Options o = new BitmapFactory.Options();
         o.inScaled = false;
         Bitmap temp_pause = BitmapFactory.decodeResource(context.getResources(), R.drawable.icon_pause, o);
-        this.death_counter_icon = Bitmap.createScaledBitmap(
-                temp_pause, (int) (30 * this.density), (int) (30 * this.density), true
+        this.icon_pause = Bitmap.createScaledBitmap(
+                temp_pause, (int) (this.mute_pause_touch_zone.width()), (int) (mute_pause_touch_zone.height()), true
         );
     }
 
@@ -657,13 +658,17 @@ public class GameState {
         if (this.paused) {
             drawFadeout(c, deltaFrameTime, 200, 128);
             drawPauseScreen(c);
-        } else if (this.player_dead) {
+        } else {
+            c.drawBitmap(this.icon_pause, this.mute_pause_touch_zone.left, this.mute_pause_touch_zone.top, null);
+        }
+
+        if (this.player_dead) {
             //Player is dead. Draw retry message
             drawFadeout(c, deltaFrameTime, 1000, 255, 300);
             c.drawText(this.you_died_retry, this.screenWidth / 2, this.screenHeight / 2, this.text_border_paint);
             c.drawText(this.you_died_retry, this.screenWidth / 2, this.screenHeight / 2, this.text_paint);
         } else if (this.finished) {
-            drawFadeout(c, deltaFrameTime, 3500, 255);
+            drawFadeout(c, deltaFrameTime, 2500, 255);
             c.drawText(this.stage.stage_name + " " + finished_next_level, this.screenWidth / 2, this.screenHeight / 2, this.text_border_paint);
             c.drawText(this.stage.stage_name + " " + finished_next_level, this.screenWidth / 2, this.screenHeight / 2, this.text_paint);
         } else if (this.start_circle_radius < 1) {
@@ -760,14 +765,14 @@ public class GameState {
      * Prepares finishing a stage by not allowing any more input
      */
     private void setNoPlayerInput() {
-        if(!this.player_no_input) {
+        if (!this.player_no_input) {
             EscapeSoundManager.getInstance(this.context).pauseMediaPlayer();
             EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).msc_level_beat);
         }
 
         this.player_no_input = true;
         this.gravity = 1;
-        if(this.player_velocity_y < 0)
+        if (this.player_velocity_y < 0)
             this.player_velocity_y = 0;
     }
 
@@ -856,6 +861,7 @@ public class GameState {
                 }
             } else if (this.mute_pause_touch_zone.contains(event.getX(), event.getY())) {
                 this.paused = true;
+                EscapeSoundManager.getInstance(this.context).stopSoundLoop();
                 EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).snd_button);
             } else if (this.player_dead) {
                 this.retry();

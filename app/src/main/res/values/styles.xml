@@ -10,4 +10,10 @@
         <item name="android:focusable">false</item>
         <item name="android:clickable">true</item>
     </style>
+
+    <style name="alertdialog" parent="@android:style/Theme.Dialog">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:fontFamily">@font/joystix_monospace</item>
+        <item name="android:textSize">10sp</item>
+    </style>
 </resources>
