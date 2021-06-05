@@ -4,9 +4,9 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:startOffset="500"
         android:duration="2500"
-        android:fromXScale="8"
-        android:fromYScale="13"
-        android:pivotX="25%"
+        android:fromXScale="7.5"
+        android:fromYScale="12"
+        android:pivotX="21.2%"
         android:pivotY="38%"
         android:toXScale="1"
         android:toYScale="1" >

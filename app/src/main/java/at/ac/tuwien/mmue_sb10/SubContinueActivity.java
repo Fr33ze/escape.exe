@@ -2,9 +2,12 @@ package at.ac.tuwien.mmue_sb10;
 
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import androidx.core.content.res.ResourcesCompat;
@@ -39,7 +42,10 @@ public class SubContinueActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        //TODO Mute Button Below
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
 
         if (!EscapeSoundManager.getInstance(this).isMuted()) {
             EscapeSoundManager.getInstance(this).initMediaPlayer(R.raw.mmenu_bgmusic, true);
@@ -53,6 +59,19 @@ public class SubContinueActivity extends Activity {
     public void onBackPressed() {
         super.onBackPressed();
         EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        DisplayMetrics dm = new DisplayMetrics();
+        ((WindowManager)getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRealMetrics(dm);
+        float aspect_rounded = Math.round((float)dm.widthPixels / dm.heightPixels * 10) / 10f;
+        if (aspect_rounded == Math.round(16f/9 * 10) / 10f) {
+            overridePendingTransition(R.anim.shrink_main_activity_wide, R.anim.fade_out_activity);
+        } else {
+            overridePendingTransition(R.anim.shrink_main_activity_xwide, R.anim.fade_out_activity);
+        }
     }
 
     /**

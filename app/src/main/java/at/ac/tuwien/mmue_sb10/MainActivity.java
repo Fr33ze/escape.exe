@@ -164,25 +164,34 @@ public class MainActivity extends Activity {
      */
     public void onClickContinue(View v) {
         EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
+        mmenu_text.setText(R.string.continue_game);
+        mmenu_text.setBackgroundColor(getResources().getColor(R.color.green));
+        DisplayMetrics dm = new DisplayMetrics();
+        ((WindowManager)getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRealMetrics(dm);
+        float aspect_rounded = Math.round((float)dm.widthPixels / dm.heightPixels * 10) / 10f;
+        Bundle bundle;
+        if (aspect_rounded == Math.round(16f/9 * 10) / 10f) {
+            bundle = ActivityOptionsCompat.makeCustomAnimation(this, R.anim.fade_in_activity, R.anim.enlarge_main_activity_wide).toBundle();
+        } else {
+            bundle = ActivityOptionsCompat.makeCustomAnimation(this, R.anim.fade_in_activity, R.anim.enlarge_main_activity_xwide).toBundle();
+        }
         Intent intent = new Intent(this, SubContinueActivity.class);
         intent.putExtra("user", user);
-        startActivity(intent);
+        startActivity(intent, bundle);
     }
 
     public void onClickHighscores(View v) {
+        EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
         mmenu_text.setText(R.string.highscores);
         mmenu_text.setBackgroundColor(getResources().getColor(R.color.green));
-        EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
         DisplayMetrics dm = new DisplayMetrics();
         ((WindowManager)getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRealMetrics(dm);
-        float aspect = (float)dm.widthPixels / dm.heightPixels;
+        float aspect_rounded = Math.round((float)dm.widthPixels / dm.heightPixels * 10) / 10f;
         Bundle bundle;
-        if (aspect == 20f/9) {
-            bundle = ActivityOptionsCompat.makeCustomAnimation(this, R.anim.fade_in_activity, R.anim.enlarge_main_activity_xwide).toBundle();
-        } else if (aspect == 16f/9){
+        if (aspect_rounded == Math.round(16f/9 * 10) / 10f) {
             bundle = ActivityOptionsCompat.makeCustomAnimation(this, R.anim.fade_in_activity, R.anim.enlarge_main_activity_wide).toBundle();
         } else {
-            bundle = ActivityOptionsCompat.makeCustomAnimation(this, R.anim.fade_in_activity, R.anim.enlarge_main_activity_wide).toBundle();
+            bundle = ActivityOptionsCompat.makeCustomAnimation(this, R.anim.fade_in_activity, R.anim.enlarge_main_activity_xwide).toBundle();
         }
         Intent intent = new Intent(this, HighscoreActivity.class);
         startActivity(intent, bundle);

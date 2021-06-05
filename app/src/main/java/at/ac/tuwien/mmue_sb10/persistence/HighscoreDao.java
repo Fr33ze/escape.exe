@@ -13,7 +13,4 @@ public interface HighscoreDao {
 
     @Query("SELECT * FROM highscores WHERE level == :level ORDER BY deaths ASC")
     List<Highscore> getHighscoresForLevel(int level);
-
-    @Query("SELECT * FROM highscores")
-    List<Highscore> getHighscoresForEachLevel();
 }
