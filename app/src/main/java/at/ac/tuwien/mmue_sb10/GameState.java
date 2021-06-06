@@ -702,7 +702,7 @@ public class GameState {
         c.drawRoundRect(this.continue_touch_zone, 15 * this.density, 15 * this.density, this.button_paint);
         c.drawRoundRect(this.exit_touch_zone, 15 * this.density, 15 * this.density, this.button_paint);
         c.drawText(context.getResources().getText(R.string.continue_game).toString(), this.continue_touch_zone.centerX(), this.continue_touch_zone.centerY() - this.button_text_paint.ascent() / 2, this.button_text_paint);
-        c.drawText(context.getResources().getText(R.string.back_to_menu).toString(), this.exit_touch_zone.centerX(), this.exit_touch_zone.centerY() - this.button_text_paint.ascent() / 2, this.button_text_paint);
+        c.drawText(context.getResources().getText(R.string.backtomain).toString(), this.exit_touch_zone.centerX(), this.exit_touch_zone.centerY() - this.button_text_paint.ascent() / 2, this.button_text_paint);
         if (EscapeSoundManager.getInstance(this.context).isMuted()) {
             c.drawBitmap(this.icon_mute, this.mute_pause_touch_zone.left, this.mute_pause_touch_zone.top, null);
         } else {

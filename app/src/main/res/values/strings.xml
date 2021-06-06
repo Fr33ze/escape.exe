@@ -4,23 +4,24 @@
     <string name="new_game">New Game</string>
     <string name="continue_game">Continue</string>
     <string name="highscores"> Highscores </string>
-    <string name="quit_game">Quit</string>
+    <string name="quit_game">terminate</string>
     <string name="backtomain"> Main Menu </string>
-    <string name="player_died">You died, Retry?</string>
-    <string name="pause_game">Game Paused!</string>
-    <string name="back_to_menu">Exit</string>
-    <string name="next_level"> finished! Tap to continue.</string>
-    <string name="skip_intro"> Tap here to skip.. </string>
+    <string name="player_died">Simulation failed</string>
+    <string name="pause_game">.exe Paused</string>
+    <string name="next_level"> run executed </string>
+    <string name="skip_intro"> Tap here to skip </string>
+    <string name="start">start</string>
 
-    <string name="new_game_warning"> There is already a saved game! A new game will override your current saved game! Start a new game? </string>
+    <string name="new_game_warning"> Warning: This will overwrite the current file </string>
+    <string name="new_game_final_warning"> Are you sure you want to overwrite the existing file? </string>
     <string name="yes"> Yes </string>
-    <string name="no"> No </string>
+    <string name="no"> no </string>
     <string name="ok"> Ok </string>
     <string name="cancel"> Cancel </string>
     <string name="deaths_level"> Deaths </string>
     <string name="deaths_total"> Deaths Total </string>
-    <string name="enter_player_name"> Please enter your name. </string>
+    <string name="enter_player_name"> name this file </string>
     <string name="player_name"> Playername... </string>
     <string name="player"> Player </string>
-    <string name="game_beat"> Game Beat </string>
+    <string name="game_beat"> Escaped </string>
 </resources>
