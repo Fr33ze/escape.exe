@@ -5,7 +5,7 @@
         android:startOffset="500"
         android:duration="2500"
         android:fromXScale="8"
-        android:fromYScale="12"
+        android:fromYScale="10.5"
         android:pivotX="25%"
         android:pivotY="37.5%"
         android:toXScale="1"

@@ -6,17 +6,12 @@
 package at.ac.tuwien.mmue_sb10;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.core.app.ActivityOptionsCompat;
@@ -95,55 +90,20 @@ public class MainActivity extends Activity {
     public void onClickNewGame(View v) {
         EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
 
-        if (user != null) {
-            final EditText input = new EditText(MainActivity.this);
-            input.setHint(R.string.player_name);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT);
-            input.setLayoutParams(lp);
-            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.alertdialog);
-            builder.setMessage(R.string.new_game_warning)
-                    .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            EscapeSoundManager.getInstance(MainActivity.this).playSound(EscapeSoundManager.getInstance(MainActivity.this).snd_button);
-                            Concurrency.executeAsync(() -> deleteUser());
-                            Concurrency.executeAsync(() -> saveUser(new User(input.getText().toString())));
-                            startActivity(new Intent(getBaseContext(), GameActivity.class));
-                        }
-                    })
-                    .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            // User cancelled the dialog
-                            EscapeSoundManager.getInstance(MainActivity.this).playSound(EscapeSoundManager.getInstance(MainActivity.this).snd_button);
-                        }
-                    })
-                    .setView(input);
-            builder.create().show();
+        mmenu_text.setText(R.string.new_game);
+        mmenu_text.setBackgroundColor(getResources().getColor(R.color.green));
+        DisplayMetrics dm = new DisplayMetrics();
+        ((WindowManager)getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRealMetrics(dm);
+        float aspect_rounded = Math.round((float)dm.widthPixels / dm.heightPixels * 10) / 10f;
+        Bundle bundle;
+        if (aspect_rounded == Math.round(16f/9 * 10) / 10f) {
+            bundle = ActivityOptionsCompat.makeCustomAnimation(this, R.anim.fade_in_activity, R.anim.enlarge_main_activity_wide).toBundle();
         } else {
-            final EditText input = new EditText(MainActivity.this);
-            input.setHint(R.string.player_name);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT);
-            input.setLayoutParams(lp);
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage(R.string.enter_player_name)
-                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            Concurrency.executeAsync(() -> saveUser(new User(input.getText().toString())));
-                            startActivity(new Intent(getBaseContext(), GameActivity.class));
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            // User cancelled the dialog
-
-                        }
-                    })
-                    .setView(input);
-            builder.create().show();
+            bundle = ActivityOptionsCompat.makeCustomAnimation(this, R.anim.fade_in_activity, R.anim.enlarge_main_activity_xwide).toBundle();
         }
+        Intent intent = new Intent(this, SubNewActivity.class);
+        intent.putExtra("user", user);
+        startActivity(intent, bundle);
     }
 
     public void onClickMute(View v) {
@@ -212,7 +172,7 @@ public class MainActivity extends Activity {
             return;
 
         this.user = user;
-        findViewById(R.id.btn_continue).setVisibility(View.VISIBLE);
+        findViewById(R.id.btn_start).setVisibility(View.VISIBLE);
     }
 
     /**
@@ -227,20 +187,5 @@ public class MainActivity extends Activity {
         else
             user = null;
         return user;
-    }
-
-    /**
-     * Saves a new User in the database
-     * @param user
-     */
-    private void saveUser(User user) {
-        EscapeDatabase.getInstance(this).userDao().insert(user);
-    }
-
-    /**
-     * Deletes the current User from the database
-     */
-    private void deleteUser() {
-        EscapeDatabase.getInstance(this).userDao().deleteAllUsers();
     }
 }

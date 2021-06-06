@@ -8,33 +8,28 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.TextView;
+import android.widget.EditText;
 
+import at.ac.tuwien.mmue_sb10.persistence.EscapeDatabase;
 import at.ac.tuwien.mmue_sb10.persistence.User;
+import at.ac.tuwien.mmue_sb10.util.Concurrency;
 
-public class SubContinueActivity extends Activity {
+public class SubNewActivity extends Activity {
 
-    private User user;
+    User user;
+    String newusername;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sub_continue);
-        user = (User)getIntent().getSerializableExtra("user");
-        ((TextView)findViewById(R.id.currentPlayer)).setText(user.name);
-        ((TextView)findViewById(R.id.level)).setText("" + user.currentLevel);
-        ((TextView)findViewById(R.id.totaldeaths)).setText("" + user.deathsTotal);
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        finish();
+        setContentView(R.layout.activity_sub_new);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        user = (User)getIntent().getSerializableExtra("user");
 
         View decorView = getWindow().getDecorView();
         int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
@@ -46,7 +41,12 @@ public class SubContinueActivity extends Activity {
         }
 
         EscapeSoundManager.getInstance(this).lock();
+    }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        finish();
     }
 
     @Override
@@ -79,12 +79,42 @@ public class SubContinueActivity extends Activity {
     }
 
     /**
-     * When clicked brings you to the submenu for creating a new player profile.
+     * When clicked brings you to the game
      * @param v the view as used by this method
      * @since 0.2
      */
-    public void onClickPlay(View v) {
+    public void onClickStart(View v) {
         EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
+
+        if(user != null) {
+            newusername = ((EditText)findViewById(R.id.editTextTextPersonName)).getText().toString();
+            setContentView(R.layout.activity_sub_new_confirm);
+        } else {
+            newusername = ((EditText)findViewById(R.id.editTextTextPersonName)).getText().toString();
+            Concurrency.executeAsync(() -> saveUser(new User(newusername)));
+            startActivity(new Intent(this, GameActivity.class));
+        }
+    }
+
+    public void onClickStartConfirm(View v) {
+        EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
+        Concurrency.executeAsync(this::deleteUser);
+        Concurrency.executeAsync(() -> saveUser(new User(newusername)));
         startActivity(new Intent(this, GameActivity.class));
+    }
+
+    /**
+     * Saves a new User in the database
+     * @param user
+     */
+    private void saveUser(User user) {
+        EscapeDatabase.getInstance(this).userDao().insert(user);
+    }
+
+    /**
+     * Deletes the current User from the database
+     */
+    private void deleteUser() {
+        EscapeDatabase.getInstance(this).userDao().deleteAllUsers();
     }
 }

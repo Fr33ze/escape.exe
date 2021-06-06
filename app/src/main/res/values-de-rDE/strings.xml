@@ -14,7 +14,10 @@
     <string name="continue_exe"> Programm fortsetzen? </string>
     <string name="deaths_d"> Tode: </string>
     <string name="name_d"> Name: </string>
+    <string name="new_exe"> Neues Programm erstellen </string>
+    <string name="override"> Überschreiben </string>
 
+    <string name="new_game_warning_title"> Spielstand überschreiben? </string>
     <string name="new_game_warning"> Warnung: Dies überschreibt den aktuellen Spielstand </string>
     <string name="new_game_final_warning"> Existierenden Spielstand wirklich überschreiben? </string>
     <string name="yes"> Ja </string>

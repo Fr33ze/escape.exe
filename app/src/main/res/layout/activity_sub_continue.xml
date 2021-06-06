@@ -28,7 +28,7 @@
 
 
     <Button
-        android:id="@+id/btn_continue"
+        android:id="@+id/btn_start"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
@@ -60,8 +60,8 @@
         android:textColor="@color/android_gray"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/btn_continue"
-        app:layout_constraintStart_toStartOf="@+id/btn_continue" />
+        app:layout_constraintBottom_toTopOf="@+id/btn_start"
+        app:layout_constraintStart_toStartOf="@+id/btn_start" />
 
     <TextView
         android:id="@+id/textView"
