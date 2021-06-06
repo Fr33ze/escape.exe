@@ -20,6 +20,7 @@
     <string name="deaths_level"> Tode </string>
     <string name="deaths_total"> Tode Gesamt </string>
     <string name="enter_player_name"> Bitte geben Sie Ihren Namen ein. </string>
-    <string name="player_name"> Spielername... </string>
-
+    <string name="player_name"> Spielername… </string>
+    <string name="player"> Spieler </string>
+    <string name="game_beat"> Abgeschlossen </string>
 </resources>

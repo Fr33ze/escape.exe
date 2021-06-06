@@ -21,4 +21,6 @@
     <string name="deaths_total"> Deaths Total </string>
     <string name="enter_player_name"> Please enter your name. </string>
     <string name="player_name"> Playername... </string>
+    <string name="player"> Player </string>
+    <string name="game_beat"> Game Beat </string>
 </resources>

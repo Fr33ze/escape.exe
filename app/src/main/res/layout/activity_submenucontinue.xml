@@ -19,7 +19,7 @@
         android:fontFamily="@font/joystix_monospace"
         android:gravity="center"
         android:text="Playername"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -60,13 +60,12 @@
         android:id="@+id/level"
         android:layout_width="309dp"
         android:layout_height="25dp"
+        android:layout_marginStart="24dp"
         android:layout_marginBottom="28dp"
         android:fontFamily="@font/joystix_monospace"
         android:text="Level: XX"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         app:layout_constraintBottom_toTopOf="@+id/leveldeaths"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.428"
         app:layout_constraintStart_toStartOf="@+id/center_hor2" />
 
     <TextView
@@ -77,23 +76,20 @@
         android:layout_marginBottom="28dp"
         android:fontFamily="@font/joystix_monospace"
         android:text="Deaths Total: XX"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         app:layout_constraintBottom_toTopOf="@+id/btn_continue"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/center_hor2" />
 
     <TextView
         android:id="@+id/leveldeaths"
         android:layout_width="309dp"
         android:layout_height="24dp"
+        android:layout_marginStart="24dp"
         android:layout_marginBottom="28dp"
         android:fontFamily="@font/joystix_monospace"
         android:text="Deaths Current Level XX"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         app:layout_constraintBottom_toTopOf="@+id/totaldeaths"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.428"
         app:layout_constraintStart_toStartOf="@+id/center_hor2" />
 
     <androidx.constraintlayout.widget.Guideline
