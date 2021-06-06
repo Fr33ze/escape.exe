@@ -83,26 +83,81 @@ public class HighscoreActivity extends Activity {
                     filtered.add(highscore);
             }
 
-            if (filtered.size() > 0) {
+            if (level == 0) {
+                final TableLayout table_highscores = findViewById(R.id.table_highscores);
+                final TableRow tableRow = (TableRow) getLayoutInflater().inflate(R.layout.tablerow_header, null);
+                TextView text;
 
+                //Game beat
+                text = tableRow.findViewById(R.id.aaah);
+                text.setText(R.string.game_beat);
+
+                //Deaths
+                text = tableRow.findViewById(R.id.bbbh);
+                text.setText(R.string.deaths_total);
+
+                //Player
+                text = tableRow.findViewById(R.id.ccch);
+                text.setText(R.string.player);
+
+                table_highscores.addView(tableRow);
+
+                if (filtered.isEmpty()) {
+                    final TableRow minusRow = (TableRow) getLayoutInflater().inflate(R.layout.tablerow_highscore, null);
+                    TextView minusText;
+
+                    //Level
+                    minusText = minusRow.findViewById(R.id.aaa);
+                    minusText.setText("-");
+
+                    //Deaths
+                    minusText = minusRow.findViewById(R.id.bbb);
+                    minusText.setText("-");
+
+                    //Name
+                    minusText = minusRow.findViewById(R.id.ccc);
+                    minusText.setText("-");
+
+                    table_highscores.addView(minusRow);
+                }
+
+            } else if (level > 0 && !filtered.isEmpty()) {
+                final TableLayout table_highscores = findViewById(R.id.table_highscores);
+                final TableRow tableRow = (TableRow) getLayoutInflater().inflate(R.layout.tablerow_header, null);
+                tableRow.setPadding(0, 50, 0, 0);
+                TextView text;
+
+                //Level
+                text = tableRow.findViewById(R.id.aaah);
+                text.setText("Level");
+
+                //Deaths
+                text = tableRow.findViewById(R.id.bbbh);
+                text.setText(R.string.deaths_level);
+
+                //Player
+                text = tableRow.findViewById(R.id.ccch);
+                text.setText(R.string.player);
+
+                table_highscores.addView(tableRow);
             }
 
-            for (Highscore highscore : filtered) {
+            for (int i = 0, num_scores = Math.min(5, filtered.size()); i < num_scores; i++) {
                 final TableLayout table_highscores = findViewById(R.id.table_highscores);
                 final TableRow tableRow = (TableRow) getLayoutInflater().inflate(R.layout.tablerow_highscore, null);
                 TextView text;
 
                 //Level
                 text = tableRow.findViewById(R.id.aaa);
-                text.setText("Level " + highscore.level);
+                text.setText("Level " + filtered.get(i).level);
 
                 //Deaths
                 text = tableRow.findViewById(R.id.bbb);
-                text.setText("Level " + highscore.deaths);
+                text.setText("" + filtered.get(i).deaths);
 
                 //Name
                 text = tableRow.findViewById(R.id.ccc);
-                text.setText("Level " + highscore.name);
+                text.setText(filtered.get(i).name);
 
                 table_highscores.addView(tableRow);
             }

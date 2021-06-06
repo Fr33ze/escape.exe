@@ -11,7 +11,7 @@
         android:layout_weight="0.37"
         android:fontFamily="@font/joystix_monospace"
         android:text="@string/game_beat"
-        android:textColor="@color/black"
+        android:textColor="@color/android_gray"
         android:textSize="18sp"
         android:textStyle="bold" />
 
@@ -22,7 +22,7 @@
         android:layout_weight="0.37"
         android:fontFamily="@font/joystix_monospace"
         android:text="@string/deaths_total"
-        android:textColor="@color/black"
+        android:textColor="@color/android_gray"
         android:textSize="18sp"
         android:textStyle="bold" />
 
@@ -33,7 +33,7 @@
         android:layout_weight="0.26"
         android:fontFamily="@font/joystix_monospace"
         android:text="@string/player"
-        android:textColor="@color/black"
+        android:textColor="@color/android_gray"
         android:textSize="18sp"
         android:textStyle="bold" />
 
