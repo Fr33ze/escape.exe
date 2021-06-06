@@ -9,10 +9,14 @@ package at.ac.tuwien.mmue_sb10;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceHolder;
+
+import androidx.core.app.ActivityOptionsCompat;
 
 public class GameThread extends Thread {
 
@@ -26,7 +30,8 @@ public class GameThread extends Thread {
 
     /**
      * Creates a new GameThread instance
-     * @param state GameState instance that will be updated and rendered
+     *
+     * @param state  GameState instance that will be updated and rendered
      * @param holder SurfaceHolder of the SurfaceView
      */
     public GameThread(GameState state, SurfaceHolder holder, Context context) {
@@ -37,16 +42,18 @@ public class GameThread extends Thread {
 
     /**
      * Sets the thread to be running or not. Thread will stop if this is set to false.
+     *
      * @param active boolean that sets the thread to running
      * @since 0.1
      */
     public void setRunning(boolean active) {
-        if(this.state != null)
+        if (this.state != null)
             this.state.running = active;
     }
 
     /**
      * Renderloop that renders the gamestate onto the screen
+     *
      * @since 0.1
      */
     @Override
@@ -75,11 +82,20 @@ public class GameThread extends Thread {
         } catch (NullPointerException npe) {
             npe.printStackTrace();
         }
-        end();
+
+        if (this.state.outro)
+            outro();
+        else
+            end();
     }
 
     private void end() {
         EscapeSoundManager.getInstance(this.context).releaseMediaPlayer();
-        ((Activity)context).finish();
+        ((Activity) context).finish();
+    }
+
+    private void outro() {
+        Bundle bundle = ActivityOptionsCompat.makeCustomAnimation(this.context, android.R.anim.fade_in, android.R.anim.fade_out).toBundle();
+        this.context.startActivity(new Intent(this.context, OutroActivity.class), bundle);
     }
 }

@@ -13,11 +13,9 @@ public class EscapeSoundManager {
     public int snd_death;
     public int snd_steps;
     public int snd_jump;
-    public int snd_land;
     public int snd_gravity_up;
     public int snd_gravity_down;
     public int msc_level_beat;
-    public int msc_death;
 
     private Context context;
     private MediaPlayer mediaPlayer;
@@ -178,7 +176,6 @@ public class EscapeSoundManager {
             snd_gravity_up = soundPool.load(context, R.raw.gravity_to_invert, 2);
             snd_gravity_down = soundPool.load(context, R.raw.gravity_to_normal, 2);
             snd_steps = soundPool.load(context, R.raw.steps, 1);
-            msc_death = soundPool.load(context, R.raw.death_music, 2);
             msc_level_beat = soundPool.load(context, R.raw.level_beat_music, 2);
 
             loop_stream_id = -1;

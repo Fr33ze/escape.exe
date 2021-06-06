@@ -7,7 +7,6 @@
 package at.ac.tuwien.mmue_sb10;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -19,9 +18,6 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.media.SoundPool;
 import android.view.MotionEvent;
 
 
@@ -46,6 +42,9 @@ public class GameState {
     private float player_boost_x;
     private float player_velocity_y;
     private float player_acceleration_y;
+
+    private float player_move_y;
+    private float player_move_x;
 
     /*
      * PLAYER: STATE
@@ -90,6 +89,7 @@ public class GameState {
     private boolean update_user; //indicates wheter the user needs to be updated
     private float screenWidth; //screen width of the smartphone in px
     private float screenHeight; //screen heigth of the smartphone in px
+    public boolean outro; //game is finished: show outro
 
     /*
      * DRAW
@@ -114,7 +114,6 @@ public class GameState {
      * PAINT
      */
     private Paint text_paint; //paint for text
-    private Paint text_border_paint; //border paint for text
     private Paint trans_paint; //paint for transparency
     private Paint button_paint; //paint for buttons
     private Paint button_text_paint; //paint for text on buttons
@@ -150,6 +149,7 @@ public class GameState {
         this.density = density;
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
+        this.outro = false;
 
         this.player_collision_px = new RectF();
         this.player_collision_tiles = new Rect();
@@ -165,28 +165,20 @@ public class GameState {
         this.text_paint.setStyle(Paint.Style.FILL_AND_STROKE);
         this.text_paint.setTypeface(font_joystix);
         this.text_paint.setTextAlign(Paint.Align.CENTER);
-        this.text_paint.setTextSize(24 * this.density);
-        this.text_border_paint = new Paint();
-        this.text_border_paint.setColor(Color.WHITE);
-        this.text_border_paint.setTextAlign(Paint.Align.CENTER);
-        this.text_border_paint.setTextSize(24 * this.density);
-        this.text_border_paint.setTypeface(font_joystix);
-        this.text_border_paint.setStyle(Paint.Style.STROKE);
-        this.text_border_paint.setStrokeWidth(2 * this.density);
+        this.text_paint.setTextSize(20 * this.density);
 
         this.trans_paint = new Paint();
         this.trans_paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
 
         this.button_paint = new Paint();
-        this.button_paint.setAntiAlias(true);
-        this.button_paint.setColor(Color.GRAY);
+        this.button_paint.setColor(this.context.getResources().getColor(R.color.android_gray));
 
         this.button_text_paint = new Paint();
-        this.button_text_paint.setColor(Color.BLACK);
+        this.button_text_paint.setColor(this.context.getResources().getColor(R.color.white));
         this.button_text_paint.setStyle(Paint.Style.FILL_AND_STROKE);
         this.button_text_paint.setTypeface(font_joystix);
         this.button_text_paint.setTextAlign(Paint.Align.CENTER);
-        this.button_text_paint.setTextSize(22 * this.density);
+        this.button_text_paint.setTextSize(18 * this.density);
 
         this.death_counter_paint = new Paint();
         this.death_counter_paint.setColor(Color.BLACK);
@@ -196,15 +188,15 @@ public class GameState {
         this.you_died_retry = context.getResources().getString(R.string.player_died);
         this.finished_next_level = context.getResources().getString(R.string.next_level);
 
-        this.start_circle_bmp = Bitmap.createBitmap((int) this.screenWidth, (int) this.screenHeight, Bitmap.Config.ARGB_8888);
+        this.start_circle_bmp = Bitmap.createBitmap((int) (this.screenWidth + 100 * this.density), (int) this.screenHeight, Bitmap.Config.ARGB_8888);
         this.start_circle_canvas = new Canvas(this.start_circle_bmp);
 
         this.draw_src = new Rect();
         this.draw_tar = new Rect();
 
-        this.continue_touch_zone = new RectF(this.screenWidth * 0.33f, this.screenHeight / 2 - 10 * this.density, this.screenWidth * 0.66f, this.screenHeight / 2 + 50 * this.density);
-        this.exit_touch_zone = new RectF(this.screenWidth * 0.33f, this.screenHeight / 2 + 70 * this.density, this.screenWidth * 0.66f, this.screenHeight / 2 + 130 * this.density);
-        this.mute_pause_touch_zone = new RectF(10 * this.density, 10 * this.density, 50 * this.density, 50 * this.density);
+        this.continue_touch_zone = new RectF(this.screenWidth * 0.33f, this.screenHeight / 2 - 10 * this.density, this.screenWidth * 0.66f, this.screenHeight / 2 + 30 * this.density);
+        this.exit_touch_zone = new RectF(this.screenWidth * 0.33f, this.screenHeight / 2 + 70 * this.density, this.screenWidth * 0.66f, this.screenHeight / 2 + 110 * this.density);
+        this.mute_pause_touch_zone = new RectF(16 * this.density, 16 * this.density, 66 * this.density, 66 * this.density);
         loadMuteIcons();
         loadPauseIcon();
 
@@ -280,7 +272,7 @@ public class GameState {
      * @since 0.1
      */
     public void update(long deltaFrameTime) {
-        if (this.player_dead || this.finished || !this.started) {
+        if (this.player_dead || this.finished || !this.started || this.outro) {
             //Game over. Proceed to next stage or retry
             return;
         } else if (this.start_circle_radius < 1) {
@@ -292,9 +284,11 @@ public class GameState {
         }
 
         this.player_velocity_y += ((float) deltaFrameTime / 1000) * this.player_acceleration_y * this.gravity;
+        this.player_move_y = Math.min(this.player_velocity_y * ((float) deltaFrameTime / 1000), 12);
+        this.player_move_x = Math.min( this.player_velocity_x * this.player_boost_x * ((float) deltaFrameTime / 1000), 23);
 
         //Player position after this deltatime-step
-        this.player_collision_px.set(this.player_pos_x + this.player_velocity_x * this.player_boost_x * ((float) deltaFrameTime / 1000), this.player_pos_y + this.player_velocity_y, this.player_pos_x + this.player_velocity_x * this.player_boost_x * ((float) deltaFrameTime / 1000) + PLAYER_WIDTH, this.player_pos_y + this.player_velocity_y + PLAYER_HEIGTH);
+        this.player_collision_px.set(this.player_pos_x + this.player_move_x, this.player_pos_y + this.player_move_y, this.player_pos_x + this.player_move_x + PLAYER_WIDTH, this.player_pos_y + this.player_move_y + PLAYER_HEIGTH);
         this.player_collision_tiles.set((int) (this.player_collision_px.left / 24), (int) (this.player_collision_px.top / 24), (int) (this.player_collision_px.right / 24), (int) (this.player_collision_px.bottom / 24));
 
         if (this.player_collision_tiles.left >= 0 && this.player_collision_tiles.top >= 0 && this.player_collision_tiles.right < this.stage.stage_collision.length && this.player_collision_tiles.bottom <= this.stage.stage_collision[0].length) {
@@ -362,7 +356,6 @@ public class GameState {
                     this.player_pos_y = this.player_collision_px.top;
                 }
 
-                this.player_velocity_y = 0;
                 this.player_inAir = false;
                 this.player_first_gravity_inAir = false;
             } else {
@@ -424,6 +417,8 @@ public class GameState {
             this.player_pos_y = this.player_collision_px.bottom - this.player_collision_px.bottom % 24 - PLAYER_HEIGTH;
         else
             this.player_pos_y = this.player_collision_px.top + (24 - this.player_collision_px.top % 24);
+
+        this.player_velocity_y = 0;
 
         this.player_last_state = this.player_state;
         this.player_state = PlayerState.RUNNING;
@@ -665,11 +660,9 @@ public class GameState {
         if (this.player_dead) {
             //Player is dead. Draw retry message
             drawFadeout(c, deltaFrameTime, 1000, 255, 300);
-            c.drawText(this.you_died_retry, this.screenWidth / 2, this.screenHeight / 2, this.text_border_paint);
             c.drawText(this.you_died_retry, this.screenWidth / 2, this.screenHeight / 2, this.text_paint);
         } else if (this.finished) {
             drawFadeout(c, deltaFrameTime, 2500, 255);
-            c.drawText(this.stage.stage_name + " " + finished_next_level, this.screenWidth / 2, this.screenHeight / 2, this.text_border_paint);
             c.drawText(this.stage.stage_name + " " + finished_next_level, this.screenWidth / 2, this.screenHeight / 2, this.text_paint);
         } else if (this.start_circle_radius < 1) {
             //Stage has started. Draw expanding circle first second
@@ -697,12 +690,11 @@ public class GameState {
      * @param c Canvas to draw the pause screen onto
      */
     private void drawPauseScreen(Canvas c) {
-        c.drawText(context.getResources().getText(R.string.pause_game).toString(), this.screenWidth / 2, this.screenHeight / 3, this.text_border_paint);
         c.drawText(context.getResources().getText(R.string.pause_game).toString(), this.screenWidth / 2, this.screenHeight / 3, this.text_paint);
-        c.drawRoundRect(this.continue_touch_zone, 15 * this.density, 15 * this.density, this.button_paint);
-        c.drawRoundRect(this.exit_touch_zone, 15 * this.density, 15 * this.density, this.button_paint);
-        c.drawText(context.getResources().getText(R.string.continue_game).toString(), this.continue_touch_zone.centerX(), this.continue_touch_zone.centerY() - this.button_text_paint.ascent() / 2, this.button_text_paint);
-        c.drawText(context.getResources().getText(R.string.backtomain).toString(), this.exit_touch_zone.centerX(), this.exit_touch_zone.centerY() - this.button_text_paint.ascent() / 2, this.button_text_paint);
+        c.drawRect(this.continue_touch_zone, this.button_paint);
+        c.drawRect(this.exit_touch_zone, this.button_paint);
+        c.drawText(context.getResources().getText(R.string.continue_game).toString(), this.continue_touch_zone.centerX(), this.continue_touch_zone.centerY() - this.button_text_paint.ascent() / 2 - 2 * this.density, this.button_text_paint);
+        c.drawText(context.getResources().getText(R.string.backtomain).toString(), this.exit_touch_zone.centerX(), this.exit_touch_zone.centerY() - this.button_text_paint.ascent() / 2 - 2 * this.density, this.button_text_paint);
         if (EscapeSoundManager.getInstance(this.context).isMuted()) {
             c.drawBitmap(this.icon_mute, this.mute_pause_touch_zone.left, this.mute_pause_touch_zone.top, null);
         } else {
@@ -789,7 +781,6 @@ public class GameState {
             EscapeSoundManager.getInstance(this.context).pauseMediaPlayer();
             EscapeSoundManager.getInstance(this.context).stopSoundLoop();
             EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).snd_death);
-            EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).msc_death);
             this.user.deathsCurrentLevel++;
             this.user.deathsTotal++;
             Concurrency.executeAsync(() -> updateUser(this.user));
@@ -828,7 +819,7 @@ public class GameState {
      */
     private void jump() {
         if (!this.player_inAir) {
-            this.player_velocity_y -= 5 * gravity; //TODO: Change to proper value
+            this.player_velocity_y = -240 * gravity;
             this.player_inAir = true;
 
             this.player_last_state = this.player_state;
@@ -907,6 +898,15 @@ public class GameState {
      * @since 0.1
      */
     public void load(int level) {
+
+        if(this.user.currentLevel > HighscoreActivity.TOTAL_LEVELS) {
+            Highscore finalscore = new Highscore(this.user.name, 0, this.user.deathsTotal);
+            Concurrency.executeAsync(() -> insertHighscore(finalscore));
+            this.outro = true;
+            this.running = false;
+            return;
+        }
+
         this.started = false;
         this.paused = false;
         this.finished = false;
@@ -921,7 +921,7 @@ public class GameState {
         this.player_velocity_x = stage.player_velocity_x;
         this.player_boost_x = 1.0f;
         this.player_velocity_y = 0;
-        this.player_acceleration_y = 10;
+        this.player_acceleration_y = 450;
         this.player_dead = false;
         this.player_inAir = true;
         this.player_onBoost = false;
@@ -930,7 +930,6 @@ public class GameState {
 
         this.start_circle_radius = 0.1f;
         this.start_circle_canvas.drawColor(Color.BLACK);
-        this.start_circle_canvas.drawText(this.stage.stage_name, this.screenWidth / 2, this.screenHeight / 2, this.text_border_paint);
         this.start_circle_canvas.drawText(this.stage.stage_name, this.screenWidth / 2, this.screenHeight / 2, this.text_paint);
 
         this.player_last_state = this.player_state;
@@ -954,7 +953,6 @@ public class GameState {
         this.player_velocity_x = stage.player_velocity_x;
         this.player_boost_x = 1.0f;
         this.player_velocity_y = 0;
-        this.player_acceleration_y = 10;
         this.player_dead = false;
         this.player_inAir = true;
         this.player_onBoost = false;
