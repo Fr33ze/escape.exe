@@ -27,9 +27,8 @@ public class SubContinueActivity extends Activity {
         setContentView(R.layout.activity_submenucontinue);
         user = (User)getIntent().getSerializableExtra("user");
         ((TextView)findViewById(R.id.currentPlayer)).setText(user.name);
-        ((TextView)findViewById(R.id.level)).setText("Level: " + user.currentLevel);
-        ((TextView)findViewById(R.id.totaldeaths)).setText(getResources().getText(R.string.deaths_total).toString() + ": " + user.deathsTotal);
-        ((TextView)findViewById(R.id.leveldeaths)).setText(getResources().getText(R.string.deaths_level).toString() + ": " + user.deathsCurrentLevel);
+        ((TextView)findViewById(R.id.level)).setText("" + user.currentLevel);
+        ((TextView)findViewById(R.id.totaldeaths)).setText("" + user.deathsTotal);
     }
 
     @Override

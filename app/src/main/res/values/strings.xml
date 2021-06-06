@@ -11,6 +11,9 @@
     <string name="next_level"> run executed </string>
     <string name="skip_intro"> Tap here to skip </string>
     <string name="start">start</string>
+    <string name="continue_exe"> Continue Executable? </string>
+    <string name="deaths_d">Deaths: </string>
+    <string name="name_d"> Name: </string>
 
     <string name="new_game_warning"> Warning: This will overwrite the current file </string>
     <string name="new_game_final_warning"> Are you sure you want to overwrite the existing file? </string>

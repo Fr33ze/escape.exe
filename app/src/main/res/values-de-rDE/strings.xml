@@ -11,6 +11,9 @@
     <string name="next_level"> lauf abgeschlossen </string>
     <string name="skip_intro"> Tappe hier zum überspringen </string>
     <string name="start">start</string>
+    <string name="continue_exe"> Programm fortsetzen? </string>
+    <string name="deaths_d"> Tode: </string>
+    <string name="name_d"> Name: </string>
 
     <string name="new_game_warning"> Warnung: Dies überschreibt den aktuellen Spielstand </string>
     <string name="new_game_final_warning"> Existierenden Spielstand wirklich überschreiben? </string>
