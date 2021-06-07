@@ -7,6 +7,7 @@
 package at.ac.tuwien.mmue_sb10;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -18,9 +19,11 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.os.Bundle;
 import android.view.MotionEvent;
 
 
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.res.ResourcesCompat;
 
 import at.ac.tuwien.mmue_sb10.persistence.EscapeDatabase;
@@ -29,6 +32,8 @@ import at.ac.tuwien.mmue_sb10.persistence.User;
 import at.ac.tuwien.mmue_sb10.util.Concurrency;
 
 public class GameState {
+    public static final boolean SKIP_FINISH_SPLASH_SCREEN = false;
+
     private static final int PLAYER_WIDTH = 18; //player width in pixels
     private static final int PLAYER_HEIGTH = 24; //player heigth in pixel (24 is maximum because of collision)
     private static final float FRAME_TIME = 83f; //player animation. 83f is default for 12fps
@@ -69,7 +74,7 @@ public class GameState {
      * CURRENT STAGE
      */
     private Stage stage; //current stage
-    private boolean finished; //stage is finished
+    public boolean finished; //stage is finished
     private boolean started; //stage is started
     public boolean running; //game is running
 
@@ -216,7 +221,7 @@ public class GameState {
         this.you_died_retry = context.getResources().getString(R.string.player_died);
         this.finished_next_level = context.getResources().getString(R.string.next_level);
 
-        this.start_circle_bmp = Bitmap.createBitmap((int) (this.screenWidth + 100 * this.density), (int) this.screenHeight, Bitmap.Config.ARGB_8888);
+        this.start_circle_bmp = Bitmap.createBitmap((int) (this.screenWidth), (int) this.screenHeight, Bitmap.Config.ARGB_8888);
         this.start_circle_canvas = new Canvas(this.start_circle_bmp);
 
         this.draw_src = new Rect();
@@ -915,7 +920,13 @@ public class GameState {
             } else if (this.player_dead) {
                 this.retry();
             } else if (this.finished) {
-                this.load(this.user.currentLevel);
+                if (SKIP_FINISH_SPLASH_SCREEN) {
+                    this.load(this.user.currentLevel);
+                } else {
+                    this.running = false;
+                    Bundle bundle = ActivityOptionsCompat.makeCustomAnimation(this.context, android.R.anim.fade_in, android.R.anim.fade_out).toBundle();
+                    this.context.startActivity(new Intent(this.context, FinishStageActivity.class), bundle);
+                }
             } else if (!this.started) {
                 this.started = true;
                 this.player_last_state = this.player_state;

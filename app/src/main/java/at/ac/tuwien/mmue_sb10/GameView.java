@@ -9,6 +9,8 @@ package at.ac.tuwien.mmue_sb10;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Point;
+import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -93,7 +95,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         Display dsp = ((WindowManager)getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         this.fps = dsp.getRefreshRate();
         DisplayMetrics dm = new DisplayMetrics();
-        dsp.getMetrics(dm);
+        dsp.getRealMetrics(dm);
         this.density = dm.density;
         this.screenWidth = dm.widthPixels;
         this.screenHeigth = dm.heightPixels;

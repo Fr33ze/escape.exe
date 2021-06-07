@@ -75,6 +75,5 @@ public class GameActivity extends Activity {
     @Override
     protected void onRestart() {
         super.onRestart();
-        finish();
     }
 }

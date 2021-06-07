@@ -83,9 +83,7 @@ public class GameThread extends Thread {
             npe.printStackTrace();
         }
 
-        if (this.state.outro)
-            outro();
-        else
+        if (!this.state.finished)
             end();
     }
 
