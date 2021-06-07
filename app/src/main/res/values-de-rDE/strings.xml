@@ -12,7 +12,7 @@
     <string name="skip_intro"> Tappe hier zum überspringen </string>
     <string name="start">start</string>
     <string name="continue_exe"> Programm fortsetzen? </string>
-    <string name="deaths_d"> Tode: </string>
+    <string name="deaths_d"> Simulationen: </string>
     <string name="name_d"> Name: </string>
     <string name="new_exe"> Neues Programm erstellen </string>
     <string name="override"> Überschreiben </string>
@@ -25,12 +25,16 @@
     <string name="new_game_final_warning"> Existierenden Spielstand wirklich überschreiben? </string>
     <string name="yes"> Ja </string>
     <string name="no"> Nein </string>
-    <string name="ok"> Ok </string>
+    <string name="ok"> OK </string>
     <string name="cancel"> Abbrechen </string>
-    <string name="deaths_level"> Tode </string>
-    <string name="deaths_total"> Tode Gesamt </string>
+    <string name="deaths_level"> Simulationen </string>
+    <string name="deaths_total"> Sim. Gesamt </string>
     <string name="enter_player_name"> benenne den Spielstand </string>
     <string name="player_name"> Name... </string>
     <string name="player"> Spieler*in </string>
     <string name="game_beat"> Entkommen </string>
+
+    <string name="splashscreen_executedrun">Lauf ausgeführt</string>
+    <string name="splashscreen_nextlevel">Nächstes Level</string>
 </resources>
+

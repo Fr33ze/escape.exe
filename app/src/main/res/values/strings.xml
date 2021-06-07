@@ -12,7 +12,7 @@
     <string name="skip_intro"> Tap here to skip </string>
     <string name="start">start</string>
     <string name="continue_exe"> Continue Executable? </string>
-    <string name="deaths_d">Deaths:</string>
+    <string name="deaths_d">Simulations:</string>
     <string name="name_d"> Name:</string>
     <string name="new_exe"> Create New Executable </string>
     <string name="override"> Override </string>
@@ -25,12 +25,15 @@
     <string name="new_game_final_warning"> Are you sure you want to overwrite the existing file? </string>
     <string name="yes"> Yes </string>
     <string name="no"> no </string>
-    <string name="ok"> Ok </string>
+    <string name="ok"> OK </string>
     <string name="cancel"> Cancel </string>
-    <string name="deaths_level"> Deaths </string>
-    <string name="deaths_total"> Deaths Total </string>
+    <string name="deaths_level"> Simulations </string>
+    <string name="deaths_total"> sim. Total </string>
     <string name="enter_player_name"> name this file </string>
     <string name="player_name"> Playername... </string>
     <string name="player"> Player </string>
     <string name="game_beat"> Escaped </string>
+
+    <string name="splashscreen_executedrun">Run executed</string>
+    <string name="splashscreen_nextlevel">Next Level</string>
 </resources>
