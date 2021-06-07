@@ -920,7 +920,7 @@ public class GameState {
                     EscapeSoundManager.getInstance(this.context).toggleMute(this.stage.current_music_id);
                     EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).snd_button);
                 }
-            } else if (this.mute_pause_touch_zone.contains(event.getX(), event.getY())) {
+            } else if (this.mute_pause_touch_zone.contains(event.getX(), event.getY()) && !this.player_no_input) {
                 this.paused = true;
                 EscapeSoundManager.getInstance(this.context).stopSoundLoop();
                 EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).snd_button);
@@ -958,6 +958,9 @@ public class GameState {
      * Is forwarded from activity. Called when the "back" button is pressed on the device
      */
     public void onBackPressed() {
+        if(this.player_no_input)
+            return;
+
         if (!this.paused && this.started && !this.player_dead) {
             this.paused = true;
             EscapeSoundManager.getInstance(this.context).stopSoundLoop();
