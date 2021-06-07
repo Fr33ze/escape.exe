@@ -91,9 +91,4 @@ public class GameThread extends Thread {
         EscapeSoundManager.getInstance(this.context).releaseMediaPlayer();
         ((Activity) context).finish();
     }
-
-    private void outro() {
-        Bundle bundle = ActivityOptionsCompat.makeCustomAnimation(this.context, android.R.anim.fade_in, android.R.anim.fade_out).toBundle();
-        this.context.startActivity(new Intent(this.context, OutroActivity.class), bundle);
-    }
 }

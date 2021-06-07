@@ -71,9 +71,4 @@ public class GameActivity extends Activity {
         super.finish();
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-    }
 }

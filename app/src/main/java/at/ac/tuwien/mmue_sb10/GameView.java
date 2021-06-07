@@ -11,6 +11,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -97,14 +98,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         DisplayMetrics dm = new DisplayMetrics();
         dsp.getRealMetrics(dm);
         this.density = dm.density;
-        this.screenWidth = dm.widthPixels;
-        this.screenHeigth = dm.heightPixels;
+        Rect r = new Rect();
+        getGlobalVisibleRect(r);
+        this.screenWidth = r.width();
+        this.screenHeigth = r.height();
+
+        this.state = new GameState(getContext(), this.density, this.screenWidth, this.screenHeigth);
+        this.thread = new GameThread(state, holder, getContext());
+
         Concurrency.executeAsync(() -> {
             User user = loadUser();
             ((Activity)getContext()).runOnUiThread(() -> onUserLoadedListener.onUserLoaded(user));
         });
-        this.state = new GameState(getContext(), this.density, this.screenWidth, this.screenHeigth);
-        this.thread = new GameThread(state, holder, getContext());
     }
 
     @Override
@@ -130,6 +135,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
      * @param user User that has been loaded
      */
     private void onUserLoaded(User user) {
+        if(user.currentLevel > HighscoreActivity.TOTAL_LEVELS) {
+            ((Activity) getContext()).finish();
+            return;
+        }
         this.state.setUser(user);
         startgame();
     }

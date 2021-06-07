@@ -1,10 +1,8 @@
 package at.ac.tuwien.mmue_sb10;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -32,9 +30,9 @@ public class OutroActivity extends Activity {
                 | View.SYSTEM_UI_FLAG_FULLSCREEN;
         decorView.setSystemUiVisibility(uiOptions);
 
-        skipView = findViewById(R.id.txt_skip);
-        muteBtn = findViewById(R.id.btn_mute_intro);
-        videoView = findViewById(R.id.videoView);
+        skipView = findViewById(R.id.txt_skip_outro);
+        muteBtn = findViewById(R.id.btn_mute_outro);
+        videoView = findViewById(R.id.outroView);
         videoView.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.outro)); //TODO
         videoView.setOnCompletionListener(mp -> finish());
         videoView.start();

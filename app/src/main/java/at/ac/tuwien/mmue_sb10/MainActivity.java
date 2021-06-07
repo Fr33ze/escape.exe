@@ -8,6 +8,7 @@ package at.ac.tuwien.mmue_sb10;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;

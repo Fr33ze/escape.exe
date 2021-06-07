@@ -15,10 +15,10 @@ public class EscapeSoundManager {
     public int snd_jump;
     public int snd_gravity_up;
     public int snd_gravity_down;
-    public int msc_level_beat;
 
     private Context context;
     private MediaPlayer mediaPlayer;
+    private MediaPlayer levelBeatPlayer;
     private SoundPool soundPool;
 
     private boolean locked;
@@ -56,6 +56,7 @@ public class EscapeSoundManager {
 
     /**
      * Checks if the SoundManager is muted
+     *
      * @return true if the SoundManager is muted
      */
     public boolean isMuted() {
@@ -76,6 +77,7 @@ public class EscapeSoundManager {
 
     /**
      * Mutes or Unmutes the SoundManager. Also saves the status in the preferences
+     *
      * @param music_resource Resource of the music to be played if it is unmuted
      */
     public void toggleMute(int music_resource) {
@@ -124,6 +126,7 @@ public class EscapeSoundManager {
     public void releaseMediaPlayer() {
         try {
             mediaPlayer.release();
+            levelBeatPlayer.release();
         } catch (NullPointerException | IllegalStateException exc) {
             exc.printStackTrace();
         }
@@ -142,8 +145,9 @@ public class EscapeSoundManager {
 
     /**
      * Releases and then initializes a new MediaPlayer isntance. Does nothing if the SoundManager is locked or muted
+     *
      * @param music_resource Resource of the music to be played after initialization
-     * @param loop Indicates if the track should be looped
+     * @param loop           Indicates if the track should be looped
      */
     public void initMediaPlayer(int music_resource, boolean loop) {
         if (muted || locked)
@@ -155,6 +159,9 @@ public class EscapeSoundManager {
             mediaPlayer.setVolume(1, 1);
             mediaPlayer.setLooping(loop);
             mediaPlayer.start();
+
+            levelBeatPlayer = MediaPlayer.create(context, R.raw.level_beat_music);
+            levelBeatPlayer.setVolume(1, 1);
         } catch (NullPointerException | IllegalStateException exc) {
             exc.printStackTrace();
         }
@@ -176,7 +183,6 @@ public class EscapeSoundManager {
             snd_gravity_up = soundPool.load(context, R.raw.gravity_to_invert, 2);
             snd_gravity_down = soundPool.load(context, R.raw.gravity_to_normal, 2);
             snd_steps = soundPool.load(context, R.raw.steps, 1);
-            msc_level_beat = soundPool.load(context, R.raw.level_beat_music, 2);
 
             loop_stream_id = -1;
 
@@ -185,8 +191,16 @@ public class EscapeSoundManager {
         }
     }
 
+    public void playLevelBeatMusic() {
+        if (muted)
+            return;
+
+        levelBeatPlayer.start();
+    }
+
     /**
      * Plays a sound. Does nothing if the SoundManager is muted
+     *
      * @param sound_id of the sound to be played
      */
     public void playSound(int sound_id) {
@@ -198,6 +212,7 @@ public class EscapeSoundManager {
 
     /**
      * Plays a sound on loop. Does nothing if the SoundManager is muted or if one other sound is already being played on loop
+     *
      * @param sound_id
      */
     public void playSoundLoop(int sound_id) {

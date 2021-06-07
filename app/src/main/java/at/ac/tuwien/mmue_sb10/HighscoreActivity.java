@@ -30,7 +30,7 @@ import at.ac.tuwien.mmue_sb10.util.Concurrency;
 
 public class HighscoreActivity extends Activity {
 
-    public static final int TOTAL_LEVELS = 2; //TODO
+    public static final int TOTAL_LEVELS = 5; //TODO
 
     private final OnHighscoresLoadedListener onHighscoresLoadedListener = this::onHighscoresLoaded;
 

@@ -45,8 +45,8 @@ public class SubNewActivity extends Activity {
 
     @Override
     protected void onRestart() {
-        super.onRestart();
         finish();
+        super.onRestart();
     }
 
     @Override

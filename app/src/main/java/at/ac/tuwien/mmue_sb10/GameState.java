@@ -6,6 +6,7 @@
  */
 package at.ac.tuwien.mmue_sb10;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -93,10 +94,10 @@ public class GameState {
      */
     private Context context; //context of the app
     private User user; //current savefile
+    private int current_deaths; //only used for splash screen. (passed as intent)
     private boolean update_user; //indicates wheter the user needs to be updated
     private float screenWidth; //screen width of the smartphone in px
     private float screenHeight; //screen heigth of the smartphone in px
-    public boolean outro; //game is finished: show outro
 
     /*
      * DRAW
@@ -161,7 +162,6 @@ public class GameState {
         this.density = density;
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
-        this.outro = false;
 
         this.player_collision_px = new RectF();
         this.player_collision_tiles = new Rect();
@@ -219,7 +219,7 @@ public class GameState {
         this.death_counter_paint.setTextSize(this.death_counter_icon.getHeight() * 0.65f);
 
         this.you_died_retry = context.getResources().getString(R.string.player_died);
-        this.finished_next_level = context.getResources().getString(R.string.next_level);
+        this.finished_next_level = context.getResources().getString(R.string.splashscreen_executedrun);
 
         this.start_circle_bmp = Bitmap.createBitmap((int) (this.screenWidth), (int) this.screenHeight, Bitmap.Config.ARGB_8888);
         this.start_circle_canvas = new Canvas(this.start_circle_bmp);
@@ -319,7 +319,7 @@ public class GameState {
      * @since 0.1
      */
     public void update(long deltaFrameTime) {
-        if (this.player_dead || this.finished || !this.started || this.outro) {
+        if (this.player_dead || this.finished || !this.started) {
             //Game over. Proceed to next stage or retry
             return;
         } else if (this.start_circle_radius < 1) {
@@ -710,7 +710,7 @@ public class GameState {
             c.drawText(this.you_died_retry, this.screenWidth / 2, this.screenHeight / 2, this.text_paint);
         } else if (this.finished) {
             drawFadeout(c, deltaFrameTime, 2500, 255);
-            c.drawText(this.stage.stage_name + " " + finished_next_level, this.screenWidth / 2, this.screenHeight / 2, this.text_paint);
+            c.drawText(finished_next_level, this.screenWidth / 2, this.screenHeight / 2, this.text_paint);
         } else if (this.start_circle_radius < 1) {
             //Stage has started. Draw expanding circle first second
             this.start_circle_canvas.drawCircle((this.player_pos_x + PLAYER_WIDTH / 2f) * this.stage.stage_scale, (this.player_pos_y + PLAYER_HEIGTH / 2f) * this.stage.stage_scale, this.start_circle_radius * this.screenWidth, trans_paint);
@@ -809,9 +809,16 @@ public class GameState {
             Highscore highscore = new Highscore(this.user.name, this.user.currentLevel, this.user.deathsCurrentLevel);
             Concurrency.executeAsync(() -> insertHighscore(highscore));
 
+            this.current_deaths = this.user.deathsCurrentLevel;
+
             this.user.currentLevel++;
             this.user.deathsCurrentLevel = 0;
             Concurrency.executeAsync(() -> updateUser(this.user));
+
+            if(this.user.currentLevel > HighscoreActivity.TOTAL_LEVELS) {
+                Highscore finalscore = new Highscore(this.user.name, 0, this.user.deathsTotal);
+                Concurrency.executeAsync(() -> insertHighscore(finalscore));
+            }
         }
         this.update_user = false;
     }
@@ -822,7 +829,7 @@ public class GameState {
     private void setNoPlayerInput() {
         if (!this.player_no_input) {
             EscapeSoundManager.getInstance(this.context).pauseMediaPlayer();
-            EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).msc_level_beat);
+            EscapeSoundManager.getInstance(this.context).playLevelBeatMusic();
         }
 
         this.player_no_input = true;
@@ -925,7 +932,11 @@ public class GameState {
                 } else {
                     this.running = false;
                     Bundle bundle = ActivityOptionsCompat.makeCustomAnimation(this.context, android.R.anim.fade_in, android.R.anim.fade_out).toBundle();
-                    this.context.startActivity(new Intent(this.context, FinishStageActivity.class), bundle);
+                    Intent intent = new Intent(this.context, FinishStageActivity.class);
+                    intent.putExtra("current_deaths", this.current_deaths);
+                    intent.putExtra("next_level", this.user.currentLevel); //user has already been updated with next level
+                    intent.putExtra("screen_width", this.screenWidth);
+                    this.context.startActivity(intent, bundle);
                 }
             } else if (!this.started) {
                 this.started = true;
@@ -967,15 +978,6 @@ public class GameState {
      * @since 0.1
      */
     public void load(int level) {
-
-        if(this.user.currentLevel > HighscoreActivity.TOTAL_LEVELS) {
-            Highscore finalscore = new Highscore(this.user.name, 0, this.user.deathsTotal);
-            Concurrency.executeAsync(() -> insertHighscore(finalscore));
-            this.outro = true;
-            this.running = false;
-            return;
-        }
-
         this.started = false;
         this.paused = false;
         this.finished = false;

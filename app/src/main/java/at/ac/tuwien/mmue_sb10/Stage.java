@@ -22,7 +22,6 @@ import java.io.InputStreamReader;
 
 public class Stage {
     public String stage_name; //name of the stage
-    public int stage_level; //id of the stage
     public int player_start_x, player_start_y; //starting position of player
     public float player_velocity_x; //how far player moves forward
     public float stage_scale; //scaling of the stage. scale * density = stage_scale
@@ -85,8 +84,7 @@ public class Stage {
             while ((line = reader.readLine()) != null) {
                 switch (line) {
                     case "#info":
-                        line = reader.readLine();
-                        this.stage_name = line.split("=")[1];
+                        this.stage_name = context.getResources().getString(context.getResources().getIdentifier("stage" + level, "string", context.getPackageName()));
                         line = reader.readLine();
                         this.stage_scale = this.density * Float.parseFloat(line.split("=")[1]);
                         line = reader.readLine();
