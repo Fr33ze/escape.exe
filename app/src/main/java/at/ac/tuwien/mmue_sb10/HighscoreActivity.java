@@ -44,8 +44,6 @@ public class HighscoreActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-
-
         View decorView = getWindow().getDecorView();
         int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_FULLSCREEN;
@@ -72,6 +70,12 @@ public class HighscoreActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+        EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
+        finish();
+    }
+
+    public void onClickBack(View v) {
+        EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
         finish();
     }
 
@@ -147,9 +151,14 @@ public class HighscoreActivity extends Activity {
                 final TableRow tableRow = (TableRow) getLayoutInflater().inflate(R.layout.tablerow_highscore, null);
                 TextView text;
 
-                //Level
-                text = tableRow.findViewById(R.id.aaa);
-                text.setText("Level " + filtered.get(i).level);
+                if(level > 0) {
+                    //Level
+                    text = tableRow.findViewById(R.id.aaa);
+                    text.setText("Level " + filtered.get(i).level);
+                } else {
+                    text = tableRow.findViewById(R.id.aaa);
+                    text.setText("Ja");
+                }
 
                 //Deaths
                 text = tableRow.findViewById(R.id.bbb);

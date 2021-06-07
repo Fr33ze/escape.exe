@@ -10,6 +10,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 
@@ -28,8 +29,6 @@ public class GameActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-        gameView = findViewById(R.id.gameView);
     }
 
     /**
@@ -58,6 +57,19 @@ public class GameActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+
+        gameView = findViewById(R.id.gameView);
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
     @Override

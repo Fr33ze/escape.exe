@@ -16,6 +16,9 @@
     <string name="name_d"> Name:</string>
     <string name="new_exe"> Create New Executable </string>
     <string name="override"> Override </string>
+    <string name="controls"> Controls </string>
+    <string name="control_jump"> Tap to jump </string>
+    <string name="control_gravity"> Tap to change\ngravity </string>
 
     <string name="new_game_warning_title"> Override existing File? </string>
     <string name="new_game_warning"> Warning: This will overwrite the current file </string>

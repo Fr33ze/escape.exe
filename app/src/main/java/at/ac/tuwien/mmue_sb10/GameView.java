@@ -58,13 +58,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
      */
     public GameView(Context context) {
         super(context);
-        Display dsp = ((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        this.fps = dsp.getRefreshRate();
-        DisplayMetrics dm = new DisplayMetrics();
-        dsp.getMetrics(dm);
-        this.density = dm.density;
-        this.screenWidth = dm.widthPixels;
-        this.screenHeigth = dm.heightPixels;
         getHolder().addCallback(this);
         setFocusable(true);
     }
@@ -78,13 +71,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
      */
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        Display dsp = ((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        this.fps = dsp.getRefreshRate();
-        DisplayMetrics dm = new DisplayMetrics();
-        dsp.getMetrics(dm);
-        this.density = dm.density;
-        this.screenWidth = dm.widthPixels;
-        this.screenHeigth = dm.heightPixels;
         getHolder().addCallback(this);
         setFocusable(true);
     }
@@ -98,19 +84,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
      */
     public GameView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        Display dsp = ((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        this.fps = dsp.getRefreshRate();
-        DisplayMetrics dm = new DisplayMetrics();
-        dsp.getMetrics(dm);
-        this.density = dm.density;
-        this.screenWidth = dm.widthPixels;
-        this.screenHeigth = dm.heightPixels;
         getHolder().addCallback(this);
         setFocusable(true);
     }
 
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
+        Display dsp = ((WindowManager)getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        this.fps = dsp.getRefreshRate();
+        DisplayMetrics dm = new DisplayMetrics();
+        dsp.getMetrics(dm);
+        this.density = dm.density;
+        this.screenWidth = dm.widthPixels;
+        this.screenHeigth = dm.heightPixels;
         Concurrency.executeAsync(() -> {
             User user = loadUser();
             ((Activity)getContext()).runOnUiThread(() -> onUserLoadedListener.onUserLoaded(user));

@@ -11,7 +11,8 @@
         android:layout_weight="0.37"
         android:fontFamily="@font/joystix_monospace"
         android:textColor="@color/white"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:layout_gravity="center_vertical" />
 
     <TextView
         android:id="@+id/bbb"
@@ -20,7 +21,8 @@
         android:layout_weight="0.37"
         android:fontFamily="@font/joystix_monospace"
         android:textColor="@color/white"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:layout_gravity="center_vertical" />
 
     <TextView
         android:id="@+id/ccc"
@@ -29,6 +31,7 @@
         android:layout_weight="0.26"
         android:fontFamily="@font/joystix_monospace"
         android:textColor="@color/white"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:layout_gravity="center_vertical" />
 
 </TableRow>

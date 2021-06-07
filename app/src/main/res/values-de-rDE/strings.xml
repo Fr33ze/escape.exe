@@ -16,6 +16,9 @@
     <string name="name_d"> Name: </string>
     <string name="new_exe"> Neues Programm erstellen </string>
     <string name="override"> Überschreiben </string>
+    <string name="controls"> Steuerung </string>
+    <string name="control_jump"> Tappe um zu\nspringen </string>
+    <string name="control_gravity"> Tappe um die\nGravitation zu\nändern </string>
 
     <string name="new_game_warning_title"> Spielstand überschreiben? </string>
     <string name="new_game_warning"> Warnung: Dies überschreibt den aktuellen Spielstand </string>

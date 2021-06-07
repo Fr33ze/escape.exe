@@ -81,6 +81,8 @@ public class GameState {
     private RectF exit_touch_zone; //rectangle of the exit button
     private RectF mute_pause_touch_zone; //rectangle of the mute button
 
+    private RectF controls_zone; //rectangle of the controls zone
+
     /*
      * MISC
      */
@@ -109,6 +111,8 @@ public class GameState {
     private Bitmap icon_mute; //icon for the mute button
     private Bitmap icon_sound; //icon for the unmute button
     private Bitmap icon_pause; //icon for the pause button
+    private Bitmap icon_control_jump; //icon showing the jump region
+    private Bitmap icon_control_gravity; //icon showing the gravity region
 
     /*
      * PAINT
@@ -118,6 +122,9 @@ public class GameState {
     private Paint button_paint; //paint for buttons
     private Paint button_text_paint; //paint for text on buttons
     private Paint death_counter_paint; //paint for the death counter
+    private Paint pause_paint; //paint for drawing the pause message
+    private Paint controls_header_paint; //paint for drawing the header of the controls
+    private Paint controls_text_paint; //paint for drawing the controls explanation
 
     /*
      * STRINGS
@@ -157,6 +164,7 @@ public class GameState {
 
         loadPlayerFrames();
         loadDeathCounter();
+        loadControlIcons();
 
         Typeface font_joystix = ResourcesCompat.getFont(this.context, R.font.joystix_monospace);
 
@@ -166,6 +174,26 @@ public class GameState {
         this.text_paint.setTypeface(font_joystix);
         this.text_paint.setTextAlign(Paint.Align.CENTER);
         this.text_paint.setTextSize(20 * this.density);
+
+        this.pause_paint = new Paint();
+        this.pause_paint.setColor(Color.GREEN);
+        this.pause_paint.setStyle(Paint.Style.FILL_AND_STROKE);
+        this.pause_paint.setTypeface(font_joystix);
+        this.pause_paint.setTextAlign(Paint.Align.CENTER);
+        this.pause_paint.setTextSize(24 * this.density);
+
+        this.controls_header_paint = new Paint();
+        this.controls_header_paint.setColor(Color.WHITE);
+        this.controls_header_paint.setStyle(Paint.Style.FILL_AND_STROKE);
+        this.controls_header_paint.setTypeface(font_joystix);
+        this.controls_header_paint.setTextAlign(Paint.Align.CENTER);
+        this.controls_header_paint.setTextSize(26 * this.density);
+
+        this.controls_text_paint = new Paint();
+        this.controls_text_paint.setColor(Color.WHITE);
+        this.controls_text_paint.setTypeface(font_joystix);
+        this.controls_text_paint.setTextAlign(Paint.Align.CENTER);
+        this.controls_text_paint.setTextSize(14 * this.density);
 
         this.trans_paint = new Paint();
         this.trans_paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
@@ -194,9 +222,10 @@ public class GameState {
         this.draw_src = new Rect();
         this.draw_tar = new Rect();
 
-        this.continue_touch_zone = new RectF(this.screenWidth * 0.33f, this.screenHeight / 2 - 10 * this.density, this.screenWidth * 0.66f, this.screenHeight / 2 + 30 * this.density);
-        this.exit_touch_zone = new RectF(this.screenWidth * 0.33f, this.screenHeight / 2 + 70 * this.density, this.screenWidth * 0.66f, this.screenHeight / 2 + 110 * this.density);
         this.mute_pause_touch_zone = new RectF(16 * this.density, 16 * this.density, 66 * this.density, 66 * this.density);
+        this.controls_zone = new RectF(this.screenWidth - 0.3f * this.screenWidth, 0, this.screenWidth, this.screenHeight);
+        this.continue_touch_zone = new RectF((this.screenWidth - this.controls_zone.width()) * 0.25f, this.screenHeight / 2, (this.screenWidth - this.controls_zone.width()) * 0.75f, this.screenHeight / 2 + 40 * this.density);
+        this.exit_touch_zone = new RectF((this.screenWidth - this.controls_zone.width()) * 0.25f, this.screenHeight / 2 + 80 * this.density, (this.screenWidth - this.controls_zone.width()) * 0.75f, this.screenHeight / 2 + 120 * this.density);
         loadMuteIcons();
         loadPauseIcon();
 
@@ -262,6 +291,19 @@ public class GameState {
         Bitmap temp_pause = BitmapFactory.decodeResource(context.getResources(), R.drawable.icon_pause, o);
         this.icon_pause = Bitmap.createScaledBitmap(
                 temp_pause, (int) (this.mute_pause_touch_zone.width()), (int) (mute_pause_touch_zone.height()), true
+        );
+    }
+
+    private void loadControlIcons() {
+        BitmapFactory.Options o = new BitmapFactory.Options();
+        o.inScaled = false;
+        Bitmap temp_jumpgravity = BitmapFactory.decodeResource(context.getResources(), R.drawable.phone_gravity, o);
+        this.icon_control_jump = Bitmap.createScaledBitmap(
+                temp_jumpgravity, (int) (temp_jumpgravity.getWidth() * 1.75f * this.density), (int) (temp_jumpgravity.getHeight() * 1.75f * this.density), false
+        );
+        temp_jumpgravity = BitmapFactory.decodeResource(context.getResources(), R.drawable.phone_jump, o);
+        this.icon_control_gravity = Bitmap.createScaledBitmap(
+                temp_jumpgravity, (int) (temp_jumpgravity.getWidth() * 1.75f * this.density), (int) (temp_jumpgravity.getHeight() * 1.75f * this.density), false
         );
     }
 
@@ -666,7 +708,7 @@ public class GameState {
             c.drawText(this.stage.stage_name + " " + finished_next_level, this.screenWidth / 2, this.screenHeight / 2, this.text_paint);
         } else if (this.start_circle_radius < 1) {
             //Stage has started. Draw expanding circle first second
-            this.start_circle_canvas.drawCircle((this.player_pos_x + PLAYER_WIDTH / 2) * this.stage.stage_scale, (this.player_pos_y + PLAYER_HEIGTH / 2) * this.stage.stage_scale, this.start_circle_radius * this.screenWidth, trans_paint);
+            this.start_circle_canvas.drawCircle((this.player_pos_x + PLAYER_WIDTH / 2f) * this.stage.stage_scale, (this.player_pos_y + PLAYER_HEIGTH / 2f) * this.stage.stage_scale, this.start_circle_radius * this.screenWidth, trans_paint);
             c.drawBitmap(start_circle_bmp, 0, 0, null);
         } else if (this.player_no_input) {
             drawFadeout(c, deltaFrameTime, 2500, 255);
@@ -680,8 +722,8 @@ public class GameState {
      * @param c Canvas to draw the death counter onto
      */
     private void drawDeathCounter(Canvas c) {
-        c.drawBitmap(this.death_counter_icon, 10 * this.density, c.getHeight() - this.death_counter_icon.getHeight() - 10 * this.density, null);
-        c.drawText("" + this.user.deathsCurrentLevel, 48 * this.density, c.getHeight() - 13 * this.density - this.death_counter_icon.getHeight() / 2f - this.death_counter_paint.ascent() / 2, this.death_counter_paint);
+        c.drawBitmap(this.death_counter_icon, 16 * this.density, c.getHeight() - this.death_counter_icon.getHeight() - 16 * this.density, null);
+        c.drawText("" + this.user.deathsCurrentLevel, 54 * this.density, c.getHeight() - 19 * this.density - this.death_counter_icon.getHeight() / 2f - this.death_counter_paint.ascent() / 2, this.death_counter_paint);
     }
 
     /**
@@ -690,15 +732,31 @@ public class GameState {
      * @param c Canvas to draw the pause screen onto
      */
     private void drawPauseScreen(Canvas c) {
-        c.drawText(context.getResources().getText(R.string.pause_game).toString(), this.screenWidth / 2, this.screenHeight / 3, this.text_paint);
+        c.drawText(context.getResources().getText(R.string.pause_game).toString(), (this.screenWidth - this.controls_zone.width()) / 2, this.screenHeight / 2 - 40 * this.density, this.pause_paint);
         c.drawRect(this.continue_touch_zone, this.button_paint);
         c.drawRect(this.exit_touch_zone, this.button_paint);
         c.drawText(context.getResources().getText(R.string.continue_game).toString(), this.continue_touch_zone.centerX(), this.continue_touch_zone.centerY() - this.button_text_paint.ascent() / 2 - 2 * this.density, this.button_text_paint);
         c.drawText(context.getResources().getText(R.string.backtomain).toString(), this.exit_touch_zone.centerX(), this.exit_touch_zone.centerY() - this.button_text_paint.ascent() / 2 - 2 * this.density, this.button_text_paint);
+
+        c.drawRect(this.controls_zone, this.button_paint);
+        c.drawText(this.context.getResources().getText(R.string.controls).toString(), this.controls_zone.centerX(), this.screenHeight * 0.2f, this.controls_header_paint);
+        drawMultiLineText(c, this.context.getResources().getText(R.string.control_gravity).toString(), this.controls_zone.centerX(), this.controls_zone.centerY() - 0.05f * this.screenHeight + this.button_text_paint.getTextSize(), this.controls_text_paint);
+        drawMultiLineText(c, this.context.getResources().getText(R.string.control_jump).toString(), this.controls_zone.centerX(), this.controls_zone.centerY() + this.icon_control_jump.getHeight() + 0.2f * this.screenHeight + this.button_text_paint.getTextSize(), this.controls_text_paint);
+
+        c.drawBitmap(this.icon_control_gravity, this.controls_zone.centerX() - this.icon_control_gravity.getWidth() / 2f, this.controls_zone.centerY() - 0.05f * this.screenHeight - this.icon_control_gravity.getHeight(), null);
+        c.drawBitmap(this.icon_control_jump, this.controls_zone.centerX() - this.icon_control_jump.getWidth() / 2f, this.controls_zone.centerY() + 0.2f * this.screenHeight, null);
+
         if (EscapeSoundManager.getInstance(this.context).isMuted()) {
             c.drawBitmap(this.icon_mute, this.mute_pause_touch_zone.left, this.mute_pause_touch_zone.top, null);
         } else {
             c.drawBitmap(this.icon_sound, this.mute_pause_touch_zone.left, this.mute_pause_touch_zone.top, null);
+        }
+    }
+
+    private void drawMultiLineText(Canvas c, String text, float x, float y, Paint paint) {
+        String[] lines = text.split("\n");
+        for(int i = 0; i < lines.length; i++, y += paint.getTextSize() + 2 * this.density) {
+            c.drawText(lines[i], x, y, paint);
         }
     }
 

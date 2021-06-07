@@ -5,7 +5,7 @@ music=techno03
 background=bg3
 
 #player
-startx=1
+startx=2
 starty=8
 velocityx=100
 
