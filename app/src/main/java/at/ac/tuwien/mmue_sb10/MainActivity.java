@@ -169,11 +169,16 @@ public class MainActivity extends Activity {
     }
 
     private void onUserLoaded(User user) {
-        if (user == null)
-            return;
-
-        this.user = user;
-        findViewById(R.id.btn_start).setVisibility(View.VISIBLE);
+        if (user == null) {
+            mmenu_text = findViewById(R.id.mmenu_text);
+            if(mmenu_text.getText().toString().equals(getResources().getString(R.string.continue_game)) || mmenu_text.getText().toString().equals(getResources().getString(R.string.new_game))) {
+                mmenu_text.setText(R.string.thanks);
+            }
+            findViewById(R.id.btn_start).setVisibility(View.GONE);
+        } else {
+            this.user = user;
+            findViewById(R.id.btn_start).setVisibility(View.VISIBLE);
+        }
     }
 
     /**

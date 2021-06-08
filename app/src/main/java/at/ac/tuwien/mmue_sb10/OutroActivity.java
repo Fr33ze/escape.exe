@@ -1,8 +1,11 @@
 package at.ac.tuwien.mmue_sb10;
 
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.res.ResourcesCompat;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -22,6 +25,12 @@ public class OutroActivity extends Activity {
     }
 
     @Override
+    protected void onRestart() {
+        finish();
+        super.onRestart();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
 
@@ -34,7 +43,12 @@ public class OutroActivity extends Activity {
         muteBtn = findViewById(R.id.btn_mute_outro);
         videoView = findViewById(R.id.outroView);
         videoView.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.outro)); //TODO
-        videoView.setOnCompletionListener(mp -> finish());
+        videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                startEndScreen();
+            }
+        });
         videoView.start();
 
         EscapeSoundManager.getInstance(this).releaseMediaPlayer();
@@ -73,6 +87,11 @@ public class OutroActivity extends Activity {
         //EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
         videoView.stopPlayback();
         videoView.suspend();
-        finish();
+        startEndScreen();
+    }
+
+    private void startEndScreen() {
+        Bundle bundle = ActivityOptionsCompat.makeCustomAnimation(this, android.R.anim.fade_in, android.R.anim.fade_out).toBundle();
+        startActivity(new Intent(this, FinishGameActivity.class), bundle);
     }
 }

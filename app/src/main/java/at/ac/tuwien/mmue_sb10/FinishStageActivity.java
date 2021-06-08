@@ -75,7 +75,12 @@ public class FinishStageActivity extends Activity {
 
         current_level_label.setText("" + (next_level - 1));
         deaths_level_label.setText("" + current_deaths);
-        next_level_label.setText(next_level + " - " + next_name);
+
+        if(next_level > HighscoreActivity.TOTAL_LEVELS) {
+            next_level_label.setText("-");
+        } else {
+            next_level_label.setText(next_level + " - " + next_name);
+        }
     }
 
     @Override

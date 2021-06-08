@@ -136,6 +136,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
      */
     private void onUserLoaded(User user) {
         if(user.currentLevel > HighscoreActivity.TOTAL_LEVELS) {
+
+            Concurrency.executeAsync(this::deleteUser);
+
             ((Activity) getContext()).finish();
             return;
         }
@@ -185,5 +188,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         else
             user = null;
         return user;
+    }
+
+    /**
+     * Deletes the current User from the database
+     */
+    private void deleteUser() {
+        EscapeDatabase.getInstance(getContext()).userDao().deleteAllUsers();
     }
 }
