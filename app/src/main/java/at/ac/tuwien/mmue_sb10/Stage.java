@@ -87,7 +87,10 @@ public class Stage {
             while ((line = reader.readLine()) != null) {
                 switch (line) {
                     case "#info":
-                        this.stage_name = context.getResources().getString(context.getResources().getIdentifier("stage" + level, "string", context.getPackageName()));
+                        if(level > 0)
+                            this.stage_name = context.getResources().getString(context.getResources().getIdentifier("stage" + level, "string", context.getPackageName()));
+                        else
+                            this.stage_name = context.getResources().getString(context.getResources().getIdentifier("stage_" + Math.abs(level), "string", context.getPackageName()));
                         line = reader.readLine();
                         this.stage_scale = this.density * Float.parseFloat(line.split("=")[1]);
                         line = reader.readLine();

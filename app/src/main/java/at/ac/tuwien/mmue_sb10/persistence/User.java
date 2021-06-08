@@ -16,10 +16,16 @@ public class User implements Serializable {
     public int deathsTotal;
     public int deathsCurrentLevel;
 
-    public User(String name) {
+    public User() {}
+
+    public User(String name, boolean tutorial) {
         this.name = name;
-        this.currentLevel = 1;
         this.deathsCurrentLevel = 0;
         this.deathsTotal = 0;
+
+        if (tutorial)
+            this.currentLevel = -5;
+        else
+            this.currentLevel = 1;
     }
 }

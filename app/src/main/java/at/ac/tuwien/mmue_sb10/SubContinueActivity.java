@@ -22,7 +22,12 @@ public class SubContinueActivity extends Activity {
         setContentView(R.layout.activity_sub_continue);
         user = (User)getIntent().getSerializableExtra("user");
         ((TextView)findViewById(R.id.currentPlayer)).setText(user.name);
-        ((TextView)findViewById(R.id.level)).setText("" + user.currentLevel);
+        if (user.currentLevel > 0)
+            ((TextView)findViewById(R.id.level)).setText("" + user.currentLevel);
+        else if (user.currentLevel == 0)
+            ((TextView)findViewById(R.id.level)).setText("1");
+        else
+            ((TextView)findViewById(R.id.level)).setText("Tutorial " + (user.currentLevel + 6)); //there are 5 tutorial level and level 0 is unused
         ((TextView)findViewById(R.id.totaldeaths)).setText("" + user.deathsTotal);
     }
 

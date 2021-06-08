@@ -18,6 +18,7 @@
     <string name="controls">Steuerung</string>
     <string name="control_jump">Tappe um zu\nspringen</string>
     <string name="control_gravity">Tappe um die\nGravitation zu\nändern</string>
+    <string name="play_tutorial">Spiele Tutorial</string>
 
     <string name="new_game_warning_title">Spielstand überschreiben?</string>
     <string name="new_game_warning">Warnung: Dies überschreibt den aktuellen Spielstand</string>
@@ -40,6 +41,11 @@
     <string name="splashscreen_nextlevel">Nächstes Level</string>
 
     <!--STAGE NAMES-->
+    <string name="stage_5">Tutorial 1</string>
+    <string name="stage_4">Tutorial 2</string>
+    <string name="stage_3">Tutorial 3</string>
+    <string name="stage_2">Tutorial 4</string>
+    <string name="stage_1">Tutorial 5</string>
     <string name="stage1">Stage 1</string>
     <string name="stage2">Stage 2</string>
     <string name="stage3">Stage 3</string>

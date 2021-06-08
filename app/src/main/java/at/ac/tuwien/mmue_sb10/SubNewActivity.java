@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.CheckBox;
 import android.widget.EditText;
 
 import at.ac.tuwien.mmue_sb10.persistence.EscapeDatabase;
@@ -16,6 +17,7 @@ import at.ac.tuwien.mmue_sb10.util.Concurrency;
 
 public class SubNewActivity extends Activity {
 
+    CheckBox checkBox;
     User user;
     String newusername;
 
@@ -30,6 +32,16 @@ public class SubNewActivity extends Activity {
         super.onResume();
 
         user = (User)getIntent().getSerializableExtra("user");
+
+        checkBox = findViewById(R.id.tutorialCheckbox);
+
+        DisplayMetrics dm = new DisplayMetrics();
+        ((WindowManager)getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRealMetrics(dm);
+
+        checkBox.setPadding(checkBox.getPaddingLeft() + (int)(10 * dm.density),
+                checkBox.getPaddingTop(),
+                checkBox.getPaddingRight(),
+                checkBox.getPaddingBottom());
 
         View decorView = getWindow().getDecorView();
         int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
@@ -91,7 +103,7 @@ public class SubNewActivity extends Activity {
             setContentView(R.layout.activity_sub_new_confirm);
         } else {
             newusername = ((EditText)findViewById(R.id.editTextTextPersonName)).getText().toString();
-            Concurrency.executeAsync(() -> saveUser(new User(newusername)));
+            Concurrency.executeAsync(() -> saveUser(new User(newusername, checkBox.isChecked())));
             startActivity(new Intent(this, GameActivity.class));
         }
     }
@@ -99,8 +111,12 @@ public class SubNewActivity extends Activity {
     public void onClickStartConfirm(View v) {
         EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
         Concurrency.executeAsync(this::deleteUser);
-        Concurrency.executeAsync(() -> saveUser(new User(newusername)));
+        Concurrency.executeAsync(() -> saveUser(new User(newusername, checkBox.isChecked())));
         startActivity(new Intent(this, GameActivity.class));
+    }
+
+    public void onClickCheckbox(View v) {
+        EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
     }
 
     /**

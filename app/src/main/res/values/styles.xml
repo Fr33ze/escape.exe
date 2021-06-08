@@ -16,4 +16,11 @@
         <item name="android:fontFamily">@font/joystix_monospace</item>
         <item name="android:background">@drawable/edittext</item>
     </style>
+
+    <style name="checkbox" parent="android:Widget.CompoundButton.CheckBox">
+        <item name="android:fontFamily">@font/joystix_monospace</item>
+        <item name="android:textColor">@color/android_gray</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:button">@drawable/checkbox</item>
+    </style>
 </resources>

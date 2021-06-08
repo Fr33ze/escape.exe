@@ -861,18 +861,28 @@ public class GameState {
         if (this.update_user) {
             EscapeSoundManager.getInstance(this.context).stopSoundLoop();
 
-            Highscore highscore = new Highscore(this.user.name, this.user.currentLevel, this.user.deathsCurrentLevel);
-            Concurrency.executeAsync(() -> insertHighscore(highscore));
+            if(this.user.currentLevel > 0) {
+                Highscore highscore = new Highscore(this.user.name, this.user.currentLevel, this.user.deathsCurrentLevel);
+                Concurrency.executeAsync(() -> insertHighscore(highscore));
 
-            this.current_deaths = this.user.deathsCurrentLevel;
+                this.current_deaths = this.user.deathsCurrentLevel;
 
-            this.user.currentLevel++;
-            this.user.deathsCurrentLevel = 0;
-            Concurrency.executeAsync(() -> updateUser(this.user));
+                this.user.currentLevel++;
+                this.user.deathsCurrentLevel = 0;
+                Concurrency.executeAsync(() -> updateUser(this.user));
 
-            if(this.user.currentLevel > HighscoreActivity.TOTAL_LEVELS) {
-                Highscore finalscore = new Highscore(this.user.name, 0, this.user.deathsTotal);
-                Concurrency.executeAsync(() -> insertHighscore(finalscore));
+                if (this.user.currentLevel > HighscoreActivity.TOTAL_LEVELS) {
+                    Highscore finalscore = new Highscore(this.user.name, 0, this.user.deathsTotal);
+                    Concurrency.executeAsync(() -> insertHighscore(finalscore));
+                }
+            } else {
+                this.current_deaths = this.user.deathsCurrentLevel;
+                this.user.currentLevel++;
+                if(this.user.currentLevel == 0)
+                    this.user.currentLevel++; //two times to skip level 0
+                this.user.deathsCurrentLevel = 0;
+                this.user.deathsTotal = 0; //tutorial deaths dont count
+                Concurrency.executeAsync(() -> updateUser(this.user));
             }
         }
         this.update_user = false;

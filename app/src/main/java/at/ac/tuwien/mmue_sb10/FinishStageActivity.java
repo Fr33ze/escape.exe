@@ -63,7 +63,6 @@ public class FinishStageActivity extends Activity {
         next_level = getIntent().getIntExtra("next_level", 0);
         screen_width = getIntent().getFloatExtra("screen_width", 1920);
 
-        String next_name = getResources().getString(getResources().getIdentifier("stage" + next_level, "string", getPackageName()));
 
         current_level_label = findViewById(R.id.current_level_label);
         deaths_level_label = findViewById(R.id.deaths_level_label);
@@ -73,13 +72,31 @@ public class FinishStageActivity extends Activity {
         label3 = findViewById(R.id.textView7);
         label4 = findViewById(R.id.textView8);
 
+        String next_name;
+        if (next_level > 0)
+            next_name = getResources().getString(getResources().getIdentifier("stage" + next_level, "string", getPackageName()));
+        else if (next_level == 0)
+            next_name = getResources().getString(getResources().getIdentifier("stage" + (next_level + 1), "string", getPackageName()));
+        else
+            next_name = getResources().getString(getResources().getIdentifier("stage_" + Math.abs(next_level), "string", getPackageName()));
+
+        if (next_level > 1)
         current_level_label.setText("" + (next_level - 1));
+        else if (next_level == 1)
+            current_level_label.setText(getResources().getString(getResources().getIdentifier("stage_" + Math.abs(next_level - 2), "string", getPackageName())));
+        else
+            current_level_label.setText(getResources().getString(getResources().getIdentifier("stage_" + Math.abs(next_level - 1), "string", getPackageName())));
+
         deaths_level_label.setText("" + current_deaths);
 
-        if(next_level > HighscoreActivity.TOTAL_LEVELS) {
-            next_level_label.setText("-");
+        if (next_level > 0) {
+            if (next_level > HighscoreActivity.TOTAL_LEVELS) {
+                next_level_label.setText("-");
+            } else {
+                next_level_label.setText(next_level + " - " + next_name);
+            }
         } else {
-            next_level_label.setText(next_level + " - " + next_name);
+            next_level_label.setText(next_name);
         }
     }
 
