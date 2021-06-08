@@ -110,7 +110,7 @@ public class GameState {
     private float trans_x_unscaled = 0; //draw-translation on x axis unscaled
     private float trans_y_unscaled = 0; //draw-translation on y axis unscaled
     private Rect draw_src; //source rectangle for the region of the map to draw
-    private Rect draw_tar; //target rectangle on the screen (full screen)
+    private RectF draw_tar; //target rectangle on the screen (full screen)
     private float start_circle_radius; //interpolates between 0 and 1
     private Bitmap start_circle_bmp; //bitmap for the expanding circle at the start
     private Canvas start_circle_canvas; //canvas to draw on start_circle_bmp
@@ -231,7 +231,7 @@ public class GameState {
         this.start_circle_canvas = new Canvas(this.start_circle_bmp);
 
         this.draw_src = new Rect();
-        this.draw_tar = new Rect();
+        this.draw_tar = new RectF();
 
         this.mute_pause_touch_zone = new RectF(16 * this.density, 16 * this.density, 66 * this.density, 66 * this.density);
         this.controls_zone = new RectF(this.screenWidth - 0.3f * this.screenWidth, 0, this.screenWidth, this.screenHeight);
@@ -604,8 +604,23 @@ public class GameState {
     }*/
 
     private void drawMap(Canvas c) {
+        /*this.draw_src.set(
+                (int) (this.trans_x_unscaled),
+                (int) (this.trans_y_unscaled),
+                (int) (c.getWidth() / this.stage.stage_scale + this.trans_x_unscaled),
+                (int) (c.getHeight() / this.stage.stage_scale + this.trans_y_unscaled)
+        );
+
+        this.draw_tar.set(
+                0,
+                0,
+                c.getWidth() / this.stage.stage_scale,
+                c.getHeight() / this.stage.stage_scale
+        );*/
+
         c.scale(this.stage.stage_scale, this.stage.stage_scale);
         c.drawBitmap(this.stage.stage_foreground, -this.trans_x_unscaled, -this.trans_y_unscaled, null);
+        //c.drawBitmap(this.stage.stage_foreground, this.draw_src, this.draw_tar, null);
         c.scale(1 / this.stage.stage_scale, 1 / this.stage.stage_scale);
     }
 
