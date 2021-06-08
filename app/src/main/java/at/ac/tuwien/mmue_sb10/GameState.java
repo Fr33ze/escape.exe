@@ -920,7 +920,7 @@ public class GameState {
                     EscapeSoundManager.getInstance(this.context).toggleMute(this.stage.current_music_id);
                     EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).snd_button);
                 }
-            } else if (this.mute_pause_touch_zone.contains(event.getX(), event.getY()) && !this.player_no_input) {
+            } else if (this.mute_pause_touch_zone.contains(event.getX(), event.getY()) && !this.player_no_input && !this.player_dead && !this.finished) {
                 this.paused = true;
                 EscapeSoundManager.getInstance(this.context).stopSoundLoop();
                 EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).snd_button);
