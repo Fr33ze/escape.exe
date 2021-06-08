@@ -26,11 +26,12 @@ public class Stage {
     public float player_velocity_x; //how far player moves forward
     public float stage_scale; //scaling of the stage. scale * density = stage_scale
     public int[][] stage_collision; //array of tile behavior
+    //public int[][] stage_tiles; //array of the tile numbers
     public Bitmap stage_foreground; //stage tiles put together (scaled)
-    public Bitmap stage_background; //stage background (scaled)
+    private Bitmap stage_background; //stage background (scaled)
     public int current_music_id; //resource id of the bg music
 
-    private Bitmap[] tiles_textures; //all tiles of the tileset in 24x24 format
+    public Bitmap[] tiles_textures; //all tiles of the tileset in 24x24 format
     private int[] tiles_collision; //all tile behaviors of the tileset. uses same id as tiles_textures
     private int stage_width_tiles; //width in tiles
     private int stage_heigth_tiles; //heigth in tiles
@@ -63,10 +64,12 @@ public class Stage {
         int h = tileset.getWidth() / 24;
         int v = tileset.getHeight() / 24;
         tiles_textures = new Bitmap[h * v];
+        //this.stage_scale = this.density * 1.3f;
         int tilenumber = 0;
         for (int x = 0; x < h; x++) {
             for (int y = 0; y < v; y++) {
                 tiles_textures[tilenumber] = Bitmap.createBitmap(tileset, x * 24, y * 24, 24, 24);
+                //tiles_textures[tilenumber] = Bitmap.createScaledBitmap(Bitmap.createBitmap(tileset, x * 24, y * 24, 24, 24), (int)(24 * this.stage_scale), (int)(24 * this.stage_scale), false);
                 tilenumber++;
             }
         }
@@ -109,6 +112,7 @@ public class Stage {
                         this.stage_width_tiles = Integer.parseInt(line.split("=")[1]);
                         line = reader.readLine();
                         this.stage_heigth_tiles = Integer.parseInt(line.split("=")[1]);
+                        //this.stage_tiles = new int[this.stage_width_tiles][this.stage_heigth_tiles];
                         this.stage_foreground = Bitmap.createBitmap(stage_width_tiles * 24, stage_heigth_tiles * 24, Bitmap.Config.ARGB_8888);
                         canvas = new Canvas(this.stage_foreground);
                         this.stage_collision = new int[stage_width_tiles][stage_heigth_tiles];
@@ -123,7 +127,10 @@ public class Stage {
                                     int tile_id = Integer.parseInt(tilesInLine[x]);
                                     canvas.drawBitmap(tiles_textures[tile_id], null, new RectF(x * 24, y * 24, x * 24 + 24, y * 24 + 24), null);
                                     stage_collision[x][y] = tiles_collision[tile_id];
-                                }
+                                    //this.stage_tiles[x][y] = tile_id;
+                                } /*else {
+                                    this.stage_tiles[x][y] = -1;
+                                }*/
                             }
                         }
                         break;

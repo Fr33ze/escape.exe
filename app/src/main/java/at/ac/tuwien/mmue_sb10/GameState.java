@@ -27,6 +27,8 @@ import android.view.MotionEvent;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.res.ResourcesCompat;
 
+import java.util.ArrayList;
+
 import at.ac.tuwien.mmue_sb10.persistence.EscapeDatabase;
 import at.ac.tuwien.mmue_sb10.persistence.Highscore;
 import at.ac.tuwien.mmue_sb10.persistence.User;
@@ -131,6 +133,7 @@ public class GameState {
     private Paint pause_paint; //paint for drawing the pause message
     private Paint controls_header_paint; //paint for drawing the header of the controls
     private Paint controls_text_paint; //paint for drawing the controls explanation
+    private Paint mapPaint; //used for efficient drawing map
 
     /*
      * STRINGS
@@ -202,6 +205,9 @@ public class GameState {
 
         this.trans_paint = new Paint();
         this.trans_paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+
+        this.mapPaint = new Paint();
+        this.mapPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER));
 
         this.button_paint = new Paint();
         this.button_paint.setColor(this.context.getResources().getColor(R.color.android_gray));
@@ -573,7 +579,7 @@ public class GameState {
      *
      * @param c Canvas to draw the level onto
      */
-    private void drawMap(Canvas c) {
+    /*private void drawMap(Canvas c) {
         this.draw_src.set(
                 (int) (this.trans_x_unscaled),
                 (int) (this.trans_y_unscaled),
@@ -595,7 +601,41 @@ public class GameState {
                 this.draw_tar,
                 null
         );
+    }*/
+
+    private void drawMap(Canvas c) {
+        c.scale(this.stage.stage_scale, this.stage.stage_scale);
+        c.drawBitmap(this.stage.stage_foreground, -this.trans_x_unscaled, -this.trans_y_unscaled, null);
+        c.scale(1 / this.stage.stage_scale, 1 / this.stage.stage_scale);
     }
+
+    /*private void drawMap(Canvas c) {
+        int screentransx = (int)(trans_x % this.stage.tile_size_scaled);
+        int screentransy = (int)(trans_y % this.stage.tile_size_scaled);
+        int startx = (int)(this.trans_x / this.stage.tile_size_scaled);
+        int endx = startx + (int)(this.screenWidth / this.stage.tile_size_scaled) + 1;
+        int starty = (int)(this.trans_y / this.stage.tile_size_scaled);
+        int endy = starty + (int)(this.screenHeight / this.stage.tile_size_scaled) + 1;
+
+        for(int y = starty; y < endy; y++) {
+            for(int x = startx; x < endx; x++) {
+                if(this.stage.stage_tiles[x][y] != -1) {
+                    c.drawBitmap(
+                            this.stage.tiles_textures[this.stage.stage_tiles[x][y]],
+                            (x - startx) * (int) (this.stage.tile_size_scaled) - screentransx,
+                            (y - starty) * (int) (this.stage.tile_size_scaled) - screentransy,
+                            mapPaint);
+                } else {
+                    c.drawBitmap(
+                            this.stage.stage_background,
+                            null,
+                            new Rect((x - startx) * (int) (this.stage.tile_size_scaled) - screentransx, (y - starty) * (int) (this.stage.tile_size_scaled) - screentransy, (x - startx) * (int) (this.stage.tile_size_scaled) - screentransx + (int)this.stage.tile_size_scaled, (y - starty) * (int) (this.stage.tile_size_scaled) - screentransy + (int)this.stage.tile_size_scaled),
+                            mapPaint
+                    );
+                }
+            }
+        }
+    }*/
 
     /**
      * Draws the current player frame fully transformed
@@ -920,7 +960,7 @@ public class GameState {
                     EscapeSoundManager.getInstance(this.context).toggleMute(this.stage.current_music_id);
                     EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).snd_button);
                 }
-            } else if (this.mute_pause_touch_zone.contains(event.getX(), event.getY()) && !this.player_no_input && !this.player_dead && !this.finished) {
+            } else if (this.mute_pause_touch_zone.contains(event.getX(), event.getY()) && !this.player_no_input && !this.player_dead && !this.finished && this.started) {
                 this.paused = true;
                 EscapeSoundManager.getInstance(this.context).stopSoundLoop();
                 EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).snd_button);
