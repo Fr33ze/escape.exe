@@ -69,6 +69,8 @@ public class FinishGameActivity extends Activity {
             return;
         touched = true;
 
+        MainActivity.show_thanks = true;
+
         finish();
     }
 }

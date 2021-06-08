@@ -783,7 +783,10 @@ public class GameState {
      */
     private void drawDeathCounter(Canvas c) {
         c.drawBitmap(this.death_counter_icon, 16 * this.density, c.getHeight() - this.death_counter_icon.getHeight() - 16 * this.density, null);
-        c.drawText("" + this.user.deathsCurrentLevel, 54 * this.density, c.getHeight() - 19 * this.density - this.death_counter_icon.getHeight() / 2f - this.death_counter_paint.ascent() / 2, this.death_counter_paint);
+        if(this.user.deathsCurrentLevel < 1000)
+            c.drawText("" + this.user.deathsCurrentLevel, 54 * this.density, c.getHeight() - 19 * this.density - this.death_counter_icon.getHeight() / 2f - this.death_counter_paint.ascent() / 2, this.death_counter_paint);
+        else
+            c.drawText("oof", 54 * this.density, c.getHeight() - 19 * this.density - this.death_counter_icon.getHeight() / 2f - this.death_counter_paint.ascent() / 2, this.death_counter_paint);
     }
 
     /**
@@ -899,6 +902,7 @@ public class GameState {
 
         this.player_no_input = true;
         this.gravity = 1;
+        this.player_boost_x = 1.0f;
         if (this.player_velocity_y < 0)
             this.player_velocity_y = 0;
     }
@@ -1087,6 +1091,8 @@ public class GameState {
      * @since 0.1
      */
     private void retry() {
+        this.trans_x = 0;
+        this.trans_y = 0;
         this.player_pos_x = stage.player_start_x * 24;
         this.player_pos_y = stage.player_start_y * 24;
         this.player_velocity_x = stage.player_velocity_x;

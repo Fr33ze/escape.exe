@@ -31,6 +31,8 @@ public class MainActivity extends Activity {
 
     private final OnUserLoadedListener onUserLoadedListener = this::onUserLoaded;
 
+    public static boolean show_thanks = false;
+
     private User user;
     private TextView mmenu_text;
 
@@ -91,6 +93,8 @@ public class MainActivity extends Activity {
     public void onClickNewGame(View v) {
         EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
 
+        show_thanks = false;
+
         mmenu_text.setText(R.string.new_game);
         mmenu_text.setBackgroundColor(getResources().getColor(R.color.green));
         DisplayMetrics dm = new DisplayMetrics();
@@ -125,6 +129,9 @@ public class MainActivity extends Activity {
      */
     public void onClickContinue(View v) {
         EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
+
+        show_thanks = false;
+
         mmenu_text.setText(R.string.continue_game);
         mmenu_text.setBackgroundColor(getResources().getColor(R.color.green));
         DisplayMetrics dm = new DisplayMetrics();
@@ -143,6 +150,9 @@ public class MainActivity extends Activity {
 
     public void onClickHighscores(View v) {
         EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
+
+        show_thanks = false;
+
         mmenu_text.setText(R.string.highscores);
         mmenu_text.setBackgroundColor(getResources().getColor(R.color.green));
         DisplayMetrics dm = new DisplayMetrics();
@@ -165,13 +175,16 @@ public class MainActivity extends Activity {
      */
     public void onClickQuit(View v) {
         EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
+
+        show_thanks = false;
+
         finishAffinity();
     }
 
     private void onUserLoaded(User user) {
         if (user == null) {
             mmenu_text = findViewById(R.id.mmenu_text);
-            if(mmenu_text.getText().toString().equals(getResources().getString(R.string.continue_game)) || mmenu_text.getText().toString().equals(getResources().getString(R.string.new_game))) {
+            if(show_thanks) {
                 mmenu_text.setText(R.string.thanks);
             }
             findViewById(R.id.btn_start).setVisibility(View.GONE);
