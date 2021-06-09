@@ -345,7 +345,7 @@ public class GameState {
         this.player_collision_px.set(this.player_pos_x + this.player_move_x, this.player_pos_y + this.player_move_y, this.player_pos_x + this.player_move_x + PLAYER_WIDTH, this.player_pos_y + this.player_move_y + PLAYER_HEIGTH);
         this.player_collision_tiles.set((int) (this.player_collision_px.left / 24), (int) (this.player_collision_px.top / 24), (int) (this.player_collision_px.right / 24), (int) (this.player_collision_px.bottom / 24));
 
-        if (this.player_collision_tiles.left >= 0 && this.player_collision_tiles.top >= 0 && this.player_collision_tiles.right < this.stage.stage_collision.length && this.player_collision_tiles.bottom <= this.stage.stage_collision[0].length) {
+        if (this.player_collision_tiles.left >= 0 && this.player_collision_tiles.top >= 0 && this.player_collision_tiles.right < this.stage.stage_collision.length && this.player_collision_tiles.bottom < this.stage.stage_collision[0].length) {
             //Player is inside bounds => CHECK COLLISION!
             this.collision_corners[0] = this.stage.stage_collision[this.player_collision_tiles.left][this.player_collision_tiles.top]; //TopLeft
             this.collision_corners[1] = this.stage.stage_collision[this.player_collision_tiles.right][this.player_collision_tiles.top]; //TopRight
@@ -389,6 +389,8 @@ public class GameState {
                             boostPlayerRight();
                         } else if (collision_corners[0] == 5 || collision_corners[3] == 5 || collision_corners[1] == 5 || collision_corners[2] == 5) {
                             boostPlayerLeft();
+                        } else if (collision_corners[0] == 8 || collision_corners[3] == 8 || collision_corners[1] == 8 || collision_corners[2] == 8) {
+                            this.player_onJumper = true;
                         } else {
                             this.player_onBoost = false;
                             this.player_onJumper = false;
@@ -775,7 +777,7 @@ public class GameState {
             c.drawText(finished_next_level, this.screenWidth / 2, this.screenHeight / 2, this.text_paint);
         } else if (this.start_circle_radius < 1) {
             //Stage has started. Draw expanding circle first second
-            this.start_circle_canvas.drawCircle((this.player_pos_x + PLAYER_WIDTH / 2f) * this.stage.stage_scale, (this.player_pos_y + PLAYER_HEIGTH / 2f) * this.stage.stage_scale, this.start_circle_radius * this.screenWidth, trans_paint);
+            this.start_circle_canvas.drawCircle((this.player_pos_x + PLAYER_WIDTH / 2f - this.trans_x_unscaled) * this.stage.stage_scale, (this.player_pos_y + PLAYER_HEIGTH / 2f - this.trans_y_unscaled) * this.stage.stage_scale, this.start_circle_radius * this.screenWidth, trans_paint);
             c.drawBitmap(start_circle_bmp, 0, 0, null);
         } else if (this.player_no_input) {
             drawFadeout(c, deltaFrameTime, 2500, 255);
@@ -1004,10 +1006,10 @@ public class GameState {
                 EscapeSoundManager.getInstance(this.context).stopSoundLoop();
                 EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).snd_button);
             } else if (this.player_dead) {
-                this.retry();
+                retry();
             } else if (this.finished) {
                 if (SKIP_FINISH_SPLASH_SCREEN) {
-                    this.load(this.user.currentLevel);
+                    load(this.user.currentLevel);
                 } else {
                     this.running = false;
                     Bundle bundle = ActivityOptionsCompat.makeCustomAnimation(this.context, android.R.anim.fade_in, android.R.anim.fade_out).toBundle();
@@ -1025,9 +1027,9 @@ public class GameState {
                 EscapeSoundManager.getInstance(this.context).playSound(EscapeSoundManager.getInstance(this.context).snd_button);
             } else if (!this.player_no_input) {
                 if (event.getX() < this.screenWidth / 2) {
-                    this.invertGravity();
+                    invertGravity();
                 } else {
-                    this.jump();
+                    jump();
                 }
             }
         }
