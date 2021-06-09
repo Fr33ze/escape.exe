@@ -60,6 +60,7 @@ public class GameState {
     private byte gravity; //gravity can either be regular or inverted (or top or bottom)
     private boolean player_inAir; //player is in air?
     private boolean player_onBoost; //player touches booster?
+    private boolean player_onJumper; //player touches jumper?
     private boolean player_first_gravity_inAir; //player is allowed to do only one gravity change in the air until he hits the ground again. This variable keeps track of that.
     private boolean player_dead; //player died
     private boolean player_no_input; //game doesnt accept input for player until stage is finished. starts screen fade out
@@ -358,6 +359,7 @@ public class GameState {
                     //X Collision can still happen
                     checkCollisionX();
                     this.player_onBoost = false;
+                    this.player_onJumper = false;
                 } else if ((this.collision_corners[0] == 4 && this.collision_corners[1] == 4) || (this.collision_corners[2] == 4 && this.collision_corners[3] == 4)) {
                     adjustPositionY();
                     checkCollisionX();
@@ -366,6 +368,9 @@ public class GameState {
                     adjustPositionY();
                     checkCollisionX();
                     boostPlayerLeft();
+                } else if ((this.collision_corners[0] == 8 && this.collision_corners[1] == 8) || (this.collision_corners[2] == 8 && this.collision_corners[3] == 8)) {
+                    adjustPositionY();
+                    this.player_onJumper = true;
                 } else if ((collision_corners[0] != 0 && collision_corners[3] != 0) || (collision_corners[1] != 0 && collision_corners[2] != 0)) {
                     //X Collision
                     checkCollisionX();
@@ -386,6 +391,7 @@ public class GameState {
                             boostPlayerLeft();
                         } else {
                             this.player_onBoost = false;
+                            this.player_onJumper = false;
                         }
                     }
                 }
@@ -416,6 +422,7 @@ public class GameState {
                 this.player_pos_y = this.player_collision_px.top;
                 this.player_inAir = true;
                 this.player_onBoost = false;
+                this.player_onJumper = false;
 
                 EscapeSoundManager.getInstance(this.context).stopSoundLoop();
             }
@@ -958,7 +965,10 @@ public class GameState {
      */
     private void jump() {
         if (!this.player_inAir) {
-            this.player_velocity_y = -240 * gravity;
+            if(this.player_onJumper)
+                this.player_velocity_y = -360 * gravity;
+            else
+                this.player_velocity_y = -240 * gravity;
             this.player_inAir = true;
 
             this.player_last_state = this.player_state;
@@ -1068,6 +1078,7 @@ public class GameState {
         this.player_dead = false;
         this.player_inAir = true;
         this.player_onBoost = false;
+        this.player_onJumper = false;
         this.player_first_gravity_inAir = false;
         this.gravity = 1;
 
@@ -1101,6 +1112,7 @@ public class GameState {
         this.player_dead = false;
         this.player_inAir = true;
         this.player_onBoost = false;
+        this.player_onJumper = false;
         this.player_first_gravity_inAir = false;
         this.gravity = 1;
 
