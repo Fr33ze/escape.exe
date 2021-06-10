@@ -61,7 +61,11 @@ public class OutroActivity extends Activity {
             muteBtn.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.icon_sound, null));
         }
     }
-
+    /**
+     * When the VideoView is clicked
+     * @param view VideoView that has been clicked
+     * @since 1.0
+     */
     public void onClickVideo(View view) {
         if (skipView.getVisibility() == View.VISIBLE) {
             skipView.setVisibility(View.GONE);
@@ -72,6 +76,11 @@ public class OutroActivity extends Activity {
         }
     }
 
+    /**
+     * When the MuteButton is clicked. Mutes or Unmutes the game
+     * @param view MuteButton View that has been clicked
+     * @since 1.0
+     */
     public void onClickMute(View view) {
         EscapeSoundManager.getInstance(this).toggleMute();
         if (EscapeSoundManager.getInstance(this).isMuted()) {
@@ -83,6 +92,11 @@ public class OutroActivity extends Activity {
         }
     }
 
+    /**
+     * When the SkipButton is clicked. Skips the Video and jumps straight to the MainActivity (main menu)
+     * @param view SkipButton View that has been clicked
+     * @since 1.0
+     */
     public void onClickSkip(View view) {
         //EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
         videoView.stopPlayback();
@@ -90,6 +104,10 @@ public class OutroActivity extends Activity {
         startEndScreen();
     }
 
+    /**
+     * Starts the EndScreenActivity Splashscreen when the video is skipped or has finished playing
+     * @since 1.0
+     */
     private void startEndScreen() {
         Bundle bundle = ActivityOptionsCompat.makeCustomAnimation(this, android.R.anim.fade_in, android.R.anim.fade_out).toBundle();
         startActivity(new Intent(this, FinishGameActivity.class), bundle);

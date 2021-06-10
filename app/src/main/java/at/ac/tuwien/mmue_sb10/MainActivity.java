@@ -111,6 +111,11 @@ public class MainActivity extends Activity {
         startActivity(intent, bundle);
     }
 
+    /**
+     * When MuteButton has been clicked mutes the game
+     * @param v MuteButton View that has been clicked
+     * @since 1.0
+     */
     public void onClickMute(View v) {
         EscapeSoundManager.getInstance(this).unlock();
         EscapeSoundManager.getInstance(this).toggleMute(R.raw.mmenu_bgmusic);
@@ -148,6 +153,11 @@ public class MainActivity extends Activity {
         startActivity(intent, bundle);
     }
 
+    /**
+     * When Highscores Button has been clicked goes to HighscoreActivity
+     * @param v HighscoreButton View that has been clicked
+     * @since 1.0
+     */
     public void onClickHighscores(View v) {
         EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
 
@@ -181,6 +191,11 @@ public class MainActivity extends Activity {
         finishAffinity();
     }
 
+    /**
+     * Callback when all users (in this case only one) have been loaded from the db
+     * @param user User that has been loaded from the db
+     * @since 1.0
+     */
     private void onUserLoaded(User user) {
         if (user == null) {
             mmenu_text = findViewById(R.id.mmenu_text);
@@ -197,6 +212,7 @@ public class MainActivity extends Activity {
     /**
      * Loads the current user from the database
      * @return User or null, if it does not exist
+     * @since 1.0
      */
     private User loadUser() {
         List<User> users = EscapeDatabase.getInstance(this).userDao().selectAllUsers();

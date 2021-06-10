@@ -64,6 +64,10 @@ public class FinishGameActivity extends Activity {
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
+    /**
+     * Splashscreen is being ended. Since onTouchEvent is used, a boolean value makes sure to only fire this once
+     * @since 1.0
+     */
     private void endSplashScreen() {
         if (touched) //only play touch event once
             return;

@@ -74,11 +74,22 @@ public class HighscoreActivity extends Activity {
         finish();
     }
 
+    /**
+     * When BackButton is clicked.
+     * @param v BackButton View that has been clicked
+     * @since 1.0
+     */
     public void onClickBack(View v) {
         EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
         finish();
     }
 
+    /**
+     * When highscores have been loaded from the db.
+     * Displays highscores TableView as TableRows
+     * @param highscores Highscores that have been loaded
+     * @since 1.0
+     */
     private void onHighscoresLoaded(List<Highscore> highscores) {
         for (int level = 0; level <= TOTAL_LEVELS; level++) {
             ArrayList<Highscore> filtered = new ArrayList<>();
@@ -177,6 +188,7 @@ public class HighscoreActivity extends Activity {
      * Loads the highscores from the database
      *
      * @return Highscores List
+     * @since 1.0
      */
     private List<Highscore> loadHighscores() {
         List<Highscore> highscores = EscapeDatabase.getInstance(this).highscoreDao().getHighscores();

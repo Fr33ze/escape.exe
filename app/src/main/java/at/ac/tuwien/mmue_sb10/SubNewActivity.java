@@ -108,6 +108,11 @@ public class SubNewActivity extends Activity {
         }
     }
 
+    /**
+     * Starts a new game even if there is already a saved user in the db. Deletes the saved user and creates a new one.
+     * @param v StartConfirmButton View that has been clicked
+     * @since 1.0
+     */
     public void onClickStartConfirm(View v) {
         EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
         Concurrency.executeAsync(this::deleteUser);
@@ -115,6 +120,11 @@ public class SubNewActivity extends Activity {
         startActivity(new Intent(this, GameActivity.class));
     }
 
+    /**
+     * When TutorialCheckbox has been clicked. Only plays sound
+     * @param v TutorialCheckbox View that has been clicked
+     * @since 1.0
+     */
     public void onClickCheckbox(View v) {
         EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
     }
@@ -122,6 +132,7 @@ public class SubNewActivity extends Activity {
     /**
      * Saves a new User in the database
      * @param user
+     * @since 1.0
      */
     private void saveUser(User user) {
         EscapeDatabase.getInstance(this).userDao().insert(user);
@@ -129,6 +140,7 @@ public class SubNewActivity extends Activity {
 
     /**
      * Deletes the current User from the database
+     * @since 1.0
      */
     private void deleteUser() {
         EscapeDatabase.getInstance(this).userDao().deleteAllUsers();

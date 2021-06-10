@@ -47,6 +47,11 @@ public class IntroActivity extends Activity {
         }
     }
 
+    /**
+     * When the VideoView is clicked
+     * @param view VideoView that has been clicked
+     * @since 1.0
+     */
     public void onClickVideo(View view) {
         if (skipView.getVisibility() == View.VISIBLE) {
             skipView.setVisibility(View.GONE);
@@ -57,6 +62,11 @@ public class IntroActivity extends Activity {
         }
     }
 
+    /**
+     * When the MuteButton is clicked. Mutes or Unmutes the game
+     * @param view MuteButton View that has been clicked
+     * @since 1.0
+     */
     public void onClickMute(View view) {
         EscapeSoundManager.getInstance(this).toggleMute();
         if (EscapeSoundManager.getInstance(this).isMuted()) {
@@ -68,6 +78,11 @@ public class IntroActivity extends Activity {
         }
     }
 
+    /**
+     * When the SkipButton is clicked. Skips the Video and jumps straight to the MainActivity (main menu)
+     * @param view SkipButton View that has been clicked
+     * @since 1.0
+     */
     public void onClickSkip(View view) {
         //EscapeSoundManager.getInstance(this).playSound(EscapeSoundManager.getInstance(this).snd_button);
         videoView.stopPlayback();

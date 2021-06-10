@@ -87,6 +87,10 @@ public class GameThread extends Thread {
             end();
     }
 
+    /**
+     * Finishes the GameActivity when the GameState is not running anymore
+     * @since 1.0
+     */
     private void end() {
         EscapeSoundManager.getInstance(this.context).releaseMediaPlayer();
         ((Activity) context).finish();

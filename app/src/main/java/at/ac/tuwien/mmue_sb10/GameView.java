@@ -133,6 +133,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     /**
      * Is called when the user finished loading from SQLite DB
      * @param user User that has been loaded
+     * @since 1.0
      */
     private void onUserLoaded(User user) {
         if(user.currentLevel > HighscoreActivity.TOTAL_LEVELS) {
@@ -179,6 +180,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     /**
      * Loads the current user from the database
      * @return User or null, if it does not exist
+     * @since 1.0
      */
     private User loadUser() {
         List<User> users = EscapeDatabase.getInstance(getContext()).userDao().selectAllUsers();
@@ -192,6 +194,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     /**
      * Deletes the current User from the database
+     * @since 1.0
      */
     private void deleteUser() {
         EscapeDatabase.getInstance(getContext()).userDao().deleteAllUsers();
