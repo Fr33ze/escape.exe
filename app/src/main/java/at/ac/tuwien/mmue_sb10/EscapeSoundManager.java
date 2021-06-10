@@ -25,12 +25,26 @@ public class EscapeSoundManager {
     private boolean muted;
     private int loop_stream_id;
 
+    //todo
+    /**
+     *
+     * @param context
+     * @since 1.0
+     * @author Lukas Lidauer & Jan König
+     */
     private EscapeSoundManager(Context context) {
         this.context = context.getApplicationContext();
         SharedPreferences sp = context.getSharedPreferences("escapePrefs", 0);
         muted = sp.getBoolean("muted", false);
     }
 
+    //todo
+    /**
+     *
+     * @param context
+     * @since 1.0
+     * @author Lukas Lidauer & Jan König
+     */
     public static EscapeSoundManager getInstance(Context context) {
         if (null == sInstance) {
             synchronized (EscapeSoundManager.class) {
@@ -42,22 +56,28 @@ public class EscapeSoundManager {
 
     /**
      * Locks the SoundManager. No new MediaPlayer or SoundPool can be initialized while it is locked
+     * @since 1.0
+     * @author Lukas Lidauer & Jan König
      */
     public void lock() {
         this.locked = true;
     }
 
+
     /**
      * Unlocks the SoundManager. New MediaPlayers or SoundPools can be initialized while its unlocked
+     * @since 1.0
+     * @author Lukas Lidauer & Jan König
      */
     public void unlock() {
         this.locked = false;
     }
 
+
     /**
-     * Checks if the SoundManager is muted
-     *
-     * @return true if the SoundManager is muted
+     * Checks if the SoundManager is muted and returns true if so
+     * @since 1.0
+     * @author Lukas Lidauer & Jan König
      */
     public boolean isMuted() {
         return muted;
@@ -65,6 +85,8 @@ public class EscapeSoundManager {
 
     /**
      * Mutes or Unmutes the SoundManager. Also saves the status in the preferences
+     * @since 1.0
+     * @author Lukas Lidauer & Jan König
      */
     public void toggleMute() {
         muted = !muted;
@@ -77,8 +99,9 @@ public class EscapeSoundManager {
 
     /**
      * Mutes or Unmutes the SoundManager. Also saves the status in the preferences
-     *
      * @param music_resource Resource of the music to be played if it is unmuted
+     * @since 1.0
+     * @author Lukas Lidauer & Jan König
      */
     public void toggleMute(int music_resource) {
         muted = !muted;
@@ -94,16 +117,19 @@ public class EscapeSoundManager {
 
     /**
      * Pause the MediaPlayer instance without releasing it
+     * @since 1.0
+     * @author Lukas Lidauer & Jan König
      */
     public void pauseMediaPlayer() {
         if (muted)
             return;
-
         mediaPlayer.pause();
     }
 
     /**
      * Resumes the MediaPlayer instance from where it has been paused
+     * @since 1.0
+     * @author Lukas Lidauer & Jan König
      */
     public void resumeMediaPlayer() {
         if (muted)
@@ -114,6 +140,8 @@ public class EscapeSoundManager {
 
     /**
      * Releases all MediaPlayer and SoundPool Resources
+     * @since 1.0
+     * @author Lukas Lidauer & Jan König
      */
     public void release() {
         releaseMediaPlayer();
@@ -121,7 +149,9 @@ public class EscapeSoundManager {
     }
 
     /**
-     * Only releases the MediaPlayer instance
+     * Releases the MediaPlayer instance
+     * @since 1.0
+     * @author Lukas Lidauer & Jan König
      */
     public void releaseMediaPlayer() {
         try {
@@ -133,7 +163,9 @@ public class EscapeSoundManager {
     }
 
     /**
-     * Only releases the SoundPool instance
+     * Releases the SoundPool instance
+     * @since 1.0
+     * @author Lukas Lidauer & Jan König
      */
     public void releaseSoundPool() {
         try {
@@ -143,11 +175,13 @@ public class EscapeSoundManager {
         }
     }
 
+
     /**
-     * Releases and then initializes a new MediaPlayer isntance. Does nothing if the SoundManager is locked or muted
-     *
+     * Releases and then initializes a new MediaPlayer instance. Does nothing if the SoundManager is locked or muted
      * @param music_resource Resource of the music to be played after initialization
      * @param loop           Indicates if the track should be looped
+     * @since 1.0
+     * @author Lukas Lidauer & Jan König
      */
     public void initMediaPlayer(int music_resource, boolean loop) {
         if (muted || locked)
@@ -169,6 +203,8 @@ public class EscapeSoundManager {
 
     /**
      * Releases and then initializes a new SoundPool instance with all sounds in the app. Does nothing if the SoundManager is locked or muted
+     * @since 1.0
+     * @author Lukas Lidauer & Jan König
      */
     public void initSoundPool() {
         if (muted || locked)
@@ -191,6 +227,11 @@ public class EscapeSoundManager {
         }
     }
 
+    /**
+     * Plays specific sound file when level is finished
+     * @since 1.0
+     * @author Lukas Lidauer & Jan König
+     */
     public void playLevelBeatMusic() {
         if (muted)
             return;
@@ -200,8 +241,9 @@ public class EscapeSoundManager {
 
     /**
      * Plays a sound. Does nothing if the SoundManager is muted
-     *
      * @param sound_id of the sound to be played
+     * @since 1.0
+     * @author Lukas Lidauer & Jan König
      */
     public void playSound(int sound_id) {
         if (muted)
@@ -212,8 +254,9 @@ public class EscapeSoundManager {
 
     /**
      * Plays a sound on loop. Does nothing if the SoundManager is muted or if one other sound is already being played on loop
-     *
      * @param sound_id
+     * @since 1.0
+     * @author Lukas Lidauer & Jan König
      */
     public void playSoundLoop(int sound_id) {
         if (muted || loop_stream_id != -1)
@@ -224,10 +267,11 @@ public class EscapeSoundManager {
 
     /**
      * Fades out currently looping sound effect slowly
-     *
      * @param current_fade_out_time currently progressed time since the fadeout started in ms
      * @param fade_out_time         total time for the fadeout process in ms
      * @param max_fadeout           maximum fadeout factor. 0.5 means it will fade the sound to 50% volume
+     * @since 1.0
+     * @author Lukas Lidauer & Jan König
      */
     public void fadeSoundLoop(float current_fade_out_time, int fade_out_time, float max_fadeout) {
         if (muted)
@@ -240,6 +284,8 @@ public class EscapeSoundManager {
 
     /**
      * Stops a sound that is being played on loop. Does nothing if the SoundManager is muted
+     * @since 1.0
+     * @author Lukas Lidauer & Jan König
      */
     public void stopSoundLoop() {
         if (muted)

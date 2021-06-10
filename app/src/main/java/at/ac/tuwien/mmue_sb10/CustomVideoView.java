@@ -10,24 +10,55 @@ public class CustomVideoView extends VideoView implements MediaPlayer.OnPrepared
     private MediaPlayer mediaPlayer;
     private boolean muted;
 
+    //todo
+    /**
+     *
+     * @param context
+     * @since 1.0
+     * @author Lukas Lidauer
+     */
     public CustomVideoView(Context context) {
         super(context);
         this.setOnPreparedListener(this);
         muted = false;
     }
 
+    //todo
+    /**
+     *
+     * @param context
+     * @param attrs
+     * @since 1.0
+     * @author Lukas Lidauer
+     */
     public CustomVideoView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.setOnPreparedListener(this);
         muted = false;
     }
 
+    //todo
+    /**
+     *
+     * @param context
+     * @param attrs
+     * @param defStyleAttr
+     * @since 1.0
+     * @author Lukas Lidauer
+     */
     public CustomVideoView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.setOnPreparedListener(this);
         muted = false;
     }
 
+    //todo
+    /**
+     *
+     * @param mp
+     * @since 1.0
+     * @author Lukas Lidauer
+     */
     @Override
     public void onPrepared(MediaPlayer mp) {
         this.mediaPlayer = mp;
@@ -36,7 +67,9 @@ public class CustomVideoView extends VideoView implements MediaPlayer.OnPrepared
     }
 
     /**
-     * Mutes the CustomVideoView
+     * Mutes the custom video view
+     * @since 1.0
+     * @author Lukas Lidauer
      */
     public void mute() {
         try {
@@ -47,7 +80,9 @@ public class CustomVideoView extends VideoView implements MediaPlayer.OnPrepared
     }
 
     /**
-     * Unmutes the CustomVideoView
+     * unmutes the custom Video view
+     * @since 1.0
+     * @author Lukas Lidauer
      */
     public void unmute() {
         try {

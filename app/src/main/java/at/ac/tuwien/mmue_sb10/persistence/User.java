@@ -18,8 +18,20 @@ public class User implements Serializable {
     public int deathsTotal;
     public int deathsCurrentLevel;
 
+    /**
+     * Basic Constructor for this class
+     * @since 1.0
+     * @author Lukas Lidauer & Jan König
+     */
     public User() {}
 
+    /**
+     * Constructor for this class. Creates name for the current user as delived by parameter and checks if Tutorial is going to be played or not
+     * @param name The name of the current file/player
+     * @param tutorial if true tutorial levels are going to be played
+     * @since 1.0
+     * @author Lukas Lidauer & Jan König
+     */
     public User(String name, boolean tutorial) {
         this.name = name;
         this.deathsCurrentLevel = 0;

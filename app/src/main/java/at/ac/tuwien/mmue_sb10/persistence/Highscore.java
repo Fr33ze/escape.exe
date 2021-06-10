@@ -14,6 +14,14 @@ public class Highscore {
     public int level;
     public int deaths;
 
+    /**
+     * Creates an Highscore object
+     * @param name The name of the current file/player
+     * @param level The level the player currently is at
+     * @param deaths The total amount of deaths
+     * @since 1.0
+     * @author Lukas Lidauer & Jan König
+     */
     public Highscore(String name, int level, int deaths) {
         this.name = name;
         this.level = level;

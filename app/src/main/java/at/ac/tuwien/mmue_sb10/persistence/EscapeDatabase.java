@@ -18,6 +18,13 @@ public abstract class EscapeDatabase extends RoomDatabase {
 
     private static final HashMap<Context, EscapeDatabase> INSTANCES = new HashMap<>();
 
+    // todo
+    /**
+     *
+     * @param context
+     * @since 1.0
+     * @author Lukas Lidauer & Jan König
+     */
     public static EscapeDatabase getInstance(Context context) {
         EscapeDatabase db = INSTANCES.get(context);
         if (db == null) {
