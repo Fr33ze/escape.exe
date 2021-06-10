@@ -23,7 +23,7 @@ import java.io.InputStreamReader;
 /**
  * This class handles stages (levels) and their variables
  * @since 0.1
- * @author Lukas Lidauer 
+ * @author Lukas Lidauer
  */
 public class Stage {
     public String stage_name; //name of the stage

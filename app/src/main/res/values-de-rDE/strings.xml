@@ -42,10 +42,10 @@
 
     <!--STAGE NAMES-->
     <string name="stage_5">Tutorial - Gravitation</string>
-    <string name="stage_4">Tutorial - Mehr Gravitation </string>
-    <string name="stage_3">Tutorial - Springen</string>
-    <string name="stage_2">Tutorial - Kobinationen</string>
-    <string name="stage_1">Tutorial - Beschleuniger</string>
+    <string name="stage_4">Tutorial - Springen </string>
+    <string name="stage_3">Tutorial - Beschleuniger</string>
+    <string name="stage_2">Tutorial - Sprungfeld</string>
+    <string name="stage_1">Tutorial - Springen + Gravitation</string>
     <string name="stage1">Stage 1</string>
     <string name="stage2">Stage 2</string>
     <string name="stage3">Stage 3</string>
