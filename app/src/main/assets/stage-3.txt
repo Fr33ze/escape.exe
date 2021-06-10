@@ -9,7 +9,7 @@ starty=8
 velocityx=100
 
 #size
-width=82
+width=62
 heigth=15
 
 #tiles
