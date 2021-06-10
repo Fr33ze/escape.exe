@@ -10,6 +10,11 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.webkit.WebView;
 
+/**
+ * This class handles the splash Screen for when the game is finished completely.
+ * @since 1.0
+ * @author Lukas Lidauer
+ */
 public class FinishGameActivity extends Activity {
 
     WebView webView;

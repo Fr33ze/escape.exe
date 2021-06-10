@@ -18,6 +18,11 @@ import android.view.SurfaceHolder;
 
 import androidx.core.app.ActivityOptionsCompat;
 
+/**
+ * This class mainly handles the render loop
+ * @since 0.1
+ * @author Lukas Lidauer & Jan König
+ */
 public class GameThread extends Thread {
 
     private static final String TAG = GameThread.class.getSimpleName();
@@ -33,6 +38,7 @@ public class GameThread extends Thread {
      *
      * @param state  GameState instance that will be updated and rendered
      * @param holder SurfaceHolder of the SurfaceView
+     * @since 0.1
      */
     public GameThread(GameState state, SurfaceHolder holder, Context context) {
         this.state = state;

@@ -1,12 +1,17 @@
 package at.ac.tuwien.mmue_sb10.persistence;
 
+//TODO
+/**
+ *
+ * @since 1.0
+ * @author Lukas Lidauer & Jan König
+ */
 public interface OnUserLoadedListener {
-    // todo
+    // TODO
     /**
      *
      * @param user
      * @since 1.0
-     * @author Lukas Lidauer & Jan König
      */
     void onUserLoaded(User user);
 }

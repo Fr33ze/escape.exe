@@ -11,6 +11,11 @@ import androidx.room.RoomDatabase;
 
 import java.util.HashMap;
 
+/**
+ * General DB class
+ * @since 1.0
+ * @author Lukas Lidauer & Jan König
+ */
 @Database(entities = {User.class, Highscore.class}, version = 1, exportSchema = false)
 public abstract class EscapeDatabase extends RoomDatabase {
     public abstract UserDao userDao();
@@ -18,12 +23,11 @@ public abstract class EscapeDatabase extends RoomDatabase {
 
     private static final HashMap<Context, EscapeDatabase> INSTANCES = new HashMap<>();
 
-    // todo
+    // TODO
     /**
      *
      * @param context
      * @since 1.0
-     * @author Lukas Lidauer & Jan König
      */
     public static EscapeDatabase getInstance(Context context) {
         EscapeDatabase db = INSTANCES.get(context);

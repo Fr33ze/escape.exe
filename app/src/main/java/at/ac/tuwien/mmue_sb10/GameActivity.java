@@ -16,44 +16,32 @@ import android.widget.LinearLayout;
 
 import at.ac.tuwien.mmue_sb10.persistence.User;
 
+/**
+ * This class handles the game activities such as game loop, gameView etc.
+ * @since 0.1
+ * @author Lukas Lidauer & Jan König
+ */
 public class GameActivity extends Activity {
 
     private static final String TAG = GameActivity.class.getSimpleName();
     private GameView gameView;
 
-    /**
-     * Starts an activity
-     * @param savedInstanceState saves data in case onCreate is called again (e.g. change of orientation)
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
     }
 
-    /**
-     * Stops running threads of gameView and destroys this activity.
-     * @since 0.1
-     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
     }
 
-    /**
-     * Handles presses of the back button .
-     * Currently no dialog to ensure user actually wants to exit the application.
-     * @since 0.1
-     */
     @Override
     public void onBackPressed() {
         gameView.onBackPressed();
     }
 
-    /**
-     * If the activity is restarted after being paused onResume is called.
-     * @since 0.1
-     */
     @Override
     protected void onResume() {
         super.onResume();

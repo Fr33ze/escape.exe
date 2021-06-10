@@ -8,6 +8,11 @@ import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
 
+/**
+ * User class (object as handled via DB)
+ * @since 1.0
+ * @author Lukas Lidauer & Jan König
+ */
 @Entity(tableName = "users")
 public class User implements Serializable {
     @PrimaryKey(autoGenerate = true)
@@ -21,7 +26,6 @@ public class User implements Serializable {
     /**
      * Basic Constructor for this class
      * @since 1.0
-     * @author Lukas Lidauer & Jan König
      */
     public User() {}
 
@@ -30,7 +34,6 @@ public class User implements Serializable {
      * @param name The name of the current file/player
      * @param tutorial if true tutorial levels are going to be played
      * @since 1.0
-     * @author Lukas Lidauer & Jan König
      */
     public User(String name, boolean tutorial) {
         this.name = name;

@@ -12,6 +12,11 @@ import android.widget.TextView;
 
 import at.ac.tuwien.mmue_sb10.persistence.User;
 
+/**
+ * This class handles the submenu for creation of a new profile.
+ * @since 1.0
+ * @author Lukas Lidauer & Jan König
+ */
 public class SubContinueActivity extends Activity {
 
     private User user;

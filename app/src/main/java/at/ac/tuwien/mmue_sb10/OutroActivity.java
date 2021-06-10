@@ -12,6 +12,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+/**
+ * This class handles the outro video with skip function
+ * @since 1.0
+ * @author Lukas Lidauer & Jan König
+ */
 public class OutroActivity extends Activity {
 
     CustomVideoView videoView;

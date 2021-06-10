@@ -25,6 +25,11 @@ import at.ac.tuwien.mmue_sb10.persistence.OnUserLoadedListener;
 import at.ac.tuwien.mmue_sb10.persistence.User;
 import at.ac.tuwien.mmue_sb10.util.Concurrency;
 
+/**
+ * This class handles the main menu of the game (where you can chose between New Game, Continue, Highscores and Exit)
+ * @since 0.1
+ * @author Lukas Lidauer & Jan König
+ */
 public class MainActivity extends Activity {
 
     private static final String TAG = MainActivity.class.getSimpleName();

@@ -15,6 +15,11 @@ import at.ac.tuwien.mmue_sb10.persistence.EscapeDatabase;
 import at.ac.tuwien.mmue_sb10.persistence.User;
 import at.ac.tuwien.mmue_sb10.util.Concurrency;
 
+/**
+ * This class handles the submenu for starting a new game by deleting the old profile and creating a new one
+ * @since 1.0
+ * @author Lukas Lidauer & Jan König
+ */
 public class SubNewActivity extends Activity {
 
     CheckBox checkBox;

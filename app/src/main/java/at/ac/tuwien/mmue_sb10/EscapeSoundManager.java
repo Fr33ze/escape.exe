@@ -6,6 +6,11 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 
+/**
+ * This class handles both mediaPlayer for background music and soundpool for sound effects
+ * @since 1.0
+ * @author Lukas Lidauer & Jan König
+ */
 public class EscapeSoundManager {
     private static EscapeSoundManager sInstance;
 
@@ -27,11 +32,9 @@ public class EscapeSoundManager {
 
     /**
      *
-     * Private Constructor for the EscapeSoundManager.
-     *
+     * Private Constructor for the EscapeSoundManager
      * @param context Context of the Application
      * @since 1.0
-     * @author Lukas Lidauer & Jan König
      */
     private EscapeSoundManager(Context context) {
         this.context = context.getApplicationContext();
@@ -45,7 +48,6 @@ public class EscapeSoundManager {
      *
      * @param context Context of the Application to construct the EscapeSoundManager if there is no instance yet
      * @since 1.0
-     * @author Lukas Lidauer & Jan König
      */
     public static EscapeSoundManager getInstance(Context context) {
         if (null == sInstance) {
@@ -59,7 +61,6 @@ public class EscapeSoundManager {
     /**
      * Locks the SoundManager. No new MediaPlayer or SoundPool can be initialized while it is locked
      * @since 1.0
-     * @author Lukas Lidauer & Jan König
      */
     public void lock() {
         this.locked = true;
@@ -69,7 +70,6 @@ public class EscapeSoundManager {
     /**
      * Unlocks the SoundManager. New MediaPlayers or SoundPools can be initialized while its unlocked
      * @since 1.0
-     * @author Lukas Lidauer & Jan König
      */
     public void unlock() {
         this.locked = false;
@@ -79,7 +79,6 @@ public class EscapeSoundManager {
     /**
      * Checks if the SoundManager is muted and returns true if so
      * @since 1.0
-     * @author Lukas Lidauer & Jan König
      */
     public boolean isMuted() {
         return muted;
@@ -88,7 +87,6 @@ public class EscapeSoundManager {
     /**
      * Mutes or Unmutes the SoundManager. Also saves the status in the preferences
      * @since 1.0
-     * @author Lukas Lidauer & Jan König
      */
     public void toggleMute() {
         muted = !muted;
@@ -103,7 +101,6 @@ public class EscapeSoundManager {
      * Mutes or Unmutes the SoundManager. Also saves the status in the preferences
      * @param music_resource Resource of the music to be played if it is unmuted
      * @since 1.0
-     * @author Lukas Lidauer & Jan König
      */
     public void toggleMute(int music_resource) {
         muted = !muted;
@@ -120,7 +117,6 @@ public class EscapeSoundManager {
     /**
      * Pause the MediaPlayer instance without releasing it
      * @since 1.0
-     * @author Lukas Lidauer & Jan König
      */
     public void pauseMediaPlayer() {
         if (muted)
@@ -131,7 +127,6 @@ public class EscapeSoundManager {
     /**
      * Resumes the MediaPlayer instance from where it has been paused
      * @since 1.0
-     * @author Lukas Lidauer & Jan König
      */
     public void resumeMediaPlayer() {
         if (muted)
@@ -143,7 +138,6 @@ public class EscapeSoundManager {
     /**
      * Releases all MediaPlayer and SoundPool Resources
      * @since 1.0
-     * @author Lukas Lidauer & Jan König
      */
     public void release() {
         releaseMediaPlayer();
@@ -153,7 +147,6 @@ public class EscapeSoundManager {
     /**
      * Releases the MediaPlayer instance
      * @since 1.0
-     * @author Lukas Lidauer & Jan König
      */
     public void releaseMediaPlayer() {
         try {
@@ -167,7 +160,6 @@ public class EscapeSoundManager {
     /**
      * Releases the SoundPool instance
      * @since 1.0
-     * @author Lukas Lidauer & Jan König
      */
     public void releaseSoundPool() {
         try {
@@ -183,7 +175,6 @@ public class EscapeSoundManager {
      * @param music_resource Resource of the music to be played after initialization
      * @param loop           Indicates if the track should be looped
      * @since 1.0
-     * @author Lukas Lidauer & Jan König
      */
     public void initMediaPlayer(int music_resource, boolean loop) {
         if (muted || locked)
@@ -206,7 +197,6 @@ public class EscapeSoundManager {
     /**
      * Releases and then initializes a new SoundPool instance with all sounds in the app. Does nothing if the SoundManager is locked or muted
      * @since 1.0
-     * @author Lukas Lidauer & Jan König
      */
     public void initSoundPool() {
         if (muted || locked)
@@ -232,7 +222,6 @@ public class EscapeSoundManager {
     /**
      * Plays specific sound file when level is finished
      * @since 1.0
-     * @author Lukas Lidauer & Jan König
      */
     public void playLevelBeatMusic() {
         if (muted)
@@ -245,7 +234,6 @@ public class EscapeSoundManager {
      * Plays a sound. Does nothing if the SoundManager is muted
      * @param sound_id of the sound to be played
      * @since 1.0
-     * @author Lukas Lidauer & Jan König
      */
     public void playSound(int sound_id) {
         if (muted)
@@ -258,7 +246,6 @@ public class EscapeSoundManager {
      * Plays a sound on loop. Does nothing if the SoundManager is muted or if one other sound is already being played on loop
      * @param sound_id
      * @since 1.0
-     * @author Lukas Lidauer & Jan König
      */
     public void playSoundLoop(int sound_id) {
         if (muted || loop_stream_id != -1)
@@ -273,7 +260,6 @@ public class EscapeSoundManager {
      * @param fade_out_time         total time for the fadeout process in ms
      * @param max_fadeout           maximum fadeout factor. 0.5 means it will fade the sound to 50% volume
      * @since 1.0
-     * @author Lukas Lidauer & Jan König
      */
     public void fadeSoundLoop(float current_fade_out_time, int fade_out_time, float max_fadeout) {
         if (muted)
@@ -287,7 +273,6 @@ public class EscapeSoundManager {
     /**
      * Stops a sound that is being played on loop. Does nothing if the SoundManager is muted
      * @since 1.0
-     * @author Lukas Lidauer & Jan König
      */
     public void stopSoundLoop() {
         if (muted)

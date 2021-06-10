@@ -29,6 +29,11 @@ import at.ac.tuwien.mmue_sb10.persistence.OnUserLoadedListener;
 import at.ac.tuwien.mmue_sb10.persistence.User;
 import at.ac.tuwien.mmue_sb10.util.Concurrency;
 
+/**
+ * This class mainly handles the render loop
+ * @since 0.1
+ * @author Lukas Lidauer & Jan König
+ */
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private static final String TAG = GameView.class.getSimpleName();
@@ -54,6 +59,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private final OnUserLoadedListener onUserLoadedListener = this::onUserLoaded;
 
+    //TODO
     /**
      *
      * @param context
@@ -66,6 +72,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
 
+    //TODO
     /**
      *
      * @param context
@@ -78,6 +85,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         setFocusable(true);
     }
 
+    //TODO
     /**
      *
      * @param context

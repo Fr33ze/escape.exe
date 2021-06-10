@@ -2,12 +2,17 @@ package at.ac.tuwien.mmue_sb10.persistence;
 
 import java.util.List;
 
+// TODO
+/**
+ *
+ * @since 1.0
+ * @author Lukas Lidauer & Jan König
+ */
 public interface OnHighscoresLoadedListener {
-    //todo
+    //TODO
     /**
      *
      * @since 1.0
-     * @author Lukas Lidauer & Jan König
      */
     void onHighscoresLoaded(List<Highscore> highscores);
 }

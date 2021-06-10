@@ -28,6 +28,11 @@ import at.ac.tuwien.mmue_sb10.persistence.Highscore;
 import at.ac.tuwien.mmue_sb10.persistence.OnHighscoresLoadedListener;
 import at.ac.tuwien.mmue_sb10.util.Concurrency;
 
+/**
+ * This class handles the highscore submenu and the presentation of highscores
+ * @since 1.0
+ * @author Lukas Lidauer & Jan König
+ */
 public class HighscoreActivity extends Activity {
 
     public static final int TOTAL_LEVELS = 10; //TODO

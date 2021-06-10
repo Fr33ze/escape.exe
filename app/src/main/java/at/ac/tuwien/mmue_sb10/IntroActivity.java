@@ -10,6 +10,11 @@ import android.widget.TextView;
 
 import androidx.core.content.res.ResourcesCompat;
 
+/**
+ * This class handles the intro video with skip function
+ * @since 1.0
+ * @author Lukas Lidauer & Jan König
+ */
 public class IntroActivity extends Activity {
 
     CustomVideoView videoView;

@@ -20,6 +20,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+/**
+ * This class handles stages (levels) and their variables
+ * @since 0.1
+ * @author Lukas Lidauer 
+ */
 public class Stage {
     public String stage_name; //name of the stage
     public int player_start_x, player_start_y; //starting position of player

@@ -14,6 +14,11 @@ import android.widget.TextView;
 
 import androidx.core.app.ActivityOptionsCompat;
 
+/**
+ * This class handles the splash Screen for when a stage is completed
+ * @since 1.0
+ * @author Lukas Lidauer
+ */
 public class FinishStageActivity extends Activity {
 
     WebView webView;
@@ -112,6 +117,11 @@ public class FinishStageActivity extends Activity {
         return super.onTouchEvent(event);
     }
 
+    // TODO
+    /**
+     *
+     * @since 1.0
+     */
     private void endSplashScreen() {
         if (touched) //only play touch event once
             return;

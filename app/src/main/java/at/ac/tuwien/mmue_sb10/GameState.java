@@ -34,6 +34,11 @@ import at.ac.tuwien.mmue_sb10.persistence.Highscore;
 import at.ac.tuwien.mmue_sb10.persistence.User;
 import at.ac.tuwien.mmue_sb10.util.Concurrency;
 
+/**
+ * This class handles the current state of the game such as player position, velocity, current level, current player etc. This class also computes frame by frame updates and the like
+ * @since 0.1
+ * @author Lukas Lidauer & Jan König
+ */
 public class GameState {
     public static final boolean SKIP_FINISH_SPLASH_SCREEN = false;
 
@@ -541,7 +546,7 @@ public class GameState {
     /**
      * Draws the current state of the game onto c
      *
-     * @param c              The Canvas that is drawed onto
+     * @param c              The Canvas that is drawn onto
      * @param deltaFrameTime The passed time since the last frame
      * @since 0.1
      */
@@ -562,7 +567,7 @@ public class GameState {
     /**
      * Translates the X drawing area to fit the current player position
      *
-     * @param c Canvas that needs to be translated (needed for width and heigth)
+     * @param c Canvas that needs to be translated (needed for width and height)
      * @since 1.0
      */
     private void translateX(Canvas c) {
@@ -581,7 +586,7 @@ public class GameState {
     /**
      * Translates the Y drawing area to fit the current player position
      *
-     * @param c Canvas that needs to be translated (needed for width and heigth)
+     * @param c Canvas that needs to be translated (needed for width and height)
      * @since 1.0
      */
     private void translateY(Canvas c) {

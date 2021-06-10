@@ -5,16 +5,21 @@ import android.media.MediaPlayer;
 import android.util.AttributeSet;
 import android.widget.VideoView;
 
+/**
+ * This class handles the video view via MediaPlayer
+ * @since 1.0
+ * @author Lukas Lidauer
+ */
 public class CustomVideoView extends VideoView implements MediaPlayer.OnPreparedListener {
 
     private MediaPlayer mediaPlayer;
     private boolean muted;
 
+    //TODO
     /**
      *
      * @param context
      * @since 1.0
-     * @author Lukas Lidauer
      */
     public CustomVideoView(Context context) {
         super(context);
@@ -22,12 +27,12 @@ public class CustomVideoView extends VideoView implements MediaPlayer.OnPrepared
         muted = false;
     }
 
+    //TODO
     /**
      *
      * @param context
      * @param attrs
      * @since 1.0
-     * @author Lukas Lidauer
      */
     public CustomVideoView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -35,13 +40,13 @@ public class CustomVideoView extends VideoView implements MediaPlayer.OnPrepared
         muted = false;
     }
 
+    //TODO
     /**
      *
      * @param context
      * @param attrs
      * @param defStyleAttr
      * @since 1.0
-     * @author Lukas Lidauer
      */
     public CustomVideoView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
@@ -56,7 +61,6 @@ public class CustomVideoView extends VideoView implements MediaPlayer.OnPrepared
      *
      * @param mp
      * @since 1.0
-     * @author Lukas Lidauer
      */
     @Override
     public void onPrepared(MediaPlayer mp) {
@@ -68,7 +72,6 @@ public class CustomVideoView extends VideoView implements MediaPlayer.OnPrepared
     /**
      * Mutes the custom video view
      * @since 1.0
-     * @author Lukas Lidauer
      */
     public void mute() {
         try {
@@ -81,7 +84,6 @@ public class CustomVideoView extends VideoView implements MediaPlayer.OnPrepared
     /**
      * unmutes the custom Video view
      * @since 1.0
-     * @author Lukas Lidauer
      */
     public void unmute() {
         try {
