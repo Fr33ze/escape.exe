@@ -252,6 +252,7 @@ public class GameState {
 
     /**
      * Loads the player frames from the sprite sheet into the player_frames array
+     * @since 1.0
      */
     private void loadPlayerFrames() {
         BitmapFactory.Options o = new BitmapFactory.Options();
@@ -271,6 +272,7 @@ public class GameState {
 
     /**
      * Loads the death counter sprite from the resources
+     * @since 1.0
      */
     private void loadDeathCounter() {
         BitmapFactory.Options o = new BitmapFactory.Options();
@@ -283,6 +285,7 @@ public class GameState {
 
     /**
      * Loads the mute and unmute icons from the resources
+     * @since 1.0
      */
     private void loadMuteIcons() {
         BitmapFactory.Options o = new BitmapFactory.Options();
@@ -297,6 +300,10 @@ public class GameState {
         );
     }
 
+    /**
+     * Loads the pause icon from the resources
+     * @since 1.0
+     */
     private void loadPauseIcon() {
         BitmapFactory.Options o = new BitmapFactory.Options();
         o.inScaled = false;
@@ -306,6 +313,10 @@ public class GameState {
         );
     }
 
+    /**
+     * Loads the controls icons from the resources
+     * @since 1.0
+     */
     private void loadControlIcons() {
         BitmapFactory.Options o = new BitmapFactory.Options();
         o.inScaled = false;
@@ -552,6 +563,7 @@ public class GameState {
      * Translates the X drawing area to fit the current player position
      *
      * @param c Canvas that needs to be translated (needed for width and heigth)
+     * @since 1.0
      */
     private void translateX(Canvas c) {
         if (this.player_velocity_x > 0) {
@@ -570,6 +582,7 @@ public class GameState {
      * Translates the Y drawing area to fit the current player position
      *
      * @param c Canvas that needs to be translated (needed for width and heigth)
+     * @since 1.0
      */
     private void translateY(Canvas c) {
         if (this.player_pos_y * this.stage.stage_scale + PLAYER_HEIGTH * this.stage.stage_scale > this.trans_y + c.getHeight() - (48 + PLAYER_HEIGTH) * this.stage.stage_scale)
@@ -585,8 +598,10 @@ public class GameState {
 
     /**
      * Draws the level including background
+     * Uses old way of drawing by scaling the whole bitmap (deprecated)
      *
      * @param c Canvas to draw the level onto
+     * @since 0.1
      */
     /*private void drawMap(Canvas c) {
         this.draw_src.set(
@@ -612,6 +627,12 @@ public class GameState {
         );
     }*/
 
+    /**
+     * Draws the level including background
+     * Uses new way of drawing by scaling the canvas and drawing the unscaled bitmap onto it
+     * @param c Canvas to draw the level onto
+     * @since 1.0
+     */
     private void drawMap(Canvas c) {
         /*this.draw_src.set(
                 (int) (this.trans_x_unscaled),
@@ -633,6 +654,13 @@ public class GameState {
         c.scale(1 / this.stage.stage_scale, 1 / this.stage.stage_scale);
     }
 
+    /**
+     * Draws the level including background
+     * Uses a new way of drawing by iterating and drawing tile by tile
+     * Unused because of background drawing
+     * @param c Canvas to draw the level onto
+     * @since 1.0
+     */
     /*private void drawMap(Canvas c) {
         int screentransx = (int)(trans_x % this.stage.tile_size_scaled);
         int screentransy = (int)(trans_y % this.stage.tile_size_scaled);
@@ -666,6 +694,7 @@ public class GameState {
      *
      * @param c              Canvas to draw the player frame onto
      * @param deltaFrameTime The passed time since the last frame
+     * @since 1.0
      */
     private void drawPlayer(Canvas c, float deltaFrameTime) {
         this.player_draw_matrix.reset();
@@ -757,6 +786,7 @@ public class GameState {
      *
      * @param c              Canvas to draw the HUD onto
      * @param deltaFrameTime Passed time since the last frame
+     * @since 1.0
      */
     private void drawHUD(Canvas c, float deltaFrameTime) {
         drawDeathCounter(c);
@@ -789,6 +819,7 @@ public class GameState {
      * Draws the death counter onthe canvas
      *
      * @param c Canvas to draw the death counter onto
+     * @since 1.0
      */
     private void drawDeathCounter(Canvas c) {
         c.drawBitmap(this.death_counter_icon, 16 * this.density, c.getHeight() - this.death_counter_icon.getHeight() - 16 * this.density, null);
@@ -802,6 +833,7 @@ public class GameState {
      * Draws the pause screen on the canvas
      *
      * @param c Canvas to draw the pause screen onto
+     * @since 1.0
      */
     private void drawPauseScreen(Canvas c) {
         c.drawText(context.getResources().getText(R.string.pause_game).toString(), (this.screenWidth - this.controls_zone.width()) / 2, this.screenHeight / 2 - 40 * this.density, this.pause_paint);
@@ -825,6 +857,15 @@ public class GameState {
         }
     }
 
+    /**
+     * Helper method to draw a string with line-breaks onto the canvas with proper styling
+     * @param c Canvas to draw the text onto
+     * @param text Text to draw
+     * @param x Position X on the canvas to draw
+     * @param y Position Y on the canvas to draw
+     * @param paint Paint to use for drawing the text
+     * @since 1.0
+     */
     private void drawMultiLineText(Canvas c, String text, float x, float y, Paint paint) {
         String[] lines = text.split("\n");
         for(int i = 0; i < lines.length; i++, y += paint.getTextSize() + 2 * this.density) {
@@ -839,6 +880,7 @@ public class GameState {
      * @param deltaFrameTime The passed time since the last frame
      * @param fade_out_time  Time for the screen to fully turn black
      * @param max_alpha      Maximum alpha for the fadeout effect
+     * @since 1.0
      */
     private void drawFadeout(Canvas c, float deltaFrameTime, int fade_out_time, int max_alpha) {
         this.current_fade_out_time += deltaFrameTime;
@@ -853,6 +895,7 @@ public class GameState {
      * @param fade_out_time  Time in ms for the screen to fully turn black
      * @param max_alpha      Maximum alpha for the fadeout effect
      * @param wait_time      Time in ms to wait before starting the fadeout effect
+     * @since 1.0
      */
     private void drawFadeout(Canvas c, float deltaFrameTime, int fade_out_time, int max_alpha, int wait_time) {
         this.current_fade_out_time += deltaFrameTime;
@@ -863,6 +906,7 @@ public class GameState {
 
     /**
      * Sets the stage to finished
+     * @since 1.0
      */
     private void finishStage() {
         this.finished = true;
@@ -902,6 +946,7 @@ public class GameState {
 
     /**
      * Prepares finishing a stage by not allowing any more input
+     * @since 1.0
      */
     private void setNoPlayerInput() {
         if (!this.player_no_input) {
@@ -918,6 +963,7 @@ public class GameState {
 
     /**
      * Sets the player to dead and applies the dying animation. Can be called multiple times
+     * @since 1.0
      */
     private void killPlayer() {
         this.player_dead = true;
@@ -1037,6 +1083,7 @@ public class GameState {
 
     /**
      * Is forwarded from activity. Called when the "back" button is pressed on the device
+     * @since 1.0
      */
     public void onBackPressed() {
         if(this.player_no_input)
@@ -1132,15 +1179,31 @@ public class GameState {
         EscapeSoundManager.getInstance(this.context).resumeMediaPlayer();
     }
 
+    /**
+     * Sets the user of the GameState. This is used as save file
+     * After the user is set, it will laod the current level of the User
+     * @param user User to be used as save file for this GameState instance
+     * @since 1.0
+     */
     public void setUser(User user) {
         this.user = user;
         load(this.user.currentLevel);
     }
 
+    /**
+     * Updates the User in the database with new values like deaths count or level id
+     * @param user User to be updated
+     * @since 1.0
+     */
     private void updateUser(User user) {
         EscapeDatabase.getInstance(context).userDao().update(user);
     }
 
+    /**
+     * Inserts a new Highscore into the database
+     * @param highscore Highscore to be inserted
+     * @since 1.0
+     */
     private void insertHighscore(Highscore highscore) {
         EscapeDatabase.getInstance(context).highscoreDao().insert(highscore);
     }
