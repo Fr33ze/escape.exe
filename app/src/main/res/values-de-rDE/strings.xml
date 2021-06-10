@@ -46,15 +46,13 @@
     <string name="stage_3">Tutorial - Beschleuniger</string>
     <string name="stage_2">Tutorial - Sprungfeld</string>
     <string name="stage_1">Tutorial - Kombination</string>
-    <string name="stage1">Stage 1</string>
-    <string name="stage2">Stage 2</string>
-    <string name="stage3">Stage 3</string>
-    <string name="stage4">Stage 4</string>
-    <string name="stage5">Stage 5</string>
-    <string name="stage6">Stage 6</string>
-    <string name="stage7">Stage 7</string>
-    <string name="stage8">Stage 8</string>
-    <string name="stage9">Stage 9</string>
-    <string name="stage10">Stage 10</string>
+    <string name="stage1">Andere Seite des Lasers</string>
+    <string name="stage2">Umgekehrter Balanceakt</string>
+    <string name="stage3">Schneller Invertierer</string>
+    <string name="stage4">Gib Gas und Spring!</string>
+    <string name="stage5">Kammer der Laser</string>
+    <string name="stage6">Ups! Falscher Weg</string>
+    <string name="stage7">Bergsteigen</string>
+    <string name="stage8">Die Fluchtkanone</string>
 </resources>
 
