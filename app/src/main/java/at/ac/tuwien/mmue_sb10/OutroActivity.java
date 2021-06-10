@@ -42,7 +42,7 @@ public class OutroActivity extends Activity {
         skipView = findViewById(R.id.txt_skip_outro);
         muteBtn = findViewById(R.id.btn_mute_outro);
         videoView = findViewById(R.id.outroView);
-        videoView.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.outro)); //TODO
+        videoView.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.outro));
         videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {

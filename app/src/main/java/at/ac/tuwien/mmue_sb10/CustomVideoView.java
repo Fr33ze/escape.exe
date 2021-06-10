@@ -10,7 +10,6 @@ public class CustomVideoView extends VideoView implements MediaPlayer.OnPrepared
     private MediaPlayer mediaPlayer;
     private boolean muted;
 
-    //TODO
     /**
      *
      * @param context
@@ -23,7 +22,6 @@ public class CustomVideoView extends VideoView implements MediaPlayer.OnPrepared
         muted = false;
     }
 
-    //TODO
     /**
      *
      * @param context
@@ -37,7 +35,6 @@ public class CustomVideoView extends VideoView implements MediaPlayer.OnPrepared
         muted = false;
     }
 
-    //TODO
     /**
      *
      * @param context
@@ -52,8 +49,10 @@ public class CustomVideoView extends VideoView implements MediaPlayer.OnPrepared
         muted = false;
     }
 
-    //TODO
     /**
+     *
+     * Callback when the VideoView is initialized and ready to be used.
+     * This is used to get the MediaPlayer instance behind it to mute it if needed.
      *
      * @param mp
      * @since 1.0

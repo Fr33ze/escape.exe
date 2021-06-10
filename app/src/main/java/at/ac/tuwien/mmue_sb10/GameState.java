@@ -445,7 +445,7 @@ public class GameState {
      */
     private void boostPlayerRight() {
         if (this.player_velocity_x > 0 && !this.player_onBoost) {
-            this.player_boost_x *= 1.5; //TODO
+            this.player_boost_x *= 1.5;
             this.player_onBoost = true;
         } else if (this.player_velocity_x < 0 && !this.player_onBoost) {
             this.player_boost_x *= (2f / 3);
@@ -461,7 +461,7 @@ public class GameState {
      */
     private void boostPlayerLeft() {
         if (this.player_velocity_x < 0 && !this.player_onBoost) {
-            this.player_boost_x *= 1.5; //TODO
+            this.player_boost_x *= 1.5;
             this.player_onBoost = true;
         } else if (this.player_velocity_x > 0 && !this.player_onBoost) {
             this.player_boost_x *= (2f / 3);
@@ -572,8 +572,8 @@ public class GameState {
      * @param c Canvas that needs to be translated (needed for width and heigth)
      */
     private void translateY(Canvas c) {
-        if (this.player_pos_y * this.stage.stage_scale + PLAYER_HEIGTH * this.stage.stage_scale > this.trans_y + c.getHeight() - 48 * this.stage.stage_scale)
-            this.trans_y = this.player_pos_y * this.stage.stage_scale + PLAYER_HEIGTH * this.stage.stage_scale - c.getHeight() + 48 * this.stage.stage_scale;
+        if (this.player_pos_y * this.stage.stage_scale + PLAYER_HEIGTH * this.stage.stage_scale > this.trans_y + c.getHeight() - (48 + PLAYER_HEIGTH) * this.stage.stage_scale)
+            this.trans_y = this.player_pos_y * this.stage.stage_scale + PLAYER_HEIGTH * this.stage.stage_scale - c.getHeight() + (48 + PLAYER_HEIGTH) * this.stage.stage_scale;
         else if (this.player_pos_y * this.stage.stage_scale < this.trans_y + 48 * this.stage.stage_scale)
             this.trans_y = this.player_pos_y * this.stage.stage_scale - 48 * this.stage.stage_scale;
         if (this.trans_y < 0) this.trans_y = 0;

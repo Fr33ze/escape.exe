@@ -25,10 +25,11 @@ public class EscapeSoundManager {
     private boolean muted;
     private int loop_stream_id;
 
-    //TODO
     /**
      *
-     * @param context
+     * Private Constructor for the EscapeSoundManager.
+     *
+     * @param context Context of the Application
      * @since 1.0
      * @author Lukas Lidauer & Jan König
      */
@@ -38,10 +39,11 @@ public class EscapeSoundManager {
         muted = sp.getBoolean("muted", false);
     }
 
-    //TODO
     /**
      *
-     * @param context
+     * Singleton Pattern used for the EscapeSoundManager because there can only be one
+     *
+     * @param context Context of the Application to construct the EscapeSoundManager if there is no instance yet
      * @since 1.0
      * @author Lukas Lidauer & Jan König
      */
