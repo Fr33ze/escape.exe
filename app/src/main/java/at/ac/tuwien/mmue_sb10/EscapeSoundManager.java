@@ -25,7 +25,7 @@ public class EscapeSoundManager {
     private boolean muted;
     private int loop_stream_id;
 
-    //todo
+    //TODO
     /**
      *
      * @param context
@@ -38,7 +38,7 @@ public class EscapeSoundManager {
         muted = sp.getBoolean("muted", false);
     }
 
-    //todo
+    //TODO
     /**
      *
      * @param context

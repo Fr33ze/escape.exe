@@ -10,7 +10,7 @@ public class CustomVideoView extends VideoView implements MediaPlayer.OnPrepared
     private MediaPlayer mediaPlayer;
     private boolean muted;
 
-    //todo
+    //TODO
     /**
      *
      * @param context
@@ -23,7 +23,7 @@ public class CustomVideoView extends VideoView implements MediaPlayer.OnPrepared
         muted = false;
     }
 
-    //todo
+    //TODO
     /**
      *
      * @param context
@@ -37,7 +37,7 @@ public class CustomVideoView extends VideoView implements MediaPlayer.OnPrepared
         muted = false;
     }
 
-    //todo
+    //TODO
     /**
      *
      * @param context
@@ -52,7 +52,7 @@ public class CustomVideoView extends VideoView implements MediaPlayer.OnPrepared
         muted = false;
     }
 
-    //todo
+    //TODO
     /**
      *
      * @param mp
