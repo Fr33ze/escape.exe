@@ -23,10 +23,9 @@ public abstract class EscapeDatabase extends RoomDatabase {
 
     private static final HashMap<Context, EscapeDatabase> INSTANCES = new HashMap<>();
 
-    // TODO
     /**
-     *
-     * @param context
+     * Singleton Pattern for the EscapeDatabase
+     * @param context Context of the application
      * @since 1.0
      */
     public static EscapeDatabase getInstance(Context context) {

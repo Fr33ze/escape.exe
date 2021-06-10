@@ -56,12 +56,9 @@ public class FinishStageActivity extends Activity {
         webView.loadUrl("file:///android_asset/runanim.html");
         webView.setBackgroundColor(Color.TRANSPARENT);
         webView.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
-        webView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                endSplashScreen();
-                return false;
-            }
+        webView.setOnTouchListener((v, event) -> {
+            endSplashScreen();
+            return false;
         });
 
         current_deaths = getIntent().getIntExtra("current_deaths", 0);
@@ -88,9 +85,9 @@ public class FinishStageActivity extends Activity {
         if (next_level > 1)
         current_level_label.setText("" + (next_level - 1));
         else if (next_level == 1)
-            current_level_label.setText(getResources().getString(getResources().getIdentifier("stage_" + Math.abs(next_level - 2), "string", getPackageName())));
+            current_level_label.setText("Tutorial " + 5);
         else
-            current_level_label.setText(getResources().getString(getResources().getIdentifier("stage_" + Math.abs(next_level - 1), "string", getPackageName())));
+            current_level_label.setText("Tutorial " + (next_level + 5));
 
         deaths_level_label.setText("" + current_deaths);
 
@@ -117,9 +114,8 @@ public class FinishStageActivity extends Activity {
         return super.onTouchEvent(event);
     }
 
-    // TODO
     /**
-     *
+     * Ends the splashscreen and returns you to the GameActivity
      * @since 1.0
      */
     private void endSplashScreen() {

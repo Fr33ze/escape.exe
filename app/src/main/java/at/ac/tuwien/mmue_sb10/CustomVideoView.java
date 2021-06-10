@@ -15,39 +15,18 @@ public class CustomVideoView extends VideoView implements MediaPlayer.OnPrepared
     private MediaPlayer mediaPlayer;
     private boolean muted;
 
-    //TODO
-    /**
-     *
-     * @param context
-     * @since 1.0
-     */
     public CustomVideoView(Context context) {
         super(context);
         this.setOnPreparedListener(this);
         muted = false;
     }
 
-    //TODO
-    /**
-     *
-     * @param context
-     * @param attrs
-     * @since 1.0
-     */
     public CustomVideoView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.setOnPreparedListener(this);
         muted = false;
     }
 
-    //TODO
-    /**
-     *
-     * @param context
-     * @param attrs
-     * @param defStyleAttr
-     * @since 1.0
-     */
     public CustomVideoView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.setOnPreparedListener(this);
@@ -59,7 +38,7 @@ public class CustomVideoView extends VideoView implements MediaPlayer.OnPrepared
      * Callback when the VideoView is initialized and ready to be used.
      * This is used to get the MediaPlayer instance behind it to mute it if needed.
      *
-     * @param mp
+     * @param mp MediaPlayer used for the video
      * @since 1.0
      */
     @Override

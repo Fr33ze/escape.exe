@@ -1,10 +1,3 @@
-/**
- * The class GameView handles the visual representation of the applications state.
- * Therefore GameState and GameThread must be delivered to this class.
- * This class takes into account the screen size, FPS and density of the device it's running on.
- * @author Lukas Lidauer
- */
-
 package at.ac.tuwien.mmue_sb10;
 
 import android.app.Activity;
@@ -30,7 +23,9 @@ import at.ac.tuwien.mmue_sb10.persistence.User;
 import at.ac.tuwien.mmue_sb10.util.Concurrency;
 
 /**
- * This class mainly handles the render loop
+ * The class GameView handles the visual representation of the applications state.
+ * Therefore GameState and GameThread must be delivered to this class.
+ * This class takes into account the screen size, FPS and density of the device it's running on.
  * @since 0.1
  * @author Lukas Lidauer & Jan König
  */
@@ -59,40 +54,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private final OnUserLoadedListener onUserLoadedListener = this::onUserLoaded;
 
-    //TODO
-    /**
-     *
-     * @param context
-     * @since 0.1
-     */
     public GameView(Context context) {
         super(context);
         getHolder().addCallback(this);
         setFocusable(true);
     }
 
-
-    //TODO
-    /**
-     *
-     * @param context
-     * @param attrs
-     * @since 0.1
-     */
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
         getHolder().addCallback(this);
         setFocusable(true);
     }
 
-    //TODO
-    /**
-     *
-     * @param context
-     * @param attrs
-     * @param defStyle
-     * @since 0.1
-     */
     public GameView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         getHolder().addCallback(this);
