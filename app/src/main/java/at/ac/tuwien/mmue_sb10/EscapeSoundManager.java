@@ -215,12 +215,12 @@ public class EscapeSoundManager {
         try {
             releaseSoundPool();
             soundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
-            snd_button = soundPool.load(context, R.raw.button_click, 3);
-            snd_death = soundPool.load(context, R.raw.death_sound, 2);
-            snd_jump = soundPool.load(context, R.raw.jump, 1);
-            snd_gravity_up = soundPool.load(context, R.raw.gravity_to_invert, 2);
-            snd_gravity_down = soundPool.load(context, R.raw.gravity_to_normal, 2);
-            snd_steps = soundPool.load(context, R.raw.steps, 1);
+            snd_button = soundPool.load(context, R.raw.button_click_ogg, 3);
+            snd_death = soundPool.load(context, R.raw.death_sound_ogg, 2);
+            snd_jump = soundPool.load(context, R.raw.jump_ogg, 1);
+            snd_gravity_up = soundPool.load(context, R.raw.gravity_to_invert_ogg, 2);
+            snd_gravity_down = soundPool.load(context, R.raw.gravity_to_normal_ogg, 2);
+            snd_steps = soundPool.load(context, R.raw.steps_ogg, 1);
 
             loop_stream_id = -1;
 
