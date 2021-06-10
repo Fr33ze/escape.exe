@@ -65,6 +65,7 @@ public class GameState {
     private byte gravity; //gravity can either be regular or inverted (or top or bottom)
     private boolean player_inAir; //player is in air?
     private boolean player_onBoost; //player touches booster?
+    private boolean player_inInverter; //player touches inverter?
     private boolean player_onJumper; //player touches jumper?
     private boolean player_first_gravity_inAir; //player is allowed to do only one gravity change in the air until he hits the ground again. This variable keeps track of that.
     private boolean player_dead; //player died
@@ -374,8 +375,10 @@ public class GameState {
                     adjustPositionY();
                     //X Collision can still happen
                     checkCollisionX();
-                    this.player_onBoost = false;
-                    this.player_onJumper = false;
+                    if (this.player_onBoost)
+                        this.player_onBoost = false;
+                    if (this.player_onJumper)
+                        this.player_onJumper = false;
                 } else if ((this.collision_corners[0] == 4 && this.collision_corners[1] == 4) || (this.collision_corners[2] == 4 && this.collision_corners[3] == 4)) {
                     adjustPositionY();
                     checkCollisionX();
@@ -386,7 +389,8 @@ public class GameState {
                     boostPlayerLeft();
                 } else if ((this.collision_corners[0] == 8 && this.collision_corners[1] == 8) || (this.collision_corners[2] == 8 && this.collision_corners[3] == 8)) {
                     adjustPositionY();
-                    this.player_onJumper = true;
+                    if (!this.player_onJumper)
+                        this.player_onJumper = true;
                 } else if ((collision_corners[0] != 0 && collision_corners[3] != 0) || (collision_corners[1] != 0 && collision_corners[2] != 0)) {
                     //X Collision
                     checkCollisionX();
@@ -406,17 +410,23 @@ public class GameState {
                         } else if (collision_corners[0] == 5 || collision_corners[3] == 5 || collision_corners[1] == 5 || collision_corners[2] == 5) {
                             boostPlayerLeft();
                         } else if (collision_corners[0] == 8 || collision_corners[3] == 8 || collision_corners[1] == 8 || collision_corners[2] == 8) {
-                            this.player_onJumper = true;
+                            if (!this.player_onJumper)
+                                this.player_onJumper = true;
                         } else {
-                            this.player_onBoost = false;
-                            this.player_onJumper = false;
+                            if (this.player_onBoost)
+                                this.player_onBoost = false;
+                            if (this.player_onJumper)
+                                this.player_onJumper = false;
                         }
                     }
                 }
 
                 if (collision_corners[0] == 3 || collision_corners[1] == 3 || collision_corners[2] == 3 || collision_corners[3] == 3) {
                     //X Inverter Collision
-                    this.player_velocity_x *= -1;
+                    if (!this.player_inInverter) {
+                        this.player_velocity_x *= -1;
+                        this.player_inInverter = true;
+                    }
                     this.player_pos_y = this.player_collision_px.top;
                 } else if (collision_corners[0] == 6 || collision_corners[1] == 6 || collision_corners[2] == 6 || collision_corners[3] == 6) {
                     //X Finish Collision
@@ -431,16 +441,24 @@ public class GameState {
                     //X Death Collision (spikes)
                     killPlayer();
                     this.player_pos_y = this.player_collision_px.top;
+                } else {
+                    if (this.player_inInverter)
+                        this.player_inInverter = false;
                 }
 
-                this.player_inAir = false;
-                this.player_first_gravity_inAir = false;
+                if (this.player_inAir)
+                    this.player_inAir = false;
+                if (this.player_first_gravity_inAir)
+                    this.player_first_gravity_inAir = false;
             } else {
                 //None of the player corners collides with anything
                 this.player_pos_y = this.player_collision_px.top;
-                this.player_inAir = true;
-                this.player_onBoost = false;
-                this.player_onJumper = false;
+                if (!this.player_inAir)
+                    this.player_inAir = true;
+                if (this.player_onBoost)
+                    this.player_onBoost = false;
+                if (this.player_onJumper)
+                    this.player_onJumper = false;
 
                 EscapeSoundManager.getInstance(this.context).stopSoundLoop();
             }
@@ -957,13 +975,12 @@ public class GameState {
         if (!this.player_no_input) {
             EscapeSoundManager.getInstance(this.context).pauseMediaPlayer();
             EscapeSoundManager.getInstance(this.context).playLevelBeatMusic();
+            this.player_no_input = true;
+            this.gravity = 1;
+            this.player_boost_x = 1.0f;
+            if (this.player_velocity_y < 0)
+                this.player_velocity_y = 0;
         }
-
-        this.player_no_input = true;
-        this.gravity = 1;
-        this.player_boost_x = 1.0f;
-        if (this.player_velocity_y < 0)
-            this.player_velocity_y = 0;
     }
 
     /**
@@ -971,7 +988,9 @@ public class GameState {
      * @since 1.0
      */
     private void killPlayer() {
-        this.player_dead = true;
+        if (!this.player_dead)
+            this.player_dead = true;
+
         this.player_last_state = this.player_state;
         this.player_state = PlayerState.DYING;
         this.player_anim_time = 0;
@@ -983,8 +1002,8 @@ public class GameState {
             this.user.deathsCurrentLevel++;
             this.user.deathsTotal++;
             Concurrency.executeAsync(() -> updateUser(this.user));
+            this.update_user = false;
         }
-        this.update_user = false;
     }
 
     /**
