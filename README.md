@@ -75,11 +75,11 @@ Im folgenden ein grobes UML Diagramm zur Erklärung der Abhängigkeiten zwischen
 MenuActivity zeigt das Menü und kann mit einem Knopfdruck die GameActivity starten. Diese hat als Content die CanvasView, welche eine selbst programmierte View ist wo wir den Canvas bemalen. Diese View startet den GameThread, welcher die Renderloop beinhaltet und auch den aktuellen Zustand des Spiels (dieser wird bei jedem durchlauf der Renderloop einmal updated und gezeichnet). Im aktuellen GameState befinden sich Informationen über den Zustand des Spiels, wie Spielerpositionen, Gegnerpositionen, Projektile, Gravitation, Bewegungsvektoren, Kollisionsdaten, Texturen etc.
 
 # 3. Credits
-## 3.1 Background Music:
+### 3.1 Background Music:
 https://pixabay.com/users/zen_man-4257870/
 
-## 3.2 Sprite base:
+### 3.2 Sprite base:
 https://o-lobster.itch.io/
 
-# 4. Walkthrough on Youtube
+# 4. Walkthrough
 https://youtu.be/Go0GET-VdmY
