@@ -1,4 +1,4 @@
-#1. Gruppeninformation
+# 1. Gruppeninformation
 Vorname | Nachname | Matrikelnummer | Studienkennzahl | E-Mail
 --- | --- | --- | --- | ---
 Lukas | Lidauer | 01635862 | 033 532 | lukas.lidauer@tuwien.ac.at
@@ -21,7 +21,8 @@ Die Geschichte wird in einer Endsequenz zu Ende erzählt. Der Plan Zwischenseque
 
 Das Spiel startet mit einem Hauptmenü. Vom Hauptmenü aus können Highscores eingesehen werden, das Spiel fortgesetzt oder ein neues Spiel begonnen werden, sowie die Anwendung geschlossen werden. 
 
-Hauptmenü
+<img src="https://user-images.githubusercontent.com/2223159/224555907-9c5256e3-db31-451b-8592-9afce821ecaa.PNG" width="600">
+
 
 Im eigentlichen Game-Loop gibt es zwei Fähigkeiten, die von den Spieler*innen ausgelöst werden können: Sprung und Gravity-Change. Mit einem Sprung können einfache Hindernisse überwunden werden. Gravity Change ändert die Ausrichtung der Magnete, die im Zero-G Umfeld nötig sind, um entweder am Boden oder der Decke zu gehen. D.h. durch das Auslösen der Gravity-Change Fähigkeit wechselt der Android zwischen dem Boden und der Decke als Laufplattform. Sprung und Gravity Change können nur in genau dieser Reihenfolge kombiniert werden. 
 
@@ -31,9 +32,7 @@ Die ursprüngliche Idee Buttons zum Auslösen dieser Fähigkeiten zu verwenden w
 
 Insgesamt wurden zwei Splash-Screens umgesetzt. Eine Game Finished Animation, die nach dem Outro getriggered wird, sowie eine Level Finished Animation, die die Leistung in einem Level zusammenfasst und als Ladebildschirm zwischen zwei Leveln dient: 
 
-Splash-Screen
-
-
+<img src="https://user-images.githubusercontent.com/2223159/224556247-1cd00587-7dc4-4118-84e0-e259aa65ae97.PNG" width="600">
 
 
 
@@ -41,7 +40,7 @@ Splash-Screen
 
 Um möglichst einen großen Anteil des Displays für die Spieldarstellung zu reservieren, wurde die ursprüngliche Idee einer Menüleiste verworfen. Stattdessen befindet sich am oberen linken Rand ein Pause-Button. Wird dieser gedrückt, so wird das Spiel pausiert und ein Pause-Menü samt Steuerungserklärung öffnet sich. Statt einem textbasierten Hilfe-Dialog wurde eine grafische Umsetzung gewählt. Ebenfalls in jenem Menü enthalten ist die Option das Spiel zu muten. Über dieses Menü kann man schließlich auch ins Hauptmenü zurückkehren. 
 
-Menu
+<img src="https://user-images.githubusercontent.com/2223159/224556319-532035b7-b85c-4c83-ab14-1888181596d5.png" width="600">
 
 Der aktuelle Score ist im Unterpunkt Highscores des Hauptmenüs zu sehen. Wird ein Leben verloren, so werden Punkte vom Score abgezogen. Wird ein Level beendet, werden Punkte zum Score addiert. 
 
@@ -59,18 +58,18 @@ Ein animiertes Sprite gibt es für den Androiden. Die Überlegung Plasmaleitunge
 
 Das fertige Sprite der Spielfigur beinhaltet Animationen für das Laufen, Springen, Abspringen, Aufwachen, Gravity-Change, Death (Anm.: die gelben Störpixel entstehen durch das Vergrößern der Grafik durch das HTML-Format): 
 
-Sprite der Spielfigur
+<img src="https://user-images.githubusercontent.com/2223159/224556458-c00979bf-faa9-4100-be77-bc16f46a7299.gif" width="52">
 
 ## 2.7 Technische Umsetzung
 
 Im Folgenden ein Diagramm zur Darstellung der Game-States:
 
-Diagramm: Game-States
+<img src="https://user-images.githubusercontent.com/2223159/224556530-5e445dd4-8f67-4425-8e44-395eb5f7e340.jpg" width="800">
 
 
 
 Im folgenden ein grobes UML Diagramm zur Erklärung der Abhängigkeiten zwischen den Klassen:
 
-Early URL for the Android game "escape.exe"
+<img src="https://user-images.githubusercontent.com/2223159/224556681-23647e91-340b-44c9-9a68-006a2f5eaf8e.png" width="500">
 
 MenuActivity zeigt das Menü und kann mit einem Knopfdruck die GameActivity starten. Diese hat als Content die CanvasView, welche eine selbst programmierte View ist wo wir den Canvas bemalen. Diese View startet den GameThread, welcher die Renderloop beinhaltet und auch den aktuellen Zustand des Spiels (dieser wird bei jedem durchlauf der Renderloop einmal updated und gezeichnet). Im aktuellen GameState befinden sich Informationen über den Zustand des Spiels, wie Spielerpositionen, Gegnerpositionen, Projektile, Gravitation, Bewegungsvektoren, Kollisionsdaten, Texturen etc.
