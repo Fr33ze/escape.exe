@@ -82,4 +82,4 @@ https://pixabay.com/users/zen_man-4257870/
 https://o-lobster.itch.io/
 
 # 4. Walkthrough
-https://youtu.be/Go0GET-VdmY
+[![YOUTUBE](https://user-images.githubusercontent.com/2223159/224563567-3b27facf-7d50-4258-8bc0-7f5e3c8b1a6f.svg)](https://youtu.be/Go0GET-VdmY)
